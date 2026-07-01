@@ -42,7 +42,7 @@ dict <- c(treat_x_post = "Treated $\\times$ Post", trxp_fem = "Treated $\\times$
           treated = "Treated (child $\\leq$4)", tr_fem = "Treated $\\times$ Female",
           home_office = "Home office", rendimento_habitual_real = "Real income",
           hours_usual = "Usual hours", employed = "Employed", in_labor_force = "In labor force",
-          on_maternity_leave = "Maternity leave", id_panel = "Individual",
+          on_maternity_leave = "Maternity leave", id_panel = "Individual", id_dom = "Household",
           year_quarter = "Year-quarter", female = "Female")
 
 did  <- function(sample, y = "home_office")
@@ -70,7 +70,7 @@ etable(ddd_mods,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Triple Difference Across Outcomes",
        label = "tab:triple_diff_outcomes",
-       notes = "Each column is a triple-difference regression (spec of Table \\ref{tab:triple_diff}). Reported: the men effect (Treated $\\times$ Post) and the female differential (Treated $\\times$ Post $\\times$ Female). $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
+       notes = "Each column is a triple-difference regression with the same specification as the first-stage triple difference. Reported: the men effect (Treated $\\times$ Post) and the female differential (Treated $\\times$ Post $\\times$ Female). $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
 
 # ---- Console ---------------------------------------------------------------
 cat("\n=== First stage: men / women / DDD (home office, pp) ===\n")

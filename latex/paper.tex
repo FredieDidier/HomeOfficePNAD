@@ -1,0 +1,179 @@
+% =============================================================================
+% paper.tex — "A Priority That Does Not Bind"
+% Journal of Population Economics submission draft.
+% Compile with pdfLaTeX + BibTeX (paper -> bibtex paper -> paper -> paper).
+% =============================================================================
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+\usepackage[round]{natbib}
+\bibliographystyle{plainnat}
+
+\graphicspath{{../analysis/output/graphs/}{../analysis/output/maps/}}
+\captionsetup{font=small,labelfont=bf}
+\onehalfspacing
+
+\title{\textbf{A Priority That Does Not Bind:\\ Telework Mandates and Mothers of Young Children in Brazil}}
+\author{Fredie Didier\thanks{Contact: fdidier@terra.com.br. This paper uses public microdata from the Brazilian Continuous National Household Sample Survey (PNADC/IBGE). All errors are my own.}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent In 2022, Brazil enacted a law requiring employers to give employees with children under four years old \emph{priority} in the allocation of positions eligible for telework. Because the law grants a priority rather than an enforceable right, its effect is an empirical question. Using the rotating panel of the Continuous National Household Sample Survey and a difference-in-differences design that compares mothers of children under four to mothers of children aged five to seven, I find no effect on the share of women working from home: the estimate is $-0.1$ percentage points and precisely estimated. The null holds across specifications, subgroups, and robustness checks, and there is no sign that eligible mothers moved into telework-friendly occupations. The evidence indicates that a discretionary, unenforceable priority did not change the outcome it targeted.
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} telework; work from home; gender; family policy; child penalty; Brazil
+
+\vspace{0.3em}
+\noindent\textbf{JEL codes:} J13; J16; J22; J18; K31
+\end{abstract}
+
+\clearpage
+
+% =============================================================================
+\section{Introduction}
+% =============================================================================
+
+The arrival and persistence of a young child remains one of the sharpest turning points in a woman's working life. Across high- and middle-income countries, mothers' earnings and employment fall abruptly at the birth of a first child and recover slowly, if at all, while fathers' trajectories are largely undisturbed \citep{kleven2019denmark,kleven2019countries}. In Brazil the tension between paid work and young children is severe: among prime-age women who head a household or are the spouse of the head, labor-force participation is roughly sixty percent for those with a child under four, well below the rate for otherwise similar women without young children, and a large share of those who do work hold informal jobs. At the same time, the pandemic made working from home a mainstream possibility for a meaningful minority of jobs and put workplace flexibility at the center of the policy debate on gender gaps \citep{barrero2023,dingelneiman2020}. Whether flexibility can be legislated into the hands of the workers who need it most is, therefore, a first-order question for population and family economics.
+
+Economic theory offers a clear reason to expect flexibility to matter and an equally clear reason to doubt that a soft legal instrument can deliver it. On the demand side, \citet{goldin2014} argues that a large part of the remaining gender gap reflects the disproportionate reward that firms attach to long, inflexible hours, so that arrangements which relax the time constraint---telework prominent among them---are precisely what could narrow it. Workers, in turn, value such arrangements: \citet{maspallais2017} show that the average worker is willing to give up a non-trivial fraction of wages to avoid rigid schedules, and \citet{bloom2015} document that home work can raise, rather than lower, productivity. Yet the instrument at issue here is not a subsidy or an entitlement but a mandated \emph{priority}, and the economics of mandated benefits warns that such mandates bind only weakly when compliance is costly and hard to verify \citep{summers1989,gruber1994}. When the law merely instructs employers to ``prioritize'' a group for a benefit that many jobs cannot supply, and provides no enforcement, standard incidence logic predicts little movement in equilibrium allocations.
+
+This paper asks whether such a priority changed behavior. In March 2022 Brazil enacted, through Provisional Measure 1108 and subsequently Law 14.442, an amendment to the Consolidation of Labor Laws (Article 75-F) requiring employers to give priority in the allocation of telework-eligible positions to employees who have children or legal dependents up to four years of age. I evaluate this reform using the rotating panel of the Continuous National Household Sample Survey (PNADC), which follows individuals for up to five consecutive quarters and records whether each worker performs her main job at home. The design is a difference-in-differences comparison of women whose youngest child is under four (the eligible, ``treated'' group) with women whose youngest child is aged five to seven---mothers who selected into motherhood on similar margins but whose child has just crossed the statutory age threshold.
+
+The data are well suited to the question and impose discipline on the design. The outcome of first interest is whether a woman works from home, which serves as the compliance proxy, or first stage: it measures how much the law actually moved telework take-up among eligible women. Because eligibility switches on and off within the panel as children are born and age past the threshold, the specification includes individual fixed effects, which absorb time-invariant selection into motherhood, together with quarter fixed effects that absorb aggregate shocks, including the receding pandemic. The empirical strategy is an intent-to-treat evaluation: I observe legal eligibility, not whether any given employer actually granted telework, so the estimates recover the effect of being entitled to priority, the policy-relevant parameter.
+
+The central result is a precisely estimated null. The share of eligible women working from home did not rise relative to the control group after the law: the difference-in-differences estimate is $-0.1$ percentage points on a pre-reform base of about five percent, with a confidence interval that rules out effects larger than roughly half a percentage point. A specification ladder is instructive. Without individual fixed effects the estimate is a marginally significant $+0.4$ points; adding individual fixed effects drives it to zero, revealing that the apparent positive is selection---who has a child under four versus five to seven differs in unobservables correlated with home-office trends---rather than a response to the law. An event study confirms flat pre-reform trends through the pandemic and, at most, a small effect that emerges only two to three years later. A placebo comparing the two control groups, which the law does not touch, is zero, validating the age threshold as the source of identification.
+
+Two mechanism tests explain why the reduced form is silent. First, the first stage remains null even among women who were already in telework-eligible occupations at baseline---the only women for whom the priority could plausibly bite. Second, treated mothers did not move into telework-eligible occupations after the reform: occupation is often described as endogenous to such policies, but here there is no sign of the ``priority-seeking'' sorting that would generate an effect. Heterogeneity analysis reinforces the pattern. The effect is indistinguishable from zero for formal and informal workers, for private-sector employees on registered contracts (the group the law formally binds) and for public employees, and across education and age bands. A triple-difference that adds men---who are also eligible under the gender-neutral statute---shows the null is not gendered, and a battery of robustness checks (alternative treatment definitions and cutoffs, dropping the pandemic years, state-by-time fixed effects, alternative clustering, and narrowing the age window) leaves it unchanged.
+
+The paper makes three contributions. First, it speaks to the economics of gender and workplace flexibility \citep{goldin2014,maspallais2017,bertrand2011,blaukahn2017}. A recurring hope in this literature is that expanding access to flexible arrangements can compress gender gaps; the present evidence shows that access cannot be conjured by fiat when the underlying jobs are not teleworkable and compliance is voluntary. Second, it contributes to the literature on the effectiveness of family policy \citep{olivettipetrongolo2017,kleven2019denmark,addadustmann2017}, which has largely studied leave, transfers, and childcare. Telework priority is a newer and cheaper instrument that governments increasingly reach for; documenting that a well-identified version of it did nothing is directly useful for policy design. Third, it adds to the economics of mandates and enforcement \citep{summers1989,gruber1994,ulyssea2018,gerardgonzaga2021}. In a labor market with a large informal sector and limited enforcement, a ``priority, not a right'' is close to the limiting case of a non-binding mandate, and the paper provides a clean estimate of its consequences: none that we can detect.
+
+The remainder of the paper is organized as follows. Section~\ref{sec:background} describes the reform and the institutional setting. Section~\ref{sec:data} presents the data and sample. Section~\ref{sec:strategy} lays out the empirical strategy. Section~\ref{sec:results} reports the main results, Section~\ref{sec:mechanisms} the mechanisms, and Section~\ref{sec:heterogeneity} the heterogeneity analysis. Section~\ref{sec:robustness} collects the robustness checks and the triple difference. Section~\ref{sec:conclusion} concludes.
+
+% =============================================================================
+\section{Institutional background}\label{sec:background}
+% =============================================================================
+
+Telework had no dedicated place in Brazilian labor law until 2017, when a broad labor reform introduced a chapter regulating remote work in the Consolidation of Labor Laws (CLT). The arrangement remained marginal until the pandemic forced a temporary and massive shift to home-based work in 2020--2021. As that shock receded, the federal government issued Provisional Measure 1108 on 25 March 2022 (published 28 March 2022), which modernized the telework chapter and, in its Article 75-F, created the provision studied here. The Provisional Measure was converted, with the same article, into Law 14.442 on 2 September 2022.
+
+Article 75-F instructs employers to give \emph{priority} to employees with disabilities and to employees with children or legal dependents up to four years of age in the allocation of positions for activities that can be performed through telework or remote work. Three features of the provision shape the analysis. First, it is a priority in allocation, not a right to telework: the employer must place eligible employees ahead of others when distributing positions that are already teleworkable, but is not obliged to create such positions or to grant remote work to any particular employee. Second, it carries no dedicated enforcement mechanism or penalty and does not depend on employee request or certification. Third, it applies to employees under the CLT---formal, registered, private-sector and comparable workers---and not to the self-employed, employers, or the large set of workers without a registered contract. These features make the provision a near-textbook example of a soft mandate, and they motivate both the intent-to-treat interpretation and the placebo splits by contract type reported below.
+
+% =============================================================================
+\section{Data}\label{sec:data}
+% =============================================================================
+
+The analysis uses the Continuous National Household Sample Survey (PNADC), the rotating quarterly household survey conducted by the Brazilian Institute of Geography and Statistics (IBGE). PNADC interviews each selected household in up to five consecutive quarters, which yields a short panel at the individual level. I use all quarters from the first quarter of 2018---the first period in which the survey records the location where each worker performs her main job---through the first quarter of 2026. Individuals are linked across quarters using the survey's household and person identifiers together with an advanced matching procedure that reconstructs the panel even when interviews are incomplete; Appendix~\ref{app:pnadc} describes the survey and the panel construction in detail, and Appendix Table~\ref{tab:panel_retention} documents that the resulting panel captures genuine repeated observations of the same individuals and households.
+
+The estimation sample consists of women aged 18--49 who are the head of the household or the head's spouse or partner, the group for whom the presence of a young child in the household is informative about their own children. The key outcome is an indicator for working from home, defined as performing the main job at the worker's own residence. Additional outcomes are real monthly labor earnings, usual weekly hours, indicators for employment and labor-force participation defined over the full sample, and an indicator for being on maternity leave, a proxy for a recent birth. All statistics use the survey sampling weights.
+
+Treatment is defined by the presence of a child aged four or younger in the household of a woman who is head or spouse. The primary comparison group consists of women with no child under four but with a youngest child aged five to seven: mothers who are similar on the margins that select women into motherhood but whose youngest child has just crossed the statutory age cutoff. A broader comparison group---women with no child aged zero to seven---is used to gauge power and to construct a placebo. An occupation is classified as telework-eligible following the adaptation of \citet{dingelneiman2020} to Brazilian occupation codes in \citet{goes2020} and \citet{costa2024}; this classification is used as a moderator and as an outcome in the mechanism analysis, never as a sample restriction, because occupation may itself respond to the policy.
+
+Table~\ref{tab:descriptives} reports summary statistics by group and period. Two patterns stand out. Working from home is uncommon in all groups---about five percent before the reform---and rises only modestly afterward, in parallel across groups. Treated women are younger, participate less in the labor market, and are less likely to hold a formal job than the comparison groups, exactly the selection that the individual fixed effects are meant to absorb.
+
+\input{../analysis/output/tables/tab01_descriptives.tex}
+
+% =============================================================================
+\section{Empirical strategy}\label{sec:strategy}
+% =============================================================================
+
+I estimate the effect of eligibility with a two-way fixed-effects difference-in-differences model. For woman $i$ in quarter $t$,
+%
+\begin{equation}
+y_{it} = \beta\,(\text{Treated}_{it}\times \text{Post}_t) + \gamma\,\text{Treated}_{it} + \alpha_i + \delta_t + \varepsilon_{it},
+\label{eq:did}
+\end{equation}
+%
+where $\text{Treated}_{it}$ equals one when woman $i$ has a child under four in quarter $t$, $\text{Post}_t$ equals one from the second quarter of 2022 onward, $\alpha_i$ are individual fixed effects, and $\delta_t$ are quarter fixed effects. The coefficient of interest is $\beta$. Because eligibility is time-varying---a woman is treated only in the quarters in which she has a young child---the contemporaneous term $\text{Treated}_{it}$ must be included: individual fixed effects do not absorb it, and omitting it would load the level ``motherhood penalty'' of women who transition into young-child status onto $\beta$. Standard errors are clustered at the household level and all regressions are weighted by the survey weights.
+
+The identifying assumption is that, absent the reform, home-office rates for mothers of children under four and for the comparison group would have evolved in parallel. Individual fixed effects make this assumption considerably more credible than a cross-sectional comparison, because they remove all time-invariant differences between women who have a child under four and women whose youngest child is five to seven. The remaining threat---differential trends---is examined directly with an event study that traces the treated-versus-control gap quarter by quarter, normalized to the last pre-reform quarter.
+
+The estimate recovers an intent-to-treat effect. The survey does not reveal whether a given employer reassigned a given woman to telework because of the law; it reveals eligibility and realized outcomes. Comparing eligible and non-eligible women around the reform therefore identifies the effect of being entitled to priority, regardless of take-up. Because the first-stage effect on home office is itself the compliance proxy, its magnitude bounds how large any downstream effect on earnings, hours, or fertility can be.
+
+% =============================================================================
+\section{Results}\label{sec:results}
+% =============================================================================
+
+\paragraph{First stage.} Table~\ref{tab:did_firststage} reports the effect on home office through a specification ladder. Column~1 is an ordinary least squares regression with demographic controls but no fixed effects; columns~2--4 add quarter fixed effects, then individual fixed effects, then a quadratic in age. Without individual fixed effects the estimate is a marginally significant $+0.4$ percentage points. Adding individual fixed effects collapses it to $-0.1$ points and removes its significance, and adding age controls leaves it unchanged. The lesson is that the cross-sectional association reflects selection into young motherhood rather than an effect of the law; once that selection is netted out, no first stage remains. The preferred estimate of $-0.08$ percentage points (standard error $0.30$) is small and tightly bounded, with a ninety-five percent confidence interval of roughly $[-0.67,\,0.51]$ that excludes effects larger than about half a percentage point.
+
+\input{../analysis/output/tables/tab02_did_firststage.tex}
+
+\paragraph{Event study.} Figure~\ref{fig:event_home} plots the estimated treated-versus-control gap in home office by quarter, for both comparison groups, normalized to the first quarter of 2022. The pre-reform coefficients are flat and close to zero throughout, including during the 2020--2021 pandemic, which supports the parallel-trends assumption. After the reform the gap remains near zero for roughly two years and drifts up to about one point only in 2024--2025. Whatever the source of this late movement---the reform was converted into permanent law only in September 2022, and telework arrangements are renegotiated slowly---the pooled estimate averages it with the flat early-post period and is therefore close to zero.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{fig06_event_study_home_office.pdf}
+\caption{Event study: home office around the reform. Points are coefficients on the interaction of the treated indicator with each quarter, normalized to 2022Q1 (red marker); vertical bars are ninety-five percent confidence intervals from household-clustered standard errors. The vertical dashed line marks the first post-reform quarter.}
+\label{fig:event_home}
+\end{figure}
+
+\paragraph{Reduced form.} Table~\ref{tab:did_outcomes_A} reports the difference-in-differences estimates for the remaining outcomes using the primary comparison group. Real earnings and usual hours are statistically indistinguishable from zero. Employment and labor-force participation are estimated at about one percentage point with borderline significance, and maternity leave at about $-0.9$ points. These coefficients cannot be attributed to the reform: with a null first stage, the law's only channel---telework access---did not move, so any change in downstream outcomes must operate through some other mechanism or reflect trends unrelated to the policy. The maternity-leave estimate is a clear illustration. The corresponding event study (Appendix Figure~\ref{fig:event_maternity}) shows a strong pre-reform trend: the treated-versus-control gap in maternity leave was already declining well before 2022, so the parallel-trends assumption fails for that outcome and its coefficient is not interpreted causally. Home office, by contrast, is the one outcome with flat pre-trends, which is why the analysis centers on it. Finally, the placebo that compares the two control groups---mothers of children five to seven versus women with no young children, neither of whom the law touches---is $+0.04$ points and insignificant, so the age threshold, rather than some generic difference between mothers and non-mothers, is what the design exploits.
+
+\input{../analysis/output/tables/tab03a_did_outcomes_A.tex}
+
+% =============================================================================
+\section{Mechanisms}\label{sec:mechanisms}
+% =============================================================================
+
+If the reform had worked through the telework-priority channel, its effect on home office should have concentrated among women whose jobs can actually be done from home, and it might have induced eligible women to move toward such jobs. Neither is present in the data.
+
+Table~\ref{tab:mech_moderation} splits the first stage by whether a woman was in a telework-eligible occupation at baseline, measured in her first observed quarter and held fixed so that it is not itself an outcome. The effect is no different from zero among the eligible---the only women for whom a priority in allocating telework positions could bind---and among the non-eligible. Table~\ref{tab:mech_allocation} takes the natural next step and uses telework eligibility of the current occupation as the outcome. A reform that pushed mothers to seek telework-friendly jobs in order to claim the priority would produce a positive coefficient; the estimate is essentially zero for both comparison groups. Appendix Table~\ref{tab:occ_transition} makes the same point descriptively: among women observed both before and after the reform, the pattern of occupation switches into and out of telework eligibility is nearly identical for treated and control mothers. There is, in short, no behavioral response of occupational choice to the priority.
+
+\input{../analysis/output/tables/tab04_mechanism_moderation.tex}
+\input{../analysis/output/tables/tab05_mechanism_allocation.tex}
+
+% =============================================================================
+\section{Heterogeneity}\label{sec:heterogeneity}
+% =============================================================================
+
+Table~\ref{tab:heterogeneity} and Figure~\ref{fig:hetero} report the first-stage effect across subgroups, all defined at baseline. The splits by contract type are the most informative, because the statute binds only on registered private-sector employees: if the estimate reflected Article 75-F rather than a generic shock to mothers of young children, it should appear for that group and vanish for informal and public-sector workers. Instead it is indistinguishable from zero everywhere---for formal and informal workers, for registered private-sector employees and for public employees, and across education and age. Of the twelve subgroups only one, women aged forty to forty-nine, is individually significant; with twelve tests this is what one expects by chance, the group is small and selected, and there is no theory that would single it out. The heterogeneity analysis thus does not rescue a hidden effect; it shows the null is uniform, including where the law was supposed to bite hardest.
+
+\input{../analysis/output/tables/tab06_heterogeneity.tex}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{fig07_heterogeneity_coefplot.pdf}
+\caption{First-stage home-office effect by subgroup. Points are difference-in-differences estimates; horizontal bars are ninety-five percent confidence intervals from household-clustered standard errors. Subgroups are defined at baseline.}
+\label{fig:hetero}
+\end{figure}
+
+% =============================================================================
+\section{Robustness and a triple difference}\label{sec:robustness}
+% =============================================================================
+
+Table~\ref{tab:robustness} collects robustness checks on the first stage. The null is unchanged when the post-period starts one quarter earlier, when the treatment definition excludes grandchildren or stepchildren, when the pandemic years are dropped so that a clean 2018--2019 pre-period is compared with the post-reform quarters, when the sample is restricted to prime childbearing ages, when state-by-quarter fixed effects absorb region-specific shocks, when standard errors are clustered two ways, when the sample is limited to individuals with a confirmed cross-quarter match, and when it is limited to telework-eligible occupations. A control-window robustness (Appendix Figure~\ref{fig:window}) widens the comparison group from a youngest child aged five--six up to five--twelve and finds the estimate stable throughout. Outlier sensitivity for earnings tells a similar story: the raw earnings coefficient, itself insignificant, shrinks by more than eighty percent when the top one percent of the earnings distribution is winsorized, confirming that it was driven by a few extreme values rather than a broad shift.
+
+\input{../analysis/output/tables/tab07_robustness.tex}
+
+Because Article 75-F is not gender-restricted, men with young children are also eligible, which allows a triple difference that nets out any generic shock to parents of young children after 2022 and isolates the woman-specific response. Table~\ref{tab:triple_diff} reports the first stage for men and women separately and the triple-difference coefficient. Men show no effect either, the women's estimate is the null already reported, and the triple-difference term is small and insignificant: the absence of an effect is not gendered. Appendix Table~\ref{tab:triple_diff_outcomes} extends the triple difference to the other outcomes; the significant coefficients there track the pre-existing gender-differential trends discussed above rather than the reform.
+
+\input{../analysis/output/tables/tab08_triple_diff.tex}
+
+% =============================================================================
+\section{Conclusion}\label{sec:conclusion}
+% =============================================================================
+
+Brazil's 2022 telework reform gave mothers of young children a legal priority in the allocation of remote-work positions. Using the rotating panel of the national household survey and a difference-in-differences design built around the statutory age-four threshold, I find that the reform did not raise the share of eligible women working from home. The estimate is a precise zero; it is robust to the fixed-effects specification, to the definition of treatment and controls, to the pandemic window, to clustering and to the choice of comparison group; it is uniform across subgroups, including registered private-sector employees, the group the law binds; and it is accompanied by no occupational sorting toward telework-eligible jobs and no gendered pattern in a triple difference.
+
+The most plausible reading is institutional. A priority is not a right: employers retain discretion, the provision carries no enforcement, and most eligible women hold jobs---informal, public, or simply not teleworkable---in which a priority over teleworkable positions has nothing to allocate. In a labor market with a large informal sector and limited enforcement, this is close to the limiting case of a non-binding mandate, and the paper shows what such a mandate delivers. The finding is a caution for a policy instrument that is cheap, increasingly popular, and easy to legislate: expanding access to workplace flexibility, and through it narrowing gender gaps, appears to require more than instructing employers to prefer one group over another.
+
+\clearpage
+\bibliography{refs}
+
+\clearpage
+\appendix
+\input{appendix.tex}
+
+\end{document}

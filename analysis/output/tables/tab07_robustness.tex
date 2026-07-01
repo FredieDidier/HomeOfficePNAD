@@ -6,25 +6,27 @@
  & Treated $\times$ Post & Obs. \\
 \midrule
 \multicolumn{3}{l}{\textit{Home office (pp)}} \\
-Main (Q2 2022, id\_dom) & -0.08$^{}$ & 1,020,823 \\
+Baseline & -0.08$^{}$ & 1,020,823 \\
  & (0.30) & \\
-A1: alt. cutoff (Q1 2022) & 0.20$^{}$ & 1,020,823 \\
+Alternative cutoff (2022Q1 post) & 0.20$^{}$ & 1,020,823 \\
  & (0.30) & \\
-A2: treated excl. grandchildren & -0.07$^{}$ & 956,777 \\
+Treated excl.\ grandchildren & -0.07$^{}$ & 956,777 \\
  & (0.31) & \\
-A2: treated excl. stepchildren & -0.13$^{}$ & 1,005,187 \\
+Treated excl.\ stepchildren & -0.13$^{}$ & 1,005,187 \\
  & (0.30) & \\
-A3: drop 2020--2021 (COVID) & -0.09$^{}$ & 823,117 \\
+Excluding 2020--2021 (COVID) & -0.09$^{}$ & 823,117 \\
  & (0.37) & \\
-A4: ages 20--35 & -0.36$^{}$ & 617,885 \\
+Ages 20--35 & -0.36$^{}$ & 617,885 \\
  & (0.38) & \\
-A4: ages 20--40 & -0.41$^{}$ & 830,421 \\
+Ages 20--40 & -0.41$^{}$ & 830,421 \\
  & (0.33) & \\
-A5: cluster UPA & -0.08$^{}$ & 1,020,823 \\
- & (0.29) & \\
-A6: matched panel only & -0.08$^{}$ & 989,898 \\
+State $\times$ quarter fixed effects & -0.08$^{}$ & 1,020,823 \\
  & (0.30) & \\
-A7: telework-eligible only & -0.95$^{}$ & 139,496 \\
+Two-way cluster (household, PSU) & -0.08$^{}$ & 1,020,823 \\
+ & (0.29) & \\
+Matched panel only & -0.08$^{}$ & 989,898 \\
+ & (0.30) & \\
+Telework-eligible only & -0.95$^{}$ & 139,496 \\
  & (1.01) & \\
 \midrule
 \multicolumn{3}{l}{\textit{Real income (R\$), outlier sensitivity}} \\
@@ -33,6 +35,5 @@ Income: raw & 32.7$^{}$ & 495,994 \\
 Income: winsor. 1\% & 5.3$^{}$ & 495,994 \\
  & (26.8) & \\
 \bottomrule\end{tabular}
-\begin{tablenotes}\small
-\item \textit{Notes:} Each estimate is a separate DiD on the preferred sample (treated vs.\ Control A, child 5--7) with the treated main effect, individual and year-quarter FE, and survey weights; SE clustered at the household in parentheses (row A5 clusters at the UPA). $^{*}$/$^{**}$/$^{***}$: 10/5/1\%. Placebo on men is now Table \ref{tab:triple_diff} (07\_triple\_diff.R).
-\end{tablenotes}\end{table}
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate difference-in-differences regression on the preferred sample (treated vs.\ Control A, child 5--7), including the treated main effect, individual and year-quarter fixed effects, and survey weights; standard errors clustered at the household in parentheses (except the two-way row, clustered at the household and primary sampling unit). $^{*}$/$^{**}$/$^{***}$ denote significance at 10/5/1\%. The placebo on men is reported in Table \ref{tab:triple_diff}.
+\end{table}

@@ -104,11 +104,7 @@ The MP/Lei applies to formal employees (CLT empregados). However, restricting th
 | Data build & analysis | R (`data.table`, `fixest`, `ggplot2`) |
 | Writing | LaTeX / Beamer |
 
-**Note on `datazoom.social`:** Source of the Stage 3 advanced individual panel ID (`id_rs3`, Graph Theory fuzzy matching for fragmented interviews) and household ID (`id_dom`), plus pre-derived labor market variables (`ocupado`, `forca_trab`, `home_office`, `formal`, `informal`, `rendimento_habitual_real`, `faixa_educ`, `regiao`, `sigla_uf`, `cnae_2dig`, `cod_2dig`).
-
-**Panel download strategy — see the header comment in `build/01_pnadc.R` for full detail.** In short: `download_pnadc_panels()` downloads one quarter at a time via `PNADcIBGE::get_pnadc()` (bypassing `load_pnadc()`'s wrapper), immediately prunes to the ~35 columns needed and filters to the target V1014 group, then calls the package's own `build_pnadc_panel(panel = "advanced_3")` once per group's full window. This was arrived at after two crashes on a 16GB/460GB machine — a RAM crash (bulk multi-year downloads holding ~210 columns in memory) and a disk crash (`get_pnadc()` leaves unzipped microdata in R's `tempdir()`, which accumulated ~350GB across quarters) — both fixes and the reasoning are documented in the script itself, not repeated here. **If a `Panel_{v}.RData` looks implausibly small or a run errors with "error writing to connection," delete that file manually before re-running** (the function skips any panel whose output already exists).
-
-`id_rs3` is `NA` for individuals the algorithm could not match across quarters; **always use `id_panel` (not `id_rs3`) as the FE variable** — see `build_main_data()`'s header comment in `01_pnadc.R` for why. `panel_matched` flags genuine cross-quarter links (robustness subsample candidate).
+Data download and the panel-by-panel build strategy are documented in the header of `build/01_pnadc.R`. Panel identifiers and labor-market flags come from the `datazoom.social` package; **always use `id_panel`, not `id_rs3`, as the FE variable.**
 
 Both the panel input files and the final analytical dataset are saved as **`.RData`**.
 
@@ -137,6 +133,11 @@ analysis/
     tables/           .tex table outputs (committed to git)
     graphs/           figure outputs — line/bar charts, event studies (committed to git)
     maps/             geographic map outputs — e.g. fig05 state map (committed to git)
+
+latex/
+  paper.tex           Main manuscript (JPopE draft; \input's the tables/figures)
+  appendix.tex        Appendix (PNADC + advanced panel identification, extra exhibits)
+  refs.bib            Bibliography
 
 dictionary/
   dicionario_PNADC_microdados_trimestral.xls   PNADC variable dictionary
@@ -322,8 +323,6 @@ Journals in the target tier (see below) typically allow ~6–8 exhibits in the m
 | Table 2 | Main DiD estimates, for both Control A and Control B. **Column 1 = First stage** (`home_office ~ treat_x_post`) — report prominently, not just as one outcome among others: it quantifies actual compliance/take-up and calibrates how the reader should read every other column (income, hours, employment, `on_maternity_leave`) — a weak first stage mechanically caps how large the reduced-form ITT effects can be, regardless of whether the underlying mechanism is real. | `03_did.R` |
 | Figure X (CONDITIONAL — decide after seeing Table 2) | Event-study for `on_maternity_leave`, same layout as Figure 1 | `02_event_study.R` |
 
-**On the maternity-leave figure:** do NOT build this preemptively. No map is needed for fertility (there's no geographic story). Whether it gets a dedicated event-study figure at all depends on the Table 2 result: a fertility effect is one of the three things flagged under "Target Journals" below as potentially elevating this paper, so if `on_maternity_leave` comes out significant, promote it to a Main Results figure; if it's null/noisy, leave it as a single column in Table 2 and skip the figure entirely. Decide once, after running `03_did.R` — don't build it "just in case."
-
 ### Mechanisms — `04_mechanisms.R` (WHY/HOW the effect operates through the telework-priority channel)
 This script isolates the specific causal channel of Art. 75-F: telework allocation. All specs use the main TWFE setup (`| id_panel + year_quarter`, weighted, `cluster = ~id_dom`).
 
@@ -361,8 +360,6 @@ Subgroup splits of the main DiD. **Interpretation note:** the `formal` and publi
 | Figure A3 | Two-panel trends: Treated vs. A / Treated vs. B separately (currently `fig02`) | `01_descriptives.R` (done) |
 | Figure A4 (optional) | State map — descriptive geographic distribution of `home_office` or treated-group share (saved to `analysis/output/maps/`, not `graphs/`) | `01_descriptives.R` (done, `fig05`) |
 
-**On the state map:** not required for identification (the DiD does not rely on geographic variation — `sigla_uf^year_quarter` is already a robustness FE, not the main design), but useful as a descriptive appendix figure to show the treated population and the first-stage effect are not concentrated in one region (supports external validity and the state×time robustness spec). Low priority — build only if main results are in good shape and there's room in the appendix. Implementation sketch (guarded by `requireNamespace`, since `geobr`/`sf` are optional): map `home_office` rate by state among treated women, post-MP, using `geobr::read_state()`.
-
 **Triple difference & men placebo (`07_triple_diff.R`).** `main_data.RData` holds both sexes (`female` flag), so the men comparison is a filter, not a separate extraction. Men with young children are *also* eligible under Art. 75-F (the law is not gender-restricted), so they are not a pure placebo for eligibility; instead they net out any generic "parent of a young child, post-2022" shock, isolating the woman-specific response. The DDD is `outcome ~ treated + treated:female + treat_x_post + treat_x_post:female | id_panel + female^year_quarter`, where `treat_x_post:female` is the extra effect for women vs. men and `female^year_quarter` FE absorb sex-specific time shocks. The table reports the men-only DiD, the women-only DiD, and the DDD side by side. **Result: home-office DDD −0.27pp (n.s.)** — the null is not gendered; men also show no first stage (+0.18pp, n.s.).
 
 ---
@@ -388,43 +385,6 @@ Subgroup splits of the main DiD. **Interpretation note:** the `formal` and publi
 - **Main spec:** Q1 2022 is pre-period (`post_mp = 0`)
 - **Robustness:** Q1 2022 is post-period (`post_mp_alt = 1`)
 - If point estimates are similar under both cutoffs → results do not hinge on this choice
-
----
-
-## Current Status (as of 2026-07-01)
-
-### Done
-- [x] Data build pipeline (`build/01_pnadc.R`) — rewritten to download panel-by-panel (`.RData`) and read `.RData` in build step
-- [x] `main_data.RData` build function with sample restrictions, treatment variables
-- [x] Panel files downloaded (`Panel_6..13.RData`) and `main_data.RData` built (3,676,650 obs, 2018Q1–2026Q1)
-- [x] **Build correctness fixes (2026-07-01):** `(id_dom, V1014, year_quarter)` merge key + globally-unique `id_dom` composite (fixes cross-panel contamination); added `employed`/`unemployed`/`in_labor_force` outcomes (since raw `ocupado` is NA out of the labor force); added `clt_private` (VD4009==1, sharp CLT placebo); `telework_cod` replaced with the exact 126-code Costa et al. (2024) Table 2 list. `main_data.RData` rebuilt (65 vars); `01_descriptives.R` outputs regenerated.
-- [x] `analysis/code/02_event_study.R` — event study of `home_office`, Treated vs. Control A and B (Figure 1, `fig06_event_study_home_office`). Clean pre-trends (incl. through COVID); modest, gradually-building post-MP first stage (~+1pp by 2025).
-- [x] `analysis/code/03_did.R` — main DiD (Table 2, `tab02_did_main.tex`), correct spec (`treated + treat_x_post`), Control A preferred + B + A-vs-B placebo. **Result (2026-07-01): the first stage is null** — home office −0.08pp (Control A, n.s.) / +0.38pp (Control B, n.s.); placebo A-vs-B = +0.04pp (n.s., passes). Reduced form (Control A): income n.s., hours n.s.; employment +1.0pp\*\*, LFP +1.05pp\*\*, maternity leave −0.87pp\*\*\*. **With a null first stage these reduced-form significances cannot be attributed to the telework channel** (no first stage ⇒ no Art. 75-F mechanism); likely fragile / other-channel / multiple-testing. Diagnostic: effect is back-loaded (mature 2024+ first stage +0.58pp\*), and bindable subgroups (CLT-private × telework-eligible) point to ~2pp in the mature period but with huge SEs (n.s.).
-- [x] Master scripts (`config/00_master_build.R`, `config/00_master_analysis.R`)
-- [x] PNADC dictionary reviewed; research design finalized
-- [x] `id_rs3` (Stage 3), `id_panel`, `panel_matched` added for safe FE usage
-- [x] `potential_telework` variable (V4010 mapped to Góes et al. 2020 / Costa et al. 2024 COD codes)
-- [x] `has_child_5_7`, `has_child_5_7_no_gc`, `has_child_5_7_no_sc` (donut DiD control variables)
-- [x] `has_child_u4_no_sc` (excludes stepchildren/enteados, V2005=6 — new robustness variant)
-- [x] Fixed V2005 labels in code and dictionary (4=child of head+spouse, 5=child of head only, 6=stepchild, 10=grandchild)
-- [x] `analysis/code/01_descriptives.R` — Summary statistics and trend figures (run; outputs committed)
-- [x] `analysis/code/04_mechanisms.R` — Table 3 (first-stage moderation by baseline telework eligibility) + Table 4 (`potential_telework` as outcome). **Both null:** first stage is ~0 even among baseline-teleworkable women (−0.95pp, n.s.), and there is **no occupational sorting** into eligible jobs (+0.06pp / −0.25pp, n.s.). The priority-seeking-migration story is not in the data.
-- [x] `analysis/code/05_heterogeneity.R` — first-stage DiD across subgroups (Table 5, `fig07` coefplot). **Uniformly null**, including where the law should bind hardest (CLT-private +0.27pp n.s., private employee +0.18pp n.s.). Only 1 of 12 cells is significant (age 40–49, +1.39pp\*\*) — a small, selected group with no theoretical basis, consistent with multiple testing.
-
-### Interpretation note (2026-07-01) — where the paper stands
-The evidence is a **clean, comprehensive null**. The first stage (home office) is ~0 and reasonably tight (Control A: −0.08pp, SE 0.30 → 95% CI ≈ [−0.67, +0.51]pp), ruling out an average telework effect above ~0.5pp; it stays null in the mature (2024+) window (marginal +0.58pp\*), across every subgroup, and there is no occupational sorting toward eligible jobs. The design is credible — flat pre-trends through COVID, passing A-vs-B placebo — so this is a **well-identified null, not an underpowered mess** (except the bindable subgroups, which are genuinely too small/rare to be conclusive). Reduced-form employment/LFP (+1pp) and maternity leave (−0.87pp) reach significance but, with no first stage, cannot be attributed to the telework channel.
-
-**Framing:** the paper's contribution is an evaluation of a *"priority, not right"* legal instrument — increasingly common in family/labor policy — that shows it did not move the outcome it targets, and *why* (employer compliance is voluntary and unenforceable; most eligible women are in non-teleworkable/informal/public jobs; no behavioral sorting toward eligibility). We commit to this null paper now; the identification (donut/threshold, placebo, flat pre-trends through COVID) is what makes the null credible and publishable. See "Target Journals" for the outlet plan.
-
-- [x] `analysis/code/06_robustness.R` — first-stage robustness (`tab07`) + winsorized income + control-window coefplot (`fig08`). **The null is bulletproof:** home office stays ~0 and n.s. under the alt cutoff (+0.20), COVID-window drop (−0.09), treatment variants, ages 20–35/20–40, UPA clustering, matched-panel, and telework-eligible-only; winsorizing income collapses the raw +33 to +5 (n.s.).
-- [x] **Both-sex rebuild (2026-07-01):** `main_data.RData` now holds men too (7,150,307 obs); added `female` (V2007==2) and `higher_educ` (VD3004==7). All women-only scripts filter `female == 1`; results unchanged.
-- [x] `analysis/code/07_triple_diff.R` — DDD (`treat_x_post:female`) + men placebo (`tab08`, `tab08b`). **Home-office DDD −0.27pp (n.s.); men DiD +0.18pp (n.s.)** → the null is not gendered and the men placebo passes. DDD on income (−129\*\*) and maternity (−0.87\*\*\*) are significant but reflect gender-differential trends / pre-trends, not the (null) telework channel.
-- [x] **First-stage specification ladder (Table 2, `tab02`):** OLS+controls +0.4pp\* → +year FE +0.4pp\* → +individual FE −0.08 (n.s.) → +age² −0.08. The apparent positive without individual FE is **selection into young-motherhood**; individual FE removes it. Justifies the FE choice.
-- [x] `fig09` — maternity-leave event study shows strong pre-trends ⇒ the significant maternity DiD is not causal (parallel trends fails); home office is the only outcome with clean pre-trends.
-- [x] Journal-standard formatting: regression tables via `etable` (coef, SE below, FE rows, N, R²); clean labels (no raw `VD####`); heterogeneity/robustness tables in two-line format.
-
-### Pending
-- [ ] LaTeX paper draft (the null paper — see Target Journals)
 
 ---
 

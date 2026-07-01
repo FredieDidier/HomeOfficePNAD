@@ -84,9 +84,8 @@ tab <- c("\\begin{table}[htbp]\\centering",
   grp("By education", c("Higher education", "No higher education")), "\\midrule",
   grp("By age band", c("Age 18--29", "Age 30--39", "Age 40--49")),
   "\\bottomrule\\end{tabular}",
-  "\\begin{tablenotes}\\small",
-  "\\item \\textit{Notes:} Each estimate is a separate first-stage DiD (outcome: home office, pp) on the preferred sample (treated vs.\\ Control A), with the treated main effect, individual and year-quarter FE, weighted, SE clustered at the household (in parentheses). Subgroups defined at baseline (first observed quarter). $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.",
-  "\\end{tablenotes}\\end{table}")
+  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control A), including the treated main effect, individual and year-quarter fixed effects, weighted by survey weights, with standard errors clustered at the household (in parentheses). Subgroups are defined at baseline (first observed quarter). $^{*}$/$^{**}$/$^{***}$ denote significance at 10/5/1\\%.",
+  "\\end{table}")
 writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
 
 # ---- Figure 3 (fig07) — coefficient plot -----------------------------------

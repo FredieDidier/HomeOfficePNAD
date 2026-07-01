@@ -32,7 +32,7 @@ dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
 
 dict <- c(treat_x_post = "Treated $\\times$ Post", treated = "Treated (child $\\leq$4)",
           home_office = "Home office", potential_telework = "Telework-eligible occ.",
-          id_panel = "Individual", year_quarter = "Year-quarter")
+          id_panel = "Individual", id_dom = "Household", year_quarter = "Year-quarter")
 
 A <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
 B <- dt[has_child_u4 == 1 | (has_child_u4 == 0 & has_child_5_7 == 0)]
@@ -57,7 +57,7 @@ etable(fe(A, "potential_telework"), fe(B, "potential_telework"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Occupational Sorting: Telework-Eligible Occupation as Outcome",
        label = "tab:mech_allocation",
-       notes = "Outcome: indicator for being in a telework-eligible occupation. A positive Treated $\\times$ Post means treated mothers move into eligible occupations after the MP. Same spec as Table \\ref{tab:mech_moderation}. $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
+       notes = "Outcome: indicator for being in a telework-eligible occupation. A positive Treated $\\times$ Post means treated mothers move into eligible occupations after the reform. Same specification as the moderation table. $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
 
 # ---- Table 5b: occupation transition matrix (descriptive) ------------------
 # Among matched women observed both pre- and post-MP: baseline (first pre-MP)
@@ -82,9 +82,8 @@ tb <- c("\\begin{table}[htbp]\\centering",
   "\\begin{tabular}{lcc}", "\\toprule",
   trans_tab(1, "Treated (child $\\leq$4)"), "\\midrule",
   trans_tab(0, "Control A (child 5--7)"), "\\bottomrule\\end{tabular}",
-  "\\begin{tablenotes}\\small",
-  "\\item \\textit{Notes:} Cells are the share of women in each pre$\\to$post telework-eligibility transition, among matched women (panel\\_matched $=1$) observed both before and after 2022Q2. Off-diagonal cells are occupation switches; the treated and control distributions are similar, consistent with the null in Table \\ref{tab:mech_allocation}.",
-  "\\end{tablenotes}\\end{table}")
+  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Cells are the share of women in each pre$\\to$post telework-eligibility transition, among panel women observed both before and after 2022Q2. Off-diagonal cells are occupation switches; the treated and control distributions are similar, consistent with the null in Table \\ref{tab:mech_allocation}.",
+  "\\end{table}")
 writeLines(tb, file.path(TABLE_DIR, "tab05b_occupation_transition.tex"))
 
 # ---- Console ----------------------------------------------------------------

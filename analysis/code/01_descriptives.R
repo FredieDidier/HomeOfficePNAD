@@ -75,9 +75,9 @@ vars_desc <- c(
 )
 
 labels_desc <- c(
-  "Home office (%)", "In labor force (%)", "Employed (%)",
-  "Habitual income (R$, real)", "Usual weekly hours", "Effective weekly hours",
-  "On maternity leave (%)", "Formal employment (%)", "Potential telework occupation (%)",
+  "Home office (\\%)", "In labor force (\\%)", "Employed (\\%)",
+  "Real monthly earnings (R\\$)", "Usual weekly hours", "Effective weekly hours",
+  "On maternity leave (\\%)", "Formal employment (\\%)", "Telework-eligible occ.\\ (\\%)",
   "Age (years)"
 )
 
@@ -114,16 +114,15 @@ make_latex_table1 <- function(tab, labels, outfile) {
     " & Pre-MP & Post-MP & Pre-MP & Post-MP & Pre-MP & Post-MP \\\\",
     "\\midrule"
   )
+  pp_vars <- c("home_office", "in_labor_force", "employed",
+               "on_maternity_leave", "formal", "potential_telework")
   for (i in seq_len(nvar)) {
     row_vals <- as.numeric(tab[i, -1])
-    # Scale percentage variables ×100 for display
-    if (labels[i] %in% c(
-      "Home office (%)", "In labor force (%)", "Employed (%)",
-      "On maternity leave (%)", "Formal employment (%)", "Potential telework occupation (%)"
-    )) {
+    # Scale 0/1 (share) variables ×100 for display as percentages
+    if (vars_desc[i] %in% pp_vars) {
       row_vals[seq_along(row_vals)] <- row_vals * 100
       fmt <- "%.1f"
-    } else if (labels[i] == "Habitual income (R$, real)") {
+    } else if (vars_desc[i] == "rendimento_habitual_real") {
       fmt <- "%.0f"
     } else {
       fmt <- "%.1f"
@@ -140,10 +139,7 @@ make_latex_table1 <- function(tab, labels, outfile) {
     paste0("Observations & ", paste(n_vals, collapse = " & "), " \\\\"),
     "\\bottomrule",
     "\\end{tabular}",
-    "\\begin{tablenotes}",
-    "\\small",
-    "\\item \\textit{Notes:} Sample restricted to women aged 18--49 who are household head or spouse, with at least one interview from 2018 onwards. Means are weighted using survey sampling weights. Post-MP refers to the second quarter of 2022 onwards. Treated women have a youngest child aged 0--4 in the household; Control A women have a youngest child aged 5--7; Control B women have no child aged 0--7 in the household. Habitual income is deflated to real terms using the IBGE habitual income deflator.",
-    "\\end{tablenotes}",
+    "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Sample restricted to women aged 18--49 who are household head or spouse, with at least one interview from 2018 onwards. Means are weighted using survey sampling weights. Post refers to the second quarter of 2022 onwards. Treated women have a youngest child aged 0--4 in the household; Control A women have a youngest child aged 5--7; Control B women have no child aged 0--7 in the household. Earnings are deflated to real terms.",
     "\\end{table}"
   )
   writeLines(lines, outfile)
@@ -252,10 +248,7 @@ make_latex_table2 <- function(hh_res, ind_res, outfile, range_str) {
     paste0("\\multicolumn{4}{l}{Households} & \\multicolumn{2}{r}{", fmt_pct(hh_res$transition), "} \\\\"),
     "\\bottomrule",
     "\\end{tabular}",
-    "\\begin{tablenotes}",
-    "\\small",
-    "\\item \\textit{Notes:} Sample: women aged 18--49 who are household head or spouse, the main estimation sample used throughout the paper. Individuals are tracked across quarters using an advanced panel identification algorithm that links respondents via birth date and household composition, including fuzzy matching for interviews with incomplete or fragmented information; the sample is restricted to individuals for whom this linkage succeeded. Households are tracked using a time-invariant household identifier. Panel A reports retention rates: the share of households and individuals observed for at least $X$ quarterly interviews (the survey's rotating panel design caps any respondent at five). Panel B reports quarter-to-quarter transition probabilities: of all household-quarter or individual-quarter observations for which a subsequent quarter could in principle have been observed, the share that are. Statistics pool all quarters from ", range_str, ".",
-    "\\end{tablenotes}",
+    "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Sample: women aged 18--49 who are household head or spouse, the main estimation sample used throughout the paper. Individuals are tracked across quarters using an advanced panel identification algorithm that links respondents via birth date and household composition, including fuzzy matching for interviews with incomplete or fragmented information; the sample is restricted to individuals for whom this linkage succeeded. Households are tracked using a time-invariant household identifier. Panel A reports retention rates: the share of households and individuals observed for at least $X$ quarterly interviews (the survey's rotating panel design caps any respondent at five). Panel B reports quarter-to-quarter transition probabilities: of all household-quarter or individual-quarter observations for which a subsequent quarter could in principle have been observed, the share that are. Statistics pool all quarters from ", range_str, ".",
     "\\end{table}"
   )
   writeLines(lines, outfile)

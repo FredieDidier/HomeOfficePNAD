@@ -42,8 +42,9 @@ fmt0 <- function(x) formatC(x, format = "d", big.mark = ",")
 
 # Generic first-stage DiD. `sample` must already contain `tr` (0/1 treated) and
 # `trxp` (tr x post). Returns the trxp row scaled to pp (or level for income).
-fs <- function(sample, label, clu = ~id_dom, y = "home_office", pp = TRUE) {
-  m <- feols(as.formula(sprintf("%s ~ tr + trxp | id_panel + year_quarter", y)),
+fs <- function(sample, label, clu = ~id_dom, y = "home_office", pp = TRUE,
+               fes = "id_panel + year_quarter") {
+  m <- feols(as.formula(sprintf("%s ~ tr + trxp | %s", y, fes)),
              data = sample, weights = ~V1028, cluster = clu, notes = FALSE)
   ct <- coeftable(m)["trxp", ]
   s  <- if (pp) 100 else 1
@@ -62,16 +63,17 @@ mk <- function(treat_col, ctrl_col, post_col = "post_mp", extra = NULL) {
 A_main <- mk("has_child_u4", "has_child_5_7")
 
 rows <- rbindlist(list(
-  fs(A_main,                                              "Main (Q2 2022, id\\_dom)"),
-  fs(mk("has_child_u4", "has_child_5_7", "post_mp_alt"),  "A1: alt. cutoff (Q1 2022)"),
-  fs(mk("has_child_u4_no_gc", "has_child_5_7_no_gc"),     "A2: treated excl. grandchildren"),
-  fs(mk("has_child_u4_no_sc", "has_child_5_7_no_sc"),     "A2: treated excl. stepchildren"),
-  fs(A_main[!(year_quarter %/% 10L %in% c(2020L, 2021L))],"A3: drop 2020--2021 (COVID)"),
-  fs(A_main[V2009 >= 20 & V2009 <= 35],                   "A4: ages 20--35"),
-  fs(A_main[V2009 >= 20 & V2009 <= 40],                   "A4: ages 20--40"),
-  fs(A_main, "A5: cluster UPA", clu = ~UPA),
-  fs(A_main[panel_matched == 1],                          "A6: matched panel only"),
-  fs(A_main[pt_base == 1],                                "A7: telework-eligible only")
+  fs(A_main,                                              "Baseline"),
+  fs(mk("has_child_u4", "has_child_5_7", "post_mp_alt"),  "Alternative cutoff (2022Q1 post)"),
+  fs(mk("has_child_u4_no_gc", "has_child_5_7_no_gc"),     "Treated excl.\\ grandchildren"),
+  fs(mk("has_child_u4_no_sc", "has_child_5_7_no_sc"),     "Treated excl.\\ stepchildren"),
+  fs(A_main[!(year_quarter %/% 10L %in% c(2020L, 2021L))],"Excluding 2020--2021 (COVID)"),
+  fs(A_main[V2009 >= 20 & V2009 <= 35],                   "Ages 20--35"),
+  fs(A_main[V2009 >= 20 & V2009 <= 40],                   "Ages 20--40"),
+  fs(A_main, "State $\\times$ quarter fixed effects", fes = "id_panel + sigla_uf^year_quarter"),
+  fs(A_main, "Two-way cluster (household, PSU)", clu = ~id_dom + UPA),
+  fs(A_main[panel_matched == 1],                          "Matched panel only"),
+  fs(A_main[pt_base == 1],                                "Telework-eligible only")
 ))
 
 # ---- A9: winsorized real income (top 1%), income outcome --------------------
@@ -102,9 +104,8 @@ tab <- c(
   row_tex(inc_raw, 1),
   row_tex(inc_wins, 1),
   "\\bottomrule\\end{tabular}",
-  "\\begin{tablenotes}\\small",
-  "\\item \\textit{Notes:} Each estimate is a separate DiD on the preferred sample (treated vs.\\ Control A, child 5--7) with the treated main effect, individual and year-quarter FE, and survey weights; SE clustered at the household in parentheses (row A5 clusters at the UPA). $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%. Placebo on men is now Table \\ref{tab:triple_diff} (07\\_triple\\_diff.R).",
-  "\\end{tablenotes}\\end{table}"
+  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression on the preferred sample (treated vs.\\ Control A, child 5--7), including the treated main effect, individual and year-quarter fixed effects, and survey weights; standard errors clustered at the household in parentheses (except the two-way row, clustered at the household and primary sampling unit). $^{*}$/$^{**}$/$^{***}$ denote significance at 10/5/1\\%. The placebo on men is reported in Table \\ref{tab:triple_diff}.",
+  "\\end{table}"
 )
 writeLines(tab, file.path(TABLE_DIR, "tab07_robustness.tex"))
 

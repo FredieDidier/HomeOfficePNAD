@@ -42,7 +42,7 @@ dict <- c(
   home_office  = "Home office", rendimento_habitual_real = "Real income",
   hours_usual  = "Usual hours", employed = "Employed",
   in_labor_force = "In labor force", on_maternity_leave = "Maternity leave",
-  id_panel = "Individual", year_quarter = "Year-quarter"
+  id_panel = "Individual", id_dom = "Household", year_quarter = "Year-quarter"
 )
 
 samp_A <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
@@ -59,14 +59,17 @@ m2 <- feols(home_office ~ treated + treat_x_post + V2009 + I(V2009^2) +
             samp_A, weights = ~V1028, cluster = ~id_dom)
 m3 <- feols(home_office ~ treated + treat_x_post | id_panel + year_quarter,
             samp_A, weights = ~V1028, cluster = ~id_dom)
-m4 <- feols(home_office ~ treated + treat_x_post + V2009 + I(V2009^2) |
+# Column 4: add age^2 only. The linear age term is collinear with individual +
+# year-quarter FE (age = calendar time - birth cohort, both absorbed), so it is
+# mechanically dropped; the quadratic carries any age adjustment.
+m4 <- feols(home_office ~ treated + treat_x_post + I(V2009^2) |
               id_panel + year_quarter,
             samp_A, weights = ~V1028, cluster = ~id_dom)
 
 etable(m1, m2, m3, m4,
        tex = TRUE, file = file.path(TABLE_DIR, "tab02_did_firststage.tex"), replace = TRUE,
        dict = dict, drop = c("post_mp", "V2009", "V2010", "regiao", "higher_educ", "Constant"),
-       extralines = list("Demographic controls" = c("Yes", "Yes", "No", "Age only")),
+       extralines = list("Demographic controls" = c("Yes", "Yes", "No", "Age$^2$ only")),
        fitstat = ~ n + r2 + wr2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect: Specification Ladder (Control A, child 5--7)",
        label = "tab:did_firststage",
@@ -97,7 +100,7 @@ etable(mods_B,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "DiD Estimates by Outcome --- Control B (no child 0--7)",
        label = "tab:did_outcomes_B",
-       notes = "As Table \\ref{tab:did_outcomes_A}, using Control B (women with no child aged 0--7).")
+       notes = "As in the Control~A outcome table, using the broad comparison group (women with no child aged 0--7). Each column is a separate DiD (preferred spec: treated main effect + individual and year-quarter FE, weighted, clustered at the household). $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
 
 # ---- A-vs-B placebo (home office) ------------------------------------------
 samp_P <- dt[(has_child_5_7 == 1 & has_child_u4 == 0) | (has_child_u4 == 0 & has_child_5_7 == 0)]
