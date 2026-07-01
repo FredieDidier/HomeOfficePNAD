@@ -129,9 +129,9 @@ analysis/
     01_descriptives.R   Summary statistics, sample description, descriptive figures
     02_event_study.R    Event-study plot of home_office around MP 1108/2022 (done)
     03_did.R            DiD main estimates (done)
-    04_mechanisms.R     Telework-priority channel: potential_telework moderation + occupation-allocation (to be created)
-    05_heterogeneity.R  Subgroup splits: formal/informal, public/private, education, age band (to be created)
-    06_robustness.R     Robustness checks and placebo tests (to be created)
+    04_mechanisms.R     Telework-priority channel: potential_telework moderation + occupation-allocation (done)
+    05_heterogeneity.R  Subgroup splits: formal/informal, public/private, education, age band (done)
+    06_robustness.R     Robustness checks and placebo tests (done; men placebo A8 pending)
   output/
     tables/           .tex table outputs (committed to git)
     graphs/           figure outputs — line/bar charts, event studies (committed to git)
@@ -159,7 +159,7 @@ Dropbox/HomeOfficePNAD/
 
 **Confirmed on the actual build (rebuilt 2026-07-01):** `main_data.RData` covers **2018Q1 through 2026Q1** (`year_quarter` 20181–20261) — the upper bound is simply whatever quarter IBGE had published at build time (Panel 13's own window runs through 2027, but later quarters aren't published yet and are silently skipped by `download_pnadc_panels()`). **3,676,650 observations.** Re-running the build later will naturally extend the upper bound as IBGE publishes new quarters.
 
-> **Build fix (2026-07-01) — `id_dom` cross-panel contamination.** The datazoom household ID `id_dom` is only unique *within* a V1014 rotation group, not across groups (~197k `id_dom` values are reused across panels for genuinely different households; ~26k `(id_dom, year_quarter)` keys collide in the quarters where two panels overlap). The original build merged the household child-flag lookup onto the sample on `(id_dom, year_quarter)` alone, which (a) duplicated ~7.6k rows and (b) assigned false treatment flags to women whose household happened to share an `id_dom` with a child-bearing household in another panel. Two fixes were applied in `build_main_data()`: the Pass-1/Pass-2 household merge now keys on **`(id_dom, V1014, year_quarter)`**, and `id_dom` is redefined as a **globally-unique composite string `"<V1014>_<id>"`** (so clustering `cluster = ~id_dom` and the panel-retention diagnostics no longer pool unrelated households across panels). `id_rs3`/`id_panel` were already globally unique (0 cross-panel collisions), so the individual FE were unaffected. The previously-reported household retention figures were an artifact of this collision — see the corrected numbers below.
+> **`id_dom` is globally unique by construction.** datazoom's raw `id_dom` is unique only *within* a V1014 rotation group, so `build_main_data()` keys the household child-flag merge on `(id_dom, V1014, year_quarter)` and stores `id_dom` as the composite string `"<V1014>_<id>"`. This is required for correct clustering (`cluster = ~id_dom`) and panel-retention stats; `id_rs3`/`id_panel` are already globally unique. Full rationale in the `build_main_data()` header comment.
 
 **Dropbox path** is set via `DROPBOX_ROOT` at the top of `build/01_pnadc.R` — the only line to change on a new machine. GitHub paths use `here::here()`.
 
@@ -252,7 +252,7 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
       cluster = ~id_dom)
 ```
 
-> **The `treated` main effect MUST be included (time-varying treatment).** `treated = has_child_u4` switches over the panel (a woman is treated only in the quarters she has a child ≤4; it turns on at a birth and off when the child turns 5). Individual FE therefore do **not** absorb it. Omitting it makes `treat_x_post` pick up the *level* "motherhood penalty" of women who transition into young-child status in the post period — which spuriously produced large significant vs-Control-B estimates on employment/LFP/maternity leave in an earlier draft. With `treated` controlled, `treat_x_post` is the clean DiD (how the young-child gap *changes* post-MP). NOTE: the event study (`02_event_study.R`) already handles this correctly via `i(year_quarter, treated, ref=20221)` — the full interaction set subsumes the main effect, so no separate `treated` term is added there.
+> **The `treated` main effect MUST be included (time-varying treatment).** `treated = has_child_u4` switches over the panel (a woman is treated only in the quarters she has a child ≤4; it turns on at a birth and off when the child turns 5). Individual FE therefore do **not** absorb it. Omitting it makes `treat_x_post` pick up the *level* "motherhood penalty" of women who transition into young-child status in the post period (this severely biases the vs-Control-B reduced-form estimates on employment/LFP/maternity leave). With `treated` controlled, `treat_x_post` is the clean DiD (how the young-child gap *changes* post-MP). NOTE: the event study (`02_event_study.R`) already handles this correctly via `i(year_quarter, treated, ref=20221)` — the full interaction set subsumes the main effect, so no separate `treated` term is added there.
 
 > **`cluster = ~id_dom` vs `vcov = ~id_dom`:** in `fixest` these are equivalent (a `vcov` formula `~x` is interpreted as one-way clustering on `x`). We use the explicit `cluster =` argument throughout for readability. For the `UPA` robustness, use `cluster = ~UPA`.
 
@@ -302,7 +302,7 @@ Journals in the target tier (see below) typically allow ~6–8 exhibits in the m
 ### Data Quality (Appendix / Data Section — doesn't count against the main-text exhibit budget)
 | # | Exhibit | Script |
 |---|---|---|
-| Table A0 | Panel retention diagnostics — households (`id_dom`) and individuals (`id_rs3`, matched only): share observed >=X quarters (Panel A) and quarter-to-quarter transition probability (Panel B). Confirmed on the corrected build (2026-07-01): households 41.9% reach all 5 quarters, transition 72.0%; individuals 37.4% reach all 5 (Stage 3 matching + genuine attrition + age-window censoring combined), transition 70.8%. (The previously-reported 93.2% / 79.1% household figures were an artifact of the `id_dom` cross-panel collision — different households in different panels were pooled under one `id_dom`, inflating apparent household persistence; fixed by the globally-unique `id_dom` composite.) Exists to reassure the reader the advanced panel ID is capturing real repeated structure, justifying individual FE (`id_panel`) in every spec. | `01_descriptives.R` (done, `tabA0_panel_retention.tex`) |
+| Table A0 | Panel retention diagnostics — households (`id_dom`) and individuals (`id_rs3`, matched only): share observed >=X quarters (Panel A) and quarter-to-quarter transition probability (Panel B). Households 41.9% reach all 5 quarters (transition 72.0%); individuals 37.4% reach all 5 (Stage 3 matching + attrition + age-window censoring), transition 70.8%. Exists to reassure the reader the advanced panel ID captures real repeated structure, justifying individual FE (`id_panel`) in every spec. | `01_descriptives.R` (done, `tabA0_panel_retention.tex`) |
 
 **Why this table's numbers won't match a population-wide PNADC panel retention exercise:** ours is computed on the actual DiD estimation sample, not the unrestricted population, for two compounding reasons — neither is a bug:
 1. **Sample restriction, not raw survey rotation.** A household counts as "retained" here only if it still contains a qualifying woman (18–49, head/spouse) each quarter — this measures persistence of a specific household *type*, which tends to read higher than unconditional household turnover in the full population.
@@ -405,39 +405,27 @@ Subgroup splits of the main DiD. **Interpretation note:** the `formal` and publi
 - [x] `has_child_u4_no_sc` (excludes stepchildren/enteados, V2005=6 — new robustness variant)
 - [x] Fixed V2005 labels in code and dictionary (4=child of head+spouse, 5=child of head only, 6=stepchild, 10=grandchild)
 - [x] `analysis/code/01_descriptives.R` — Summary statistics and trend figures (run; outputs committed)
+- [x] `analysis/code/04_mechanisms.R` — Table 3 (first-stage moderation by baseline telework eligibility) + Table 4 (`potential_telework` as outcome). **Both null:** first stage is ~0 even among baseline-teleworkable women (−0.95pp, n.s.), and there is **no occupational sorting** into eligible jobs (+0.06pp / −0.25pp, n.s.). The priority-seeking-migration story is not in the data.
+- [x] `analysis/code/05_heterogeneity.R` — first-stage DiD across subgroups (Table 5, `fig07` coefplot). **Uniformly null**, including where the law should bind hardest (CLT-private +0.27pp n.s., private employee +0.18pp n.s.). Only 1 of 12 cells is significant (age 40–49, +1.39pp\*\*) — a small, selected group with no theoretical basis, consistent with multiple testing.
 
 ### Interpretation note (2026-07-01) — where the paper stands
-The **first stage (home office) is null and reasonably tight** (Control A: −0.08pp, SE 0.30 → 95% CI ≈ [−0.67, +0.51]pp; the earlier +0.17pp was the misspecified no-main-effect version): we can rule out an average telework effect larger than ~0.5–0.6pp. The only positive signal is **marginal and back-loaded** (~0.5–1pp by 2024–2025 in the event study / mature-window DiD). Reduced-form employment/LFP (+1pp\*\*) and maternity leave (−0.87pp\*\*\*) are individually significant, but **with a null first stage they lack the Art. 75-F telework mechanism** — they cannot be causally attributed to the law's telework-priority channel and are likely fragile (multiple outcomes) or driven by other post-2022 changes affecting young-child mothers. Heterogeneity toward the bindable population (CLT-private, telework-eligible) has the right sign but is too imprecise (small subgroups, rare home office) to be significant.
+The evidence is a **clean, comprehensive null**. The first stage (home office) is ~0 and reasonably tight (Control A: −0.08pp, SE 0.30 → 95% CI ≈ [−0.67, +0.51]pp), ruling out an average telework effect above ~0.5pp; it stays null in the mature (2024+) window (marginal +0.58pp\*), across every subgroup, and there is no occupational sorting toward eligible jobs. The design is credible — flat pre-trends through COVID, passing A-vs-B placebo — so this is a **well-identified null, not an underpowered mess** (except the bindable subgroups, which are genuinely too small/rare to be conclusive). Reduced-form employment/LFP (+1pp) and maternity leave (−0.87pp) reach significance but, with no first stage, cannot be attributed to the telework channel.
 
-**Implication for framing:** on current data this reads more like an **informative-null policy evaluation** ("a priority-not-mandate telework law did not detectably move telework take-up — employer compliance is voluntary, most eligible women are in non-teleworkable/informal/public jobs, and the priority is unenforceable") than a positive-effect causal paper. The clean identification (flat pre-trends through COVID, passing placebo) makes the null *credible and publishable* in a field/policy outlet, but not a headline positive result for a top journal. Decide framing after `04_mechanisms.R` / `05_heterogeneity.R`; a second option is to await more post-MP quarters (2026–2027), as the event study is trending up.
+**Framing:** the paper's contribution is an evaluation of a *"priority, not right"* legal instrument — increasingly common in family/labor policy — that shows it did not move the outcome it targets, and *why* (employer compliance is voluntary and unenforceable; most eligible women are in non-teleworkable/informal/public jobs; no behavioral sorting toward eligibility). We commit to this null paper now; the identification (donut/threshold, placebo, flat pre-trends through COVID) is what makes the null credible and publishable. See "Target Journals" for the outlet plan.
+
+- [x] `analysis/code/06_robustness.R` — first-stage robustness (Table A1–A7, `tab06`) + winsorized income (A9) + control-window coefplot (`fig08`). **The null is bulletproof:** home office stays ~0 and n.s. under the alt cutoff (+0.20), COVID-window drop (−0.09), treatment variants, ages 20–35/20–40, UPA clustering, matched-panel, and telework-eligible-only; winsorizing income collapses the raw +33 to +5 (n.s.). Men placebo (A8) still pending (needs a separate `V2007==1` extraction).
 
 ### Pending
-- [ ] `analysis/code/04_mechanisms.R` — Telework-priority channel: `potential_telework` moderation (Table 3) + occupation-allocation, `potential_telework` as outcome (Table 4)
-- [ ] `analysis/code/05_heterogeneity.R` — Subgroup splits: formal/informal, public/private, education, age band (Tables 5–8)
-- [ ] `analysis/code/06_robustness.R` — full list in "Paper Output Plan" above (Tables A1–A9)
-- [ ] LaTeX paper draft
+- [ ] Table A8 — placebo on men (separate `build_placebo_men_data()` extraction, `V2007 == 1`)
+- [ ] LaTeX paper draft (the null paper — see Target Journals)
 
 ---
 
 ## Target Journals
 
-Tiered by probability of acceptance, conditional on obtaining clean estimates.
+The result is a **well-identified null** — no detectable effect of a priority-not-mandate telework law. The paper is written **now, as the null** (we do not wait for more data). It competes on *identification + question + institutional argument*, not on effect size: a legally weak instrument (priority, not a right; employer-discretionary; unenforceable) targeted at mothers of young children moved neither telework take-up nor occupational sorting nor labor-market outcomes, and the donut/age-4-threshold design (flat pre-trends through COVID, passing A-vs-B placebo) credibly rules out even modest effects. This speaks to the literature on the (in)effectiveness of soft legal entitlements and the design of family/flexible-work policy.
 
-### High probability (publish here if results are solid and well-identified)
-- **Journal of Human Resources** — perfect fit: gender, labor markets, policy quasi-experiment
-- **Labour Economics** — strong fit for Brazilian context + DiD methodology
-- **AEJ: Applied Economics** — ideal for clean DiD with policy-relevant findings
-- **Journal of Development Economics** — good fit given Brazilian / developing-country context
-
-### Medium probability (viable if identification is very clean + heterogeneity story is interesting)
-- **Review of Economics and Statistics**
-- **Journal of Labor Economics** — high bar; needs very sharp first stage and novel mechanism
-- **Journal of Public Economics** — requires stronger fiscal / policy angle
-
-### Low probability (needs striking results — large effects, compelling fertility mechanism, novel identification twist)
-- **Quarterly Journal of Economics**
-- **American Economic Review**
-- **Review of Economic Studies**
-- **Journal of Political Economy**
-
-**Realistic target path:** Submit first to AEJ: Applied or JHR. If rejected, move to Labour Economics or JDE. The identification (MP as natural experiment + age-of-child threshold) is clean but not extraordinary on its own — what will elevate the paper is: (a) a strong fertility effect, (b) the dose-response pattern with children 5–7 as control, and/or (c) a compelling heterogeneity story on potential telework eligibility.
+**Three international targets, most → least likely (no Brazilian journals):**
+1. **Journal of Population Economics** — best topical fit (family policy, female labor supply, fertility, quasi-experiments) and the most receptive of the three to a clean, well-argued null. Primary target.
+2. **Labour Economics** — strong methodological fit (policy DiD, labor); publishes well-identified nulls when the question and design carry the paper. Second submission if (1) rejects.
+3. **Journal of Development Economics** — most prestigious of the three and the least likely for a null (higher bar), but an international field top-tier where a developing-country policy evaluation with sharp identification can land. Stretch / third.
