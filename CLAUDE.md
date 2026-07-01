@@ -78,7 +78,7 @@ Occupation is a potentially endogenous outcome of the MP itself. The policy may 
 2. `income_habitual_real` — real habitual monthly income (all jobs)
 3. `hours_usual` / `hours_effective` — weekly hours worked
 4. Employment status (`employed`, `unemployed`, `in_labor_force`) — all three are project-derived 0/1 indicators defined over the FULL sample. **Do not use datazoom's raw `ocupado` as the employment outcome**: it is NA for anyone out of the labor force, so regressing on it silently drops out-of-labor-force women (conditioning on labor-force participation, itself a post-treatment outcome). `employed` = in labor force AND occupied; `unemployed` = in labor force AND not occupied; `in_labor_force` = `forca_trab`.
-5. `on_maternity_leave` — proxy for recent birth (fertility effect). Note the base rate is very low (~1.8% among treated, ~0.1% among controls), so the fertility DiD will be relatively low-powered — a point to keep in mind when deciding whether it earns a dedicated figure (see Paper Output Plan).
+5. `on_maternity_leave` — proxy for recent birth (fertility effect). Base rate is very low (~1.8% among treated, ~0.1% among controls). **Its DiD is significant (−0.87pp\*\*\*) but the event study (`fig09`) shows strong PRE-TRENDS** — the treated-vs-control maternity-leave gap is on a declining trajectory well before the MP, so parallel trends fails and the coefficient is **not interpreted causally**. Unlike `home_office` (clean flat pre-trends), maternity leave cannot carry a fertility claim; keep `fig09` as the diagnostic that shows why.
 
 ### Sample
 - Women aged 18–49 (main spec)
@@ -131,7 +131,8 @@ analysis/
     03_did.R            DiD main estimates (done)
     04_mechanisms.R     Telework-priority channel: potential_telework moderation + occupation-allocation (done)
     05_heterogeneity.R  Subgroup splits: formal/informal, public/private, education, age band (done)
-    06_robustness.R     Robustness checks and placebo tests (done; men placebo A8 pending)
+    06_robustness.R     Robustness checks (done)
+    07_triple_diff.R    Triple difference with men + men placebo (done)
   output/
     tables/           .tex table outputs (committed to git)
     graphs/           figure outputs — line/bar charts, event studies (committed to git)
@@ -157,7 +158,7 @@ Dropbox/HomeOfficePNAD/
     output/   main_data.RData  ← final analytical dataset
 ```
 
-**Confirmed on the actual build (rebuilt 2026-07-01):** `main_data.RData` covers **2018Q1 through 2026Q1** (`year_quarter` 20181–20261) — the upper bound is simply whatever quarter IBGE had published at build time (Panel 13's own window runs through 2027, but later quarters aren't published yet and are silently skipped by `download_pnadc_panels()`). **3,676,650 observations.** Re-running the build later will naturally extend the upper bound as IBGE publishes new quarters.
+**Confirmed on the actual build (rebuilt 2026-07-01):** `main_data.RData` covers **2018Q1 through 2026Q1** (`year_quarter` 20181–20261) and holds **BOTH sexes** — **7,150,307 observations** (3,676,650 women + 3,473,657 men). Women are the analysis sample (`female == 1`); men enter only the triple difference (`07_triple_diff.R`). The upper bound is simply whatever quarter IBGE had published at build time; re-running later extends it.
 
 > **`id_dom` is globally unique by construction.** datazoom's raw `id_dom` is unique only *within* a V1014 rotation group, so `build_main_data()` keys the household child-flag merge on `(id_dom, V1014, year_quarter)` and stores `id_dom` as the composite string `"<V1014>_<id>"`. This is required for correct clustering (`cluster = ~id_dom`) and panel-retention stats; `id_rs3`/`id_panel` are already globally unique. Full rationale in the `build_main_data()` header comment.
 
@@ -208,6 +209,8 @@ Open `config/00_master_analysis.R` and run it. Uncomment scripts as they are cre
 | `age_youngest_child_no_sc` | Same, excluding stepchildren | Robustness |
 | `potential_telework` | = 1 if V4010 ∈ COD codes eligible for telework (Góes et al. 2020 / Costa et al. 2024) | Derived from V4010 |
 | `clt_private` | = 1 if `VD4009 == 1` (empregado no setor privado com carteira = CLT private-sector employee). The **sharp "law binds here" group** — Art. 75-F applies to CLT employees, unlike datazoom's broader `formal`. Used as the precise placebo/heterogeneity split, not as a sample restriction. = 0 otherwise (incl. non-employed). | Derived from VD4009 |
+| `female` | = 1 if `V2007 == 2` (woman). Base holds both sexes; main analyses filter `female == 1`. Men enter only the triple difference / placebo. | Derived from V2007 |
+| `higher_educ` | = 1 if `VD3004 == 7` (Superior completo / completed higher education). Interpretable education split (vs. `faixa_educ`). ~19.7% of women. | Derived from VD3004 |
 | `is_head_or_spouse` | = 1 if V2005 ∈ {1,2,3} | V2005 |
 | `treated` | = `has_child_u4` (DiD treatment indicator) | |
 | `post_mp` | = 1 if `year_quarter >= 20222` (main spec) | |
@@ -232,7 +235,7 @@ Open `config/00_master_analysis.R` and run it. Uncomment scripts as they are cre
 - GitHub paths via `here::here()`; Dropbox via `DROPBOX_ROOT` global.
 - Analysis output goes to `analysis/output/tables/` and `analysis/output/graphs/` — committed to git.
 - Table outputs are `.tex` fragments for `\input{}` into LaTeX, not full documents.
-- Main sample in analysis scripts: `is_head_or_spouse == 1` (already implied by `treated` construction, but filter explicitly for clarity).
+- **`main_data.RData` holds BOTH sexes.** Women are the analysis sample; men enter only the triple-difference (`07_triple_diff.R`). Every women-only script filters `female == 1 & is_head_or_spouse == 1` explicitly at the top.
 - The `treated` variable is always `has_child_u4` (V2005 ∈ {4,5,6,10,11}, inclusive of stepchildren and grandchildren/great-grandchildren). Robustness: `has_child_u4_no_gc` (no grandchildren/great-grandchildren), `has_child_u4_no_sc` (no stepchildren).
 - **V2005 code note:** "grandchild" (10) and "great-grandchild" (11) are SEPARATE PNADC codes — do not assume 10 covers both. `has_child_u4` includes both; `has_child_u4_no_gc` excludes both.
 - DiD main interaction: `treat_x_post`. Robustness (Q1 2022 cutoff): `treat_x_post_alt`.
@@ -258,7 +261,7 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 
 **Survey weights (`V1028`) are used in EVERY specification, main and robustness alike — not an optional robustness axis.** PNADC's sampling design is not self-weighting (unequal selection probabilities across strata/PSUs), so unweighted estimates would not be representative of the population of interest. There is no "unweighted" version of any table in this project.
 
-**Individual FE (`id_panel`):** YES — always include. The rotating panel allows us to control for all time-invariant individual characteristics (ability, preferences, baseline education, race, region). Without individual FE, parallel trends would require selection-on-observables; with it, identification comes from within-person changes over time. **Always use `id_panel`, never `id_rs3` alone** (unmatched observations would be pooled into one spurious FE).
+**Individual FE (`id_panel`):** YES — always include. The rotating panel lets us control for all time-invariant individual characteristics (ability, preferences, baseline education, race, region). **The specification ladder in Table 2 shows why this matters:** without individual FE (OLS + demographic controls), the first stage is +0.4pp (p≈0.05); adding individual FE drives it to ≈0 (n.s.). The apparent positive is **selection** — which women have a child ≤4 vs. 5–7 differs in unobservables correlated with home-office trends — and individual FE removes it. So the FE are not optional dressing; dropping them (as one might be tempted to, given the short panel) reintroduces selection bias. **Always use `id_panel`, never `id_rs3` alone** (unmatched observations would be pooled into one spurious FE).
 
 **Checking `id_rs3` match quality (confirmed on the actual build, rebuilt 2026-07-01):** `table(dt$panel_matched)` → 136,684 unmatched vs. 3,539,966 matched, i.e. **3.72% unmatched** out of 3,676,650 total observations. This is small, so `id_panel` behaves essentially like `id_rs3` and individual FE absorb what we expect — **use `id_panel` in the main spec**, and additionally run `panel_matched == 1` as a robustness subsample (Table A6) to confirm the small unmatched share isn't driving results.
 
@@ -270,7 +273,7 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 
 | FE / Covariate | Recommended use | Rationale |
 |---|---|---|
-| Age (`V2009 + I(V2009^2)`) | Include in all specs as time-varying covariate | Age changes each quarter; correlated with outcomes and child probability. NOTE: the *linear* term `V2009` is nearly collinear with `id_panel + year_quarter` FE (age = calendar time − birth cohort, both absorbed) — `fixest` will identify it only off the discrete within-person birthday-timing jumps and may drop it as collinear. The quadratic `I(V2009^2)` is not collinear and carries the age adjustment. This is expected; do not treat a dropped/near-zero linear age term as a bug. |
+| Age (`V2009 + I(V2009^2)`) | Shown as the last column of the first-stage ladder (Table 2), not in every spec | With `id_panel + year_quarter` FE the *linear* term is collinear (age = calendar time − birth cohort, both absorbed) and `fixest` identifies it only off discrete birthday-timing jumps; the quadratic carries the age adjustment. Adding age/age² to the preferred spec leaves the first stage unchanged (−0.08pp either way), so age controls are shown once (ladder col 4) rather than repeated. In the no-FE columns of the ladder, age/age² + higher educ + race + region are the demographic controls. |
 | State × Quarter FE (`sigla_uf^year_quarter`) | Robustness only | Controls for state-specific shocks; |
 | Urban × time | Robustness | V1022 mostly stable → absorbed by individual FE; urban × year_quarter controls for city-specific COVID patterns |
 | Race FE (`V2010`) | **Absorbed** by individual FE — do not add | Race is time-invariant |
@@ -351,7 +354,7 @@ Subgroup splits of the main DiD. **Interpretation note:** the `formal` and publi
 | Table A5 | `UPA`-level clustering (vs. main `id_dom`) | `06_robustness.R` |
 | Table A6 | Balanced/matched subsample (`panel_matched == 1` only) | `06_robustness.R` |
 | Table A7 | Restricted sample: `potential_telework == 1` only | `06_robustness.R` |
-| Table A8 | Placebo test — men (see note below) | `06_robustness.R` |
+| Table 8 | Triple difference (men / women / DDD) + men placebo | `07_triple_diff.R` |
 | Table A9 | Outlier sensitivity — winsorize `rendimento_habitual_real` at top 1% (and/or logs) | `06_robustness.R` |
 | Figure A1 | Labor force participation / employment trends (currently `fig03`) | `01_descriptives.R` (done) |
 | Figure A2 | Home office trends, `potential_telework == 1` subgroup (currently `fig04`) | `01_descriptives.R` (done) |
@@ -360,7 +363,7 @@ Subgroup splits of the main DiD. **Interpretation note:** the `formal` and publi
 
 **On the state map:** not required for identification (the DiD does not rely on geographic variation — `sigla_uf^year_quarter` is already a robustness FE, not the main design), but useful as a descriptive appendix figure to show the treated population and the first-stage effect are not concentrated in one region (supports external validity and the state×time robustness spec). Low priority — build only if main results are in good shape and there's room in the appendix. Implementation sketch (guarded by `requireNamespace`, since `geobr`/`sf` are optional): map `home_office` rate by state among treated women, post-MP, using `geobr::read_state()`.
 
-**Placebo/falsification — men (Table A8):** `main_data.RData` is women-only by construction (`build_main_data()` filters `V2007 == 2` in Pass 2), so this placebo needs a **separate, parallel extraction**, not a filter on the existing dataset. Plan: add a small sibling function (e.g. `build_placebo_men_data()`, called from `06_robustness.R` or added to `01_pnadc.R`) that re-reads the same `Panel_*.RData` files and reuses Pass 1's household-level child lookup as-is (it is already sex-agnostic — it looks at V2005/V2009 of every household member regardless of sex) but repeats Pass 2 filtering to `V2007 == 1` (men) instead of `== 2`, saving `placebo_men_data.RData`. **The `(id_dom, V1014, year_quarter)` merge key and the globally-unique `id_dom` composite must be replicated in this sibling function** (same contamination risk applies). Deliberately kept as a separate function rather than a parameter on `build_main_data()`, so the main pipeline's tested logic and output stay untouched. The law's text is not gender-restricted, so a null `treat_x_post` for men supports that the effect operates through the gendered channel this paper is about, not a generic shock correlated with having young children in the household.
+**Triple difference & men placebo (`07_triple_diff.R`).** `main_data.RData` holds both sexes (`female` flag), so the men comparison is a filter, not a separate extraction. Men with young children are *also* eligible under Art. 75-F (the law is not gender-restricted), so they are not a pure placebo for eligibility; instead they net out any generic "parent of a young child, post-2022" shock, isolating the woman-specific response. The DDD is `outcome ~ treated + treated:female + treat_x_post + treat_x_post:female | id_panel + female^year_quarter`, where `treat_x_post:female` is the extra effect for women vs. men and `female^year_quarter` FE absorb sex-specific time shocks. The table reports the men-only DiD, the women-only DiD, and the DDD side by side. **Result: home-office DDD −0.27pp (n.s.)** — the null is not gendered; men also show no first stage (+0.18pp, n.s.).
 
 ---
 
@@ -413,10 +416,14 @@ The evidence is a **clean, comprehensive null**. The first stage (home office) i
 
 **Framing:** the paper's contribution is an evaluation of a *"priority, not right"* legal instrument — increasingly common in family/labor policy — that shows it did not move the outcome it targets, and *why* (employer compliance is voluntary and unenforceable; most eligible women are in non-teleworkable/informal/public jobs; no behavioral sorting toward eligibility). We commit to this null paper now; the identification (donut/threshold, placebo, flat pre-trends through COVID) is what makes the null credible and publishable. See "Target Journals" for the outlet plan.
 
-- [x] `analysis/code/06_robustness.R` — first-stage robustness (Table A1–A7, `tab06`) + winsorized income (A9) + control-window coefplot (`fig08`). **The null is bulletproof:** home office stays ~0 and n.s. under the alt cutoff (+0.20), COVID-window drop (−0.09), treatment variants, ages 20–35/20–40, UPA clustering, matched-panel, and telework-eligible-only; winsorizing income collapses the raw +33 to +5 (n.s.). Men placebo (A8) still pending (needs a separate `V2007==1` extraction).
+- [x] `analysis/code/06_robustness.R` — first-stage robustness (`tab07`) + winsorized income + control-window coefplot (`fig08`). **The null is bulletproof:** home office stays ~0 and n.s. under the alt cutoff (+0.20), COVID-window drop (−0.09), treatment variants, ages 20–35/20–40, UPA clustering, matched-panel, and telework-eligible-only; winsorizing income collapses the raw +33 to +5 (n.s.).
+- [x] **Both-sex rebuild (2026-07-01):** `main_data.RData` now holds men too (7,150,307 obs); added `female` (V2007==2) and `higher_educ` (VD3004==7). All women-only scripts filter `female == 1`; results unchanged.
+- [x] `analysis/code/07_triple_diff.R` — DDD (`treat_x_post:female`) + men placebo (`tab08`, `tab08b`). **Home-office DDD −0.27pp (n.s.); men DiD +0.18pp (n.s.)** → the null is not gendered and the men placebo passes. DDD on income (−129\*\*) and maternity (−0.87\*\*\*) are significant but reflect gender-differential trends / pre-trends, not the (null) telework channel.
+- [x] **First-stage specification ladder (Table 2, `tab02`):** OLS+controls +0.4pp\* → +year FE +0.4pp\* → +individual FE −0.08 (n.s.) → +age² −0.08. The apparent positive without individual FE is **selection into young-motherhood**; individual FE removes it. Justifies the FE choice.
+- [x] `fig09` — maternity-leave event study shows strong pre-trends ⇒ the significant maternity DiD is not causal (parallel trends fails); home office is the only outcome with clean pre-trends.
+- [x] Journal-standard formatting: regression tables via `etable` (coef, SE below, FE rows, N, R²); clean labels (no raw `VD####`); heterogeneity/robustness tables in two-line format.
 
 ### Pending
-- [ ] Table A8 — placebo on men (separate `build_placebo_men_data()` extraction, `V2007 == 1`)
 - [ ] LaTeX paper draft (the null paper — see Target Journals)
 
 ---

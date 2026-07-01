@@ -448,8 +448,11 @@ build_main_data <- function() {
     tmp <- as.data.table(panel_data)
     rm(panel_data)
 
-    # Filter to women 18-49 from 2018 onwards (V4022/home_office only from Q1 2018)
-    tmp <- tmp[V2007 == 2L & V2009 >= 18L & V2009 <= 49L & Ano >= 2018L]
+    # Filter to adults 18-49 from 2018 onwards (V4022/home_office only from Q1
+    # 2018). BOTH sexes are kept: women are the analysis sample (filter
+    # female == 1), men are the additional control dimension for the
+    # triple-difference (DDD) and the men placebo. `female` is added below.
+    tmp <- tmp[V2007 %in% c(1L, 2L) & V2009 >= 18L & V2009 <= 49L & Ano >= 2018L]
     tmp[, year_quarter := Ano * 10L + Trimestre]
 
     # Merge on the composite key (id_dom, V1014, year_quarter) — see the Pass-1
@@ -555,6 +558,16 @@ build_main_data <- function() {
   # kept as the general informality measure. = 0 for everyone else (incl. non-employed).
   dt[, clt_private := fifelse(!is.na(VD4009) & VD4009 == 1L, 1L, 0L)]
 
+  # --- Sex indicator (for the triple-difference / men placebo) ---
+  # V2007: 1 = male, 2 = female. Women are the analysis sample; men enter only
+  # as the third difference in the DDD and as the placebo group.
+  dt[, female := as.integer(V2007 == 2L)]
+
+  # --- Completed higher education (interpretable education split) ---
+  # VD3004 == 7 = "Superior completo". Cleaner binary than faixa_educ for the
+  # heterogeneity split (higher-education-complete vs. not).
+  dt[, higher_educ := fifelse(!is.na(VD3004) & VD3004 == 7L, 1L, 0L)]
+
   # --- Panel identifier for TWFE regressions ---
   # load_pnadc(panel="advanced_3") produces id_rs3: the Stage 3 (Graph Theory
   # fuzzy match) individual ID. Unmatched individuals get id_rs3 = NA.
@@ -598,11 +611,11 @@ build_main_data <- function() {
     # Survey design
     "UF", "UPA", "V1008", "V1014", "V1028", "posest",
     # Demographics (raw)
-    "V2007", "V2009", "V2010", "V2005", "V1022",
+    "V2007", "V2009", "V2010", "V2005", "V1022", "female",
     # Demographics (datazoom-derived)
     "faixa_idade", "regiao", "sigla_uf",
     # Education
-    "VD3004", "VD3005", "faixa_educ",
+    "VD3004", "VD3005", "faixa_educ", "higher_educ",
     # Labor market (raw)
     "VD4001", "VD4002", "VD4009",
     # Labor market (datazoom-derived)

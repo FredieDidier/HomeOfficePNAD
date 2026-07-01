@@ -32,7 +32,7 @@ GRAPH_DIR    <- here("analysis", "output", "graphs")
 
 load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
-dt <- dt[is_head_or_spouse == 1]
+dt <- dt[female == 1 & is_head_or_spouse == 1]
 setorder(dt, id_panel, year_quarter)
 dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
 
@@ -82,30 +82,31 @@ inc_raw  <- fs(A_main, "Income: raw",        y = "rendimento_habitual_real", pp 
 inc_wins <- fs(A_inc,  "Income: winsor. 1\\%", y = "rendimento_habitual_real", pp = FALSE)
 
 # =============================================================================
-# Table A1-A7 (first stage) + A9 (income)
+# Table A (first stage) + income (two-line journal format: estimate; (se) below)
 # =============================================================================
-row_tex <- function(r, d = 2) sprintf("%s & %s$^{%s}$ & (%s) & %s \\\\",
-                                       r$label, fmt(r$est, d), r$star, fmt(r$se, d), fmt0(r$n))
+row_tex <- function(r, d = 2) c(
+  sprintf("%s & %s$^{%s}$ & %s \\\\", r$label, fmt(r$est, d), r$star, fmt0(r$n)),
+  sprintf(" & (%s) & \\\\", fmt(r$se, d)))
 tab <- c(
   "\\begin{table}[htbp]\\centering",
   "\\caption{Robustness of the First-Stage Home-Office Effect}",
   "\\label{tab:robustness}\\small",
-  "\\begin{tabular}{lccc}",
+  "\\begin{tabular}{lcc}",
   "\\toprule",
-  "Specification & Treated $\\times$ Post & (SE) & Obs. \\\\",
+  " & Treated $\\times$ Post & Obs. \\\\",
   "\\midrule",
-  "\\multicolumn{4}{l}{\\textit{Home office (pp)}} \\\\",
+  "\\multicolumn{3}{l}{\\textit{Home office (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(rows)), function(i) row_tex(rows[i]))),
   "\\midrule",
-  "\\multicolumn{4}{l}{\\textit{Real income (R\\$), outlier sensitivity}} \\\\",
+  "\\multicolumn{3}{l}{\\textit{Real income (R\\$), outlier sensitivity}} \\\\",
   row_tex(inc_raw, 1),
   row_tex(inc_wins, 1),
   "\\bottomrule\\end{tabular}",
   "\\begin{tablenotes}\\small",
-  "\\item \\textit{Notes:} Each row is a separate DiD on the preferred sample (treated vs. Control A, child 5--7) with the treated main effect, individual and year-quarter FE, and survey weights. Clustering is at the household except row A5 (UPA). $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%. Placebo on men (Table A8) requires a separate extraction and is pending.",
+  "\\item \\textit{Notes:} Each estimate is a separate DiD on the preferred sample (treated vs.\\ Control A, child 5--7) with the treated main effect, individual and year-quarter FE, and survey weights; SE clustered at the household in parentheses (row A5 clusters at the UPA). $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%. Placebo on men is now Table \\ref{tab:triple_diff} (07\\_triple\\_diff.R).",
   "\\end{tablenotes}\\end{table}"
 )
-writeLines(tab, file.path(TABLE_DIR, "tab06_robustness.tex"))
+writeLines(tab, file.path(TABLE_DIR, "tab07_robustness.tex"))
 
 # =============================================================================
 # Figure A5 (fig08) — control-window sweep, first stage

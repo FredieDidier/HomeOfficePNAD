@@ -1,0 +1,34 @@
+
+\begin{table}[htbp]
+   \caption{\label{tab:did_firststage} First-Stage Home-Office Effect: Specification Ladder (Control A, child 5--7)}
+   \centering
+   \begin{tabular}{lcccc}
+      \tabularnewline \midrule \midrule
+      Dependent Variable: & \multicolumn{4}{c}{Home office}\\
+      Model:                   & (1)            & (2)            & (3)                   & (4)\\  
+      \midrule
+      \emph{Variables}\\
+      Treated (child $\leq$4)  & -0.005$^{***}$ & -0.005$^{***}$ & 0.003                 & 0.003\\   
+                               & (0.002)        & (0.002)        & (0.002)               & (0.002)\\   
+      Treated $\times$ Post    & 0.004$^{**}$   & 0.004$^{*}$    & -0.0008               & -0.0008\\   
+                               & (0.002)        & (0.002)        & (0.003)               & (0.003)\\   
+      Demographic controls     & Yes            & Yes            & No                    & Age only\\  
+      \midrule
+      \emph{Fixed-effects}\\
+      Year-quarter             &                & Yes            & Yes                   & Yes\\  
+      Individual               &                &                & Yes                   & Yes\\  
+      \midrule
+      \emph{Fit statistics}\\
+      Observations             & 1,020,823      & 1,020,823      & 1,020,823             & 1,020,823\\  
+      R$^2$                    & 0.003          & 0.004          & 0.662                 & 0.662\\  
+      Within R$^2$             &                & 0.002          & $1.04\times 10^{-5}$  & $1.05\times 10^{-5}$\\   
+      \midrule \midrule
+      \multicolumn{5}{l}{\emph{Clustered (id\_dom) standard-errors in parentheses}}\\
+      \multicolumn{5}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+   \end{tabular}
+   
+   \par \raggedright 
+   Sample: women 18--49, head/spouse, treated (child $\leq$4) vs.\ Control A (child 5--7). Outcome: home office (0/1). Demographic controls: age, age$^2$, higher education, race, region. Weighted by survey weights; SE clustered at the household in parentheses. Columns (3)--(4) add individual fixed effects. $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+\end{table}
+
+

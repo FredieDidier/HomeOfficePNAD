@@ -1,0 +1,38 @@
+
+\begin{table}[htbp]
+   \caption{\label{tab:triple_diff} Triple Difference: Home Office, Men vs.\ Women}
+   \centering
+   \begin{tabular}{lccc}
+      \tabularnewline \midrule \midrule
+      Dependent Variable: & \multicolumn{3}{c}{Home office}\\
+                                              & Men           & Women     & DDD \\   
+      Model:                                  & (1)           & (2)       & (3)\\  
+      \midrule
+      \emph{Variables}\\
+      Treated (child $\leq$4)                 & -0.004$^{**}$ & 0.003     & -0.004$^{**}$\\   
+                                              & (0.002)       & (0.002)   & (0.002)\\   
+      Treated $\times$ Post                   & 0.002         & -0.0008   & 0.002\\   
+                                              & (0.002)       & (0.003)   & (0.002)\\   
+      Treated $\times$ Female                 &               &           & 0.007$^{***}$\\   
+                                              &               &           & (0.003)\\   
+      Treated $\times$ Post $\times$ Female   &               &           & -0.003\\   
+                                              &               &           & (0.004)\\   
+      \midrule
+      \emph{Fixed-effects}\\
+      Individual                              & Yes           & Yes       & Yes\\  
+      Year-quarter                            & Yes           & Yes       & \\  
+      Female-Year-quarter                     &               &           & Yes\\  
+      \midrule
+      \emph{Fit statistics}\\
+      Observations                            & 798,373       & 1,020,823 & 1,819,196\\  
+      R$^2$                                   & 0.673         & 0.662     & 0.666\\  
+      \midrule \midrule
+      \multicolumn{4}{l}{\emph{Clustered (id\_dom) standard-errors in parentheses}}\\
+      \multicolumn{4}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+   \end{tabular}
+   
+   \par \raggedright 
+   Columns 1--2 are separate DiDs for men and women (treated $=$ child $\leq$4 vs.\ Control A). Column 3 is the pooled triple difference; the coefficient Treated $\times$ Post $\times$ Female is the extra effect for women relative to men, with female$\times$year-quarter fixed effects absorbing any sex-specific time shock. Individual FE throughout; weighted; SE clustered at the household. $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+\end{table}
+
+

@@ -1,0 +1,32 @@
+
+\begin{table}[htbp]
+   \caption{\label{tab:did_outcomes_A} DiD Estimates by Outcome --- Control A (child 5--7)}
+   \centering
+   \begin{tabular}{lcccccc}
+      \tabularnewline \midrule \midrule
+      Dependent Variables:     & Home office & Real income & Usual hours & Employed      & In labor force & Maternity leave\\  
+      Model:                   & (1)         & (2)         & (3)         & (4)           & (5)            & (6)\\  
+      \midrule
+      \emph{Variables}\\
+      Treated (child $\leq$4)  & 0.003       & -22.3       & -0.244      & -0.009$^{**}$ & -0.007         & 0.013$^{***}$\\   
+                               & (0.002)     & (25.9)      & (0.153)     & (0.004)       & (0.004)        & (0.002)\\   
+      Treated $\times$ Post    & -0.0008     & 32.7        & 0.069       & 0.010$^{**}$  & 0.011$^{**}$   & -0.009$^{***}$\\   
+                               & (0.003)     & (35.7)      & (0.202)     & (0.005)       & (0.005)        & (0.002)\\   
+      \midrule
+      \emph{Fixed-effects}\\
+      Individual               & Yes         & Yes         & Yes         & Yes           & Yes            & Yes\\  
+      Year-quarter             & Yes         & Yes         & Yes         & Yes           & Yes            & Yes\\  
+      \midrule
+      \emph{Fit statistics}\\
+      Observations             & 1,020,823   & 495,994     & 519,796     & 1,020,823     & 1,020,823      & 1,020,823\\  
+      R$^2$                    & 0.662       & 0.894       & 0.785       & 0.799         & 0.778          & 0.547\\  
+      \midrule \midrule
+      \multicolumn{7}{l}{\emph{Clustered (id\_dom) standard-errors in parentheses}}\\
+      \multicolumn{7}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+   \end{tabular}
+   
+   \par \raggedright 
+   Each column is a separate DiD (preferred spec: treated main effect + individual and year-quarter FE, weighted, clustered at the household). Sample: women 18--49, head/spouse. Real income and usual hours are observed for workers only. $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+\end{table}
+
+

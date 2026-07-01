@@ -50,7 +50,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "post_mp", "post_mp_alt",
                      "treat_x_post", "treat_x_post_alt",
                      "clt_private",
-                     "age_youngest_child_any"
+                     "age_youngest_child_any",
+                     "female", "higher_educ"
                    ),
                    
                    source = c(
@@ -77,7 +78,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "Project-derived", "Project-derived",
                      "Project-derived", "Project-derived",
                      "Project-derived",
-                     "Project-derived"
+                     "Project-derived",
+                     "Project-derived", "Project-derived"
                    ),
 
                    type = c(
@@ -104,7 +106,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "integer", "integer",
                      "integer", "integer",
                      "integer",
-                     "numeric"
+                     "numeric",
+                     "integer", "integer"
                    ),
 
                    description_pt = c(
@@ -173,7 +176,9 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "Interação DiD principal (= treated × post_mp)",
                      "Interação DiD de robustez (= treated × post_mp_alt)",
                      "=1 se VD4009==1 (empregado no setor privado com carteira = empregado CLT). Grupo em que o Art. 75-F de fato vincula. Usado como corte de placebo/heterogeneidade (não como restrição amostral). =0 para os demais, inclusive não ocupadas.",
-                     "Idade do filho mais novo de QUALQUER idade no domicílio (todos os tipos de filho; NA se não há filhos). Subsume as definições de grupo: tratado = (≤4); janela de controle [5,K]; Controle B = (≥8 ou NA). Usada na robustez de janela de controle."
+                     "Idade do filho mais novo de QUALQUER idade no domicílio (todos os tipos de filho; NA se não há filhos). Subsume as definições de grupo: tratado = (≤4); janela de controle [5,K]; Controle B = (≥8 ou NA). Usada na robustez de janela de controle.",
+                     "Indicador de sexo feminino (=1 se V2007==2). A base contém ambos os sexos; as análises principais filtram female==1. Homens entram apenas no triple-difference (DDD) e no placebo.",
+                     "Ensino superior completo (=1 se VD3004==7). Split de educação mais interpretável que faixa_educ, usado na heterogeneidade."
                    ),
                    
                    description_en = c(
@@ -242,7 +247,9 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "Main DiD interaction term (= treated × post_mp)",
                      "Robustness DiD interaction term (= treated × post_mp_alt)",
                      "=1 if VD4009==1 (private-sector employee with a signed card = CLT employee). The group Art. 75-F actually binds on. Used as a placebo/heterogeneity split (not a sample restriction). =0 otherwise, including the non-employed.",
-                     "Age of the youngest child of ANY age in the household (all child types; NA if no children). Subsumes the group definitions: treated = (<=4); control window [5,K]; Control B = (>=8 or NA). Used for the control-window robustness."
+                     "Age of the youngest child of ANY age in the household (all child types; NA if no children). Subsumes the group definitions: treated = (<=4); control window [5,K]; Control B = (>=8 or NA). Used for the control-window robustness.",
+                     "Female indicator (=1 if V2007==2). The base holds both sexes; main analyses filter female==1. Men enter only the triple-difference (DDD) and the placebo.",
+                     "Completed higher education (=1 if VD3004==7). More interpretable education split than faixa_educ, used in the heterogeneity analysis."
                    ),
                    
                    values_notes = c(
@@ -268,7 +275,7 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "Character, one of 7 values: 'Entre 14 e 17 anos', 'Entre 18 e 24 anos', 'Entre 25 e 29 anos', 'Entre 30 e 39 anos', 'Entre 40 e 49 anos', 'Entre 50 e 59 anos', '60 anos ou mais'. Sample restriction (18-49) means only the middle 5 categories appear in practice ('Entre 14 e 17 anos' and '60 anos ou mais' will not occur).",
                      "Norte, Nordeste, Sudeste, Sul, Centro-Oeste",
                      "Two-letter string (e.g. SP, RJ, MG, BA)",
-                     "1=No schooling, 2=Incomplete primary (4-year), 3=Complete primary (4-year) or incomplete (8-year), 4=Complete primary (8-year) or incomplete secondary, 5=Complete secondary or incomplete higher, 6=Complete higher, 7=Postgraduate",
+                     "1=No schooling (<1 year), 2=Incomplete fundamental, 3=Complete fundamental, 4=Incomplete secondary, 5=Complete secondary, 6=Incomplete higher, 7=Complete higher (Superior completo). higher_educ = (VD3004==7).",
                      "0–17+. Integer.",
                      "Character, one of 5 values: 'Sem instrução', '1 a 7 anos de estudo', '8 a 11 anos de estudo', '9 a 14 anos de estudo', '15 ou mais anos de estudo'. NA if VD3004 is missing.",
                      "1 or 2",
@@ -311,7 +318,9 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "0 or 1 (integer). Main DiD regressor.",
                      "0 or 1 (integer). Use in robustness specifications alongside post_mp_alt.",
                      "0 or 1 (integer). Sharp CLT (private carteira) indicator, VD4009==1. Heterogeneity/placebo moderator; ~19.5% of sample women, ~34% of employed.",
-                     "Integer years (0-17+) or NA. Youngest child of any age. Treated == (value <= 4); control window [5,K] == (value in 5:K)."
+                     "Integer years (0-17+) or NA. Youngest child of any age. Treated == (value <= 4); control window [5,K] == (value in 5:K).",
+                     "0 or 1 (integer). V2007: 1=male, 2=female.",
+                     "0 or 1 (integer). VD3004==7 (Superior completo). ~19.7% of women."
                    )
 )
 

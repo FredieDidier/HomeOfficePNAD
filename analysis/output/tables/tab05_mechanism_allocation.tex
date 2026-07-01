@@ -1,0 +1,33 @@
+
+\begin{table}[htbp]
+   \caption{\label{tab:mech_allocation} Occupational Sorting: Telework-Eligible Occupation as Outcome}
+   \centering
+   \begin{tabular}{lcc}
+      \tabularnewline \midrule \midrule
+      Dependent Variable: & \multicolumn{2}{c}{Telework-eligible occ.}\\
+                               & Control A (5--7) & Control B (no child 0--7) \\   
+      Model:                   & (1)              & (2)\\  
+      \midrule
+      \emph{Variables}\\
+      Treated (child $\leq$4)  & -0.001           & -0.010$^{***}$\\   
+                               & (0.003)          & (0.003)\\   
+      Treated $\times$ Post    & 0.0006           & -0.002\\   
+                               & (0.003)          & (0.003)\\   
+      \midrule
+      \emph{Fixed-effects}\\
+      Individual               & Yes              & Yes\\  
+      Year-quarter             & Yes              & Yes\\  
+      \midrule
+      \emph{Fit statistics}\\
+      Observations             & 1,020,823        & 2,248,643\\  
+      R$^2$                    & 0.829            & 0.834\\  
+      \midrule \midrule
+      \multicolumn{3}{l}{\emph{Clustered (id\_dom) standard-errors in parentheses}}\\
+      \multicolumn{3}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+   \end{tabular}
+   
+   \par \raggedright 
+   Outcome: indicator for being in a telework-eligible occupation. A positive Treated $\times$ Post means treated mothers move into eligible occupations after the MP. Same spec as Table \ref{tab:mech\_moderation}. $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+\end{table}
+
+
