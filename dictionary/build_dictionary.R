@@ -49,7 +49,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "treated",
                      "post_mp", "post_mp_alt",
                      "treat_x_post", "treat_x_post_alt",
-                     "clt_private"
+                     "clt_private",
+                     "age_youngest_child_any"
                    ),
                    
                    source = c(
@@ -75,6 +76,7 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "Project-derived",
                      "Project-derived", "Project-derived",
                      "Project-derived", "Project-derived",
+                     "Project-derived",
                      "Project-derived"
                    ),
 
@@ -101,7 +103,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "integer",
                      "integer", "integer",
                      "integer", "integer",
-                     "integer"
+                     "integer",
+                     "numeric"
                    ),
 
                    description_pt = c(
@@ -169,7 +172,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "=1 se year_quarter ≥ 20221 (robustez: pós-MP a partir do 1º tri 2022)",
                      "Interação DiD principal (= treated × post_mp)",
                      "Interação DiD de robustez (= treated × post_mp_alt)",
-                     "=1 se VD4009==1 (empregado no setor privado com carteira = empregado CLT). Grupo em que o Art. 75-F de fato vincula. Usado como corte de placebo/heterogeneidade (não como restrição amostral). =0 para os demais, inclusive não ocupadas."
+                     "=1 se VD4009==1 (empregado no setor privado com carteira = empregado CLT). Grupo em que o Art. 75-F de fato vincula. Usado como corte de placebo/heterogeneidade (não como restrição amostral). =0 para os demais, inclusive não ocupadas.",
+                     "Idade do filho mais novo de QUALQUER idade no domicílio (todos os tipos de filho; NA se não há filhos). Subsume as definições de grupo: tratado = (≤4); janela de controle [5,K]; Controle B = (≥8 ou NA). Usada na robustez de janela de controle."
                    ),
                    
                    description_en = c(
@@ -237,7 +241,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "=1 if year_quarter ≥ 20221 (robustness: post-MP from Q1 2022 onwards)",
                      "Main DiD interaction term (= treated × post_mp)",
                      "Robustness DiD interaction term (= treated × post_mp_alt)",
-                     "=1 if VD4009==1 (private-sector employee with a signed card = CLT employee). The group Art. 75-F actually binds on. Used as a placebo/heterogeneity split (not a sample restriction). =0 otherwise, including the non-employed."
+                     "=1 if VD4009==1 (private-sector employee with a signed card = CLT employee). The group Art. 75-F actually binds on. Used as a placebo/heterogeneity split (not a sample restriction). =0 otherwise, including the non-employed.",
+                     "Age of the youngest child of ANY age in the household (all child types; NA if no children). Subsumes the group definitions: treated = (<=4); control window [5,K]; Control B = (>=8 or NA). Used for the control-window robustness."
                    ),
                    
                    values_notes = c(
@@ -305,7 +310,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "0 or 1 (integer). Alternative cutoff: Q1 2022 (year_quarter ≥ 20221). Use in robustness tables.",
                      "0 or 1 (integer). Main DiD regressor.",
                      "0 or 1 (integer). Use in robustness specifications alongside post_mp_alt.",
-                     "0 or 1 (integer). Sharp CLT (private carteira) indicator, VD4009==1. Heterogeneity/placebo moderator; ~19.5% of sample women, ~34% of employed."
+                     "0 or 1 (integer). Sharp CLT (private carteira) indicator, VD4009==1. Heterogeneity/placebo moderator; ~19.5% of sample women, ~34% of employed.",
+                     "Integer years (0-17+) or NA. Youngest child of any age. Treated == (value <= 4); control window [5,K] == (value in 5:K)."
                    )
 )
 

@@ -20,8 +20,8 @@
 library(here)
 
 source(here("analysis", "code", "01_descriptives.R"))
-# source(here("analysis", "code", "02_event_study.R"))
-# source(here("analysis", "code", "03_did.R"))
+source(here("analysis", "code", "02_event_study.R"))
+source(here("analysis", "code", "03_did.R"))
 # source(here("analysis", "code", "04_mechanisms.R"))
 # source(here("analysis", "code", "05_heterogeneity.R"))
 # source(here("analysis", "code", "06_robustness.R"))

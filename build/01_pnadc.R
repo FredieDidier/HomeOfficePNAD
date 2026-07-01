@@ -401,22 +401,33 @@ build_main_data <- function() {
                         .(has_child_5_7_no_sc_hh = 1L),
                         by = .(id_dom, V1014, year_quarter)]
 
+    # Youngest child of ANY age (all child types). Flexible variable that
+    # subsumes all group definitions: treated == (age_youngest_child_any <= 4);
+    # control window [5,K] == (age_youngest_child_any in 5:K); Control B
+    # == (age_youngest_child_any >= 8 | is.na()). Enables the control-window
+    # robustness (5-6 ... 5-12) without a proliferation of binary flags.
+    ch_any <- tmp[V2005 %in% child_positions_all,
+                  .(age_youngest_child_any = min(V2009, na.rm = TRUE)),
+                  by = .(id_dom, V1014, year_quarter)]
+
     lu_key <- c("id_dom", "V1014", "year_quarter")
     hh_lu <- merge(ch_all,      ch_no_gc,    by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_no_sc,    by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_5_7,      by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_5_7_no_gc, by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_5_7_no_sc, by = lu_key, all = TRUE)
+    hh_lu <- merge(hh_lu,       ch_any,       by = lu_key, all = TRUE)
 
     hh_lookup_list[[i]] <- hh_lu
-    rm(tmp, ch_all, ch_no_gc, ch_no_sc, ch_5_7, ch_5_7_no_gc, ch_5_7_no_sc, hh_lu); gc()
+    rm(tmp, ch_all, ch_no_gc, ch_no_sc, ch_5_7, ch_5_7_no_gc, ch_5_7_no_sc, ch_any, hh_lu); gc()
   }
 
   hh_lookup <- rbindlist(hh_lookup_list, fill = TRUE)
   rm(hh_lookup_list); gc()
 
   # Replace Inf (from min() on empty sets) with NA
-  for (v in c("age_youngest_child", "age_youngest_child_no_gc", "age_youngest_child_no_sc")) {
+  for (v in c("age_youngest_child", "age_youngest_child_no_gc", "age_youngest_child_no_sc",
+              "age_youngest_child_any")) {
     if (v %in% names(hh_lookup))
       hh_lookup[is.infinite(get(v)), (v) := NA_real_]
   }
@@ -615,6 +626,7 @@ build_main_data <- function() {
     "has_child_u4", "has_child_u4_no_gc", "has_child_u4_no_sc",
     "has_child_5_7", "has_child_5_7_no_gc", "has_child_5_7_no_sc",
     "age_youngest_child", "age_youngest_child_no_gc", "age_youngest_child_no_sc",
+    "age_youngest_child_any",
     "potential_telework",
     "treated", "post_mp", "post_mp_alt",
     "treat_x_post", "treat_x_post_alt"

@@ -28,6 +28,10 @@ The preferred design uses **two control groups in parallel**:
 
 Running both comparisons enables a **dose-response falsification test**: we expect a large effect for treated vs. either control, and **zero effect** for child 5–7 vs. no children. If that pattern holds, it strongly supports the legal age cutoff as the causal mechanism.
 
+> **Control-group hierarchy (decided 2026-07-01).** Control A (child 5–7) is the **preferred/headline** control — the tight age-threshold comparison. Control B (no child 0–7) is kept as a **complementary** comparison (power + the ingredient for the A-vs-B placebo), **not dropped**: the placebo (5–7 vs. no-children ≈ 0) is what licenses treating 5–7 as a clean control, and having B pre-empts the "why not all women?" referee question. Both appear in the main DiD table (Table 2), text leads with A.
+>
+> **Control-window robustness.** A flexible variable `age_youngest_child_any` (youngest child of ANY age) subsumes every group: treated `= (age_youngest_child_any <= 4)`, control window `[5,K] = (age_youngest_child_any in 5:K)`, Control B `= (>= 8 | NA)`. This powers a compact control-window sweep (5–6, 5–7, …, 5–12) as a robustness **coefplot** in `06_robustness.R` (one figure, not many tables). Empirically the first-stage estimate is **stable across all windows** (0.12–0.29pp, all n.s.), so the control's upper bound does not drive results; the credible range is the narrower windows (≈5–6 to 5–10) — wider windows are shown for completeness but the control degrades (mothers of pre-teens are a weaker counterfactual).
+
 ### Why This Is an Intent-to-Treat (ITT) Design
 Art. 75-F gives eligible employees a **priority claim**, not an automatic right, to telework — the employer must prioritize them when allocating teleworkable positions, but is not obligated to grant telework to every eligible employee, and not every job held by an eligible woman is teleworkable. We do not observe, in the PNADC, whether a given employer actually reassigned a given woman to telework because of the law (compliance/take-up is unobserved at the individual level).
 
@@ -124,7 +128,7 @@ analysis/
   code/
     01_descriptives.R   Summary statistics, sample description, descriptive figures
     02_event_study.R    Event-study plot of home_office around MP 1108/2022 (done)
-    03_did.R            DiD main estimates (to be created)
+    03_did.R            DiD main estimates (done)
     04_mechanisms.R     Telework-priority channel: potential_telework moderation + occupation-allocation (to be created)
     05_heterogeneity.R  Subgroup splits: formal/informal, public/private, education, age band (to be created)
     06_robustness.R     Robustness checks and placebo tests (to be created)
@@ -198,7 +202,8 @@ Open `config/00_master_analysis.R` and run it. Uncomment scripts as they are cre
 | `has_child_5_7` | = 1 if head/spouse with child aged 5–7 in HH (V2005 ∈ {4,5,6,10,11}) — donut DiD Control A | Household-level merge |
 | `has_child_5_7_no_gc` | = 1 if head/spouse with child 5–7 in HH, excluding grandchildren/great-grandchildren (V2005 ∈ {4,5,6}) | Robustness |
 | `has_child_5_7_no_sc` | = 1 if head/spouse with child 5–7 in HH, excluding stepchildren (V2005 ∈ {4,5,10,11}) | Robustness |
-| `age_youngest_child` | Age of youngest qualifying child (NA if has_child_u4==0) | Household-level merge |
+| `age_youngest_child` | Age of youngest qualifying child ≤4 (NA if has_child_u4==0) | Household-level merge |
+| `age_youngest_child_any` | Age of the youngest child of ANY age in the household (all child types; NA if no children). Subsumes all group definitions: treated `= (≤4)`, control window `[5,K]`, Control B `= (≥8 | NA)`. Used for the control-window robustness. | Household-level merge |
 | `age_youngest_child_no_gc` | Same, excluding grandchildren | Robustness |
 | `age_youngest_child_no_sc` | Same, excluding stepchildren | Robustness |
 | `potential_telework` | = 1 if V4010 ∈ COD codes eligible for telework (Góes et al. 2020 / Costa et al. 2024) | Derived from V4010 |
@@ -241,11 +246,13 @@ Open `config/00_master_analysis.R` and run it. Uncomment scripts as they are cre
 ### Main TWFE specification
 
 ```r
-feols(outcome ~ treat_x_post | id_panel + year_quarter,
+feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
       data    = dt[is_head_or_spouse == 1],
       weights = ~V1028,
       cluster = ~id_dom)
 ```
+
+> **The `treated` main effect MUST be included (time-varying treatment).** `treated = has_child_u4` switches over the panel (a woman is treated only in the quarters she has a child ≤4; it turns on at a birth and off when the child turns 5). Individual FE therefore do **not** absorb it. Omitting it makes `treat_x_post` pick up the *level* "motherhood penalty" of women who transition into young-child status in the post period — which spuriously produced large significant vs-Control-B estimates on employment/LFP/maternity leave in an earlier draft. With `treated` controlled, `treat_x_post` is the clean DiD (how the young-child gap *changes* post-MP). NOTE: the event study (`02_event_study.R`) already handles this correctly via `i(year_quarter, treated, ref=20221)` — the full interaction set subsumes the main effect, so no separate `treated` term is added there.
 
 > **`cluster = ~id_dom` vs `vcov = ~id_dom`:** in `fixest` these are equivalent (a `vcov` formula `~x` is interpreted as one-way clustering on `x`). We use the explicit `cluster =` argument throughout for readability. For the `UPA` robustness, use `cluster = ~UPA`.
 
@@ -278,7 +285,7 @@ feols(outcome ~ treat_x_post | id_panel + year_quarter,
 - **Robustness:** cluster at `UPA` level (primary sampling unit / census tract). Larger clusters; better asymptotic justification for inference with geographic spillovers.
 
 ### Specification ladder (in paper)
-1. **Baseline:** `treat_x_post | id_panel + year_quarter`, `cluster = ~id_dom`
+1. **Baseline:** `treated + treat_x_post | id_panel + year_quarter`, `cluster = ~id_dom`
 2. **+ Age:** add `V2009 + I(V2009^2)` as controls
 3. **+ State × Time:** add `sigla_uf^year_quarter` to absorb state-specific trends
 4. **Cluster robustness:** re-run (1) with `cluster = ~UPA`
@@ -389,6 +396,7 @@ Subgroup splits of the main DiD. **Interpretation note:** the `formal` and publi
 - [x] Panel files downloaded (`Panel_6..13.RData`) and `main_data.RData` built (3,676,650 obs, 2018Q1–2026Q1)
 - [x] **Build correctness fixes (2026-07-01):** `(id_dom, V1014, year_quarter)` merge key + globally-unique `id_dom` composite (fixes cross-panel contamination); added `employed`/`unemployed`/`in_labor_force` outcomes (since raw `ocupado` is NA out of the labor force); added `clt_private` (VD4009==1, sharp CLT placebo); `telework_cod` replaced with the exact 126-code Costa et al. (2024) Table 2 list. `main_data.RData` rebuilt (65 vars); `01_descriptives.R` outputs regenerated.
 - [x] `analysis/code/02_event_study.R` — event study of `home_office`, Treated vs. Control A and B (Figure 1, `fig06_event_study_home_office`). Clean pre-trends (incl. through COVID); modest, gradually-building post-MP first stage (~+1pp by 2025).
+- [x] `analysis/code/03_did.R` — main DiD (Table 2, `tab02_did_main.tex`), correct spec (`treated + treat_x_post`), Control A preferred + B + A-vs-B placebo. **Result (2026-07-01): the first stage is null** — home office −0.08pp (Control A, n.s.) / +0.38pp (Control B, n.s.); placebo A-vs-B = +0.04pp (n.s., passes). Reduced form (Control A): income n.s., hours n.s.; employment +1.0pp\*\*, LFP +1.05pp\*\*, maternity leave −0.87pp\*\*\*. **With a null first stage these reduced-form significances cannot be attributed to the telework channel** (no first stage ⇒ no Art. 75-F mechanism); likely fragile / other-channel / multiple-testing. Diagnostic: effect is back-loaded (mature 2024+ first stage +0.58pp\*), and bindable subgroups (CLT-private × telework-eligible) point to ~2pp in the mature period but with huge SEs (n.s.).
 - [x] Master scripts (`config/00_master_build.R`, `config/00_master_analysis.R`)
 - [x] PNADC dictionary reviewed; research design finalized
 - [x] `id_rs3` (Stage 3), `id_panel`, `panel_matched` added for safe FE usage
@@ -398,8 +406,12 @@ Subgroup splits of the main DiD. **Interpretation note:** the `formal` and publi
 - [x] Fixed V2005 labels in code and dictionary (4=child of head+spouse, 5=child of head only, 6=stepchild, 10=grandchild)
 - [x] `analysis/code/01_descriptives.R` — Summary statistics and trend figures (run; outputs committed)
 
+### Interpretation note (2026-07-01) — where the paper stands
+The **first stage (home office) is null and reasonably tight** (Control A: −0.08pp, SE 0.30 → 95% CI ≈ [−0.67, +0.51]pp; the earlier +0.17pp was the misspecified no-main-effect version): we can rule out an average telework effect larger than ~0.5–0.6pp. The only positive signal is **marginal and back-loaded** (~0.5–1pp by 2024–2025 in the event study / mature-window DiD). Reduced-form employment/LFP (+1pp\*\*) and maternity leave (−0.87pp\*\*\*) are individually significant, but **with a null first stage they lack the Art. 75-F telework mechanism** — they cannot be causally attributed to the law's telework-priority channel and are likely fragile (multiple outcomes) or driven by other post-2022 changes affecting young-child mothers. Heterogeneity toward the bindable population (CLT-private, telework-eligible) has the right sign but is too imprecise (small subgroups, rare home office) to be significant.
+
+**Implication for framing:** on current data this reads more like an **informative-null policy evaluation** ("a priority-not-mandate telework law did not detectably move telework take-up — employer compliance is voluntary, most eligible women are in non-teleworkable/informal/public jobs, and the priority is unenforceable") than a positive-effect causal paper. The clean identification (flat pre-trends through COVID, passing placebo) makes the null *credible and publishable* in a field/policy outlet, but not a headline positive result for a top journal. Decide framing after `04_mechanisms.R` / `05_heterogeneity.R`; a second option is to await more post-MP quarters (2026–2027), as the event study is trending up.
+
 ### Pending
-- [ ] `analysis/code/03_did.R` — Main DiD estimates, two control groups (Main, Table 2)
 - [ ] `analysis/code/04_mechanisms.R` — Telework-priority channel: `potential_telework` moderation (Table 3) + occupation-allocation, `potential_telework` as outcome (Table 4)
 - [ ] `analysis/code/05_heterogeneity.R` — Subgroup splits: formal/informal, public/private, education, age band (Tables 5–8)
 - [ ] `analysis/code/06_robustness.R` — full list in "Paper Output Plan" above (Tables A1–A9)
