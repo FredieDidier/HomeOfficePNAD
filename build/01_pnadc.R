@@ -356,47 +356,57 @@ build_main_data <- function() {
     tmp <- as.data.table(panel_data)
     rm(panel_data)
 
-    tmp <- tmp[, .(id_dom, Ano, Trimestre, V2009, V2005)]
+    # CRITICAL: key the household lookup on (id_dom, V1014, year_quarter), NOT
+    # just (id_dom, year_quarter). id_dom is only unique WITHIN a V1014 rotation
+    # group, not across groups (confirmed: ~26k (id_dom, year_quarter) keys
+    # collide across the two panels that overlap each calendar quarter). Since a
+    # physical household belongs to exactly one V1014 group, adding V1014 to the
+    # key fully disambiguates. Without it, the Pass-2 merge below matched women
+    # to child flags from a DIFFERENT household in another panel that happened to
+    # share the same id_dom in the same quarter, duplicating rows and assigning
+    # false treatment flags.
+    tmp <- tmp[, .(id_dom, V1014, Ano, Trimestre, V2009, V2005)]
     tmp[, year_quarter := Ano * 10L + Trimestre]
 
     # Children ≤4 (all child types: biological + stepchildren + grandchildren+)
     ch_all <- tmp[V2009 <= 4L & V2005 %in% child_positions_all,
                   .(has_child_u4_hh      = 1L,
                     age_youngest_child   = min(V2009, na.rm = TRUE)),
-                  by = .(id_dom, year_quarter)]
+                  by = .(id_dom, V1014, year_quarter)]
 
     # Children ≤4 (excluding grandchildren/great-grandchildren)
     ch_no_gc <- tmp[V2009 <= 4L & V2005 %in% child_positions_no_gc,
                     .(has_child_u4_no_gc_hh        = 1L,
                       age_youngest_child_no_gc     = min(V2009, na.rm = TRUE)),
-                    by = .(id_dom, year_quarter)]
+                    by = .(id_dom, V1014, year_quarter)]
 
     # Children ≤4 (excluding stepchildren)
     ch_no_sc <- tmp[V2009 <= 4L & V2005 %in% child_positions_no_sc,
                     .(has_child_u4_no_sc_hh        = 1L,
                       age_youngest_child_no_sc     = min(V2009, na.rm = TRUE)),
-                    by = .(id_dom, year_quarter)]
+                    by = .(id_dom, V1014, year_quarter)]
 
     # Children 5-7 (all child types — donut DiD Control A)
     ch_5_7 <- tmp[V2009 >= 5L & V2009 <= 7L & V2005 %in% child_positions_all,
                   .(has_child_5_7_hh = 1L),
-                  by = .(id_dom, year_quarter)]
+                  by = .(id_dom, V1014, year_quarter)]
 
     # Children 5-7 (excluding grandchildren/great-grandchildren)
     ch_5_7_no_gc <- tmp[V2009 >= 5L & V2009 <= 7L & V2005 %in% child_positions_no_gc,
                         .(has_child_5_7_no_gc_hh = 1L),
-                        by = .(id_dom, year_quarter)]
+                        by = .(id_dom, V1014, year_quarter)]
 
     # Children 5-7 (excluding stepchildren)
     ch_5_7_no_sc <- tmp[V2009 >= 5L & V2009 <= 7L & V2005 %in% child_positions_no_sc,
                         .(has_child_5_7_no_sc_hh = 1L),
-                        by = .(id_dom, year_quarter)]
+                        by = .(id_dom, V1014, year_quarter)]
 
-    hh_lu <- merge(ch_all,      ch_no_gc,    by = c("id_dom", "year_quarter"), all = TRUE)
-    hh_lu <- merge(hh_lu,       ch_no_sc,    by = c("id_dom", "year_quarter"), all = TRUE)
-    hh_lu <- merge(hh_lu,       ch_5_7,      by = c("id_dom", "year_quarter"), all = TRUE)
-    hh_lu <- merge(hh_lu,       ch_5_7_no_gc, by = c("id_dom", "year_quarter"), all = TRUE)
-    hh_lu <- merge(hh_lu,       ch_5_7_no_sc, by = c("id_dom", "year_quarter"), all = TRUE)
+    lu_key <- c("id_dom", "V1014", "year_quarter")
+    hh_lu <- merge(ch_all,      ch_no_gc,    by = lu_key, all = TRUE)
+    hh_lu <- merge(hh_lu,       ch_no_sc,    by = lu_key, all = TRUE)
+    hh_lu <- merge(hh_lu,       ch_5_7,      by = lu_key, all = TRUE)
+    hh_lu <- merge(hh_lu,       ch_5_7_no_gc, by = lu_key, all = TRUE)
+    hh_lu <- merge(hh_lu,       ch_5_7_no_sc, by = lu_key, all = TRUE)
 
     hh_lookup_list[[i]] <- hh_lu
     rm(tmp, ch_all, ch_no_gc, ch_no_sc, ch_5_7, ch_5_7_no_gc, ch_5_7_no_sc, hh_lu); gc()
@@ -431,7 +441,9 @@ build_main_data <- function() {
     tmp <- tmp[V2007 == 2L & V2009 >= 18L & V2009 <= 49L & Ano >= 2018L]
     tmp[, year_quarter := Ano * 10L + Trimestre]
 
-    tmp <- merge(tmp, hh_lookup, by = c("id_dom", "year_quarter"), all.x = TRUE)
+    # Merge on the composite key (id_dom, V1014, year_quarter) — see the Pass-1
+    # comment for why V1014 is required to avoid cross-panel contamination.
+    tmp <- merge(tmp, hh_lookup, by = c("id_dom", "V1014", "year_quarter"), all.x = TRUE)
 
     # Fill NA (household not in lookup = no qualifying child in household)
     flag_vars <- c("has_child_u4_hh", "has_child_u4_no_gc_hh", "has_child_u4_no_sc_hh",
@@ -476,25 +488,61 @@ build_main_data <- function() {
   # NOTE: do NOT restrict the main sample to potential_telework == 1 — occupation
   # is endogenous to the MP (women may switch to telework-eligible jobs in
   # response to the policy). Use potential_telework as a heterogeneity moderator.
+  # EXACT list of the 126 COD codes from Table 2 of Costa et al. (2024),
+  # transcribed code-by-code. Source PDF:
+  # https://savearchive.zbw.eu/bitstream/11159/709467/1/1931566534_0.pdf
   telework_cod <- c(
     1111L, 1112L, 1113L, 1114L, 1120L,
     1211L, 1212L, 1213L, 1219L, 1221L, 1223L,
     1321L, 1322L, 1323L, 1324L, 1330L, 1344L, 1345L, 1431L,
     2111L, 2120L, 2133L, 2142L, 2151L, 2152L, 2153L,
-    2161L:2166L,
+    2161L, 2162L, 2163L, 2164L, 2166L,
     2265L, 2266L,
-    2310L:2359L, 2411L:2431L, 2511L:2529L, 2611L:2659L,
+    2310L, 2320L, 2330L, 2341L, 2342L, 2351L, 2352L, 2353L, 2354L, 2355L, 2356L, 2359L,
+    2411L, 2412L, 2413L, 2421L, 2422L, 2424L, 2431L,
+    2511L, 2512L, 2513L, 2514L, 2519L, 2521L, 2522L, 2523L, 2529L,
+    2611L, 2612L, 2621L, 2622L, 2631L, 2632L, 2633L, 2634L, 2636L, 2641L, 2643L,
+    2651L, 2652L, 2653L, 2654L, 2655L, 2656L, 2659L,
     3118L,
-    3311L:3359L, 3411L:3422L, 3511L:3522L,
-    4110L:4225L, 4311L:4415L,
+    3311L, 3312L, 3313L, 3314L, 3315L, 3321L, 3322L, 3323L, 3341L, 3342L, 3343L,
+    3352L, 3353L, 3359L,
+    3411L, 3413L, 3421L, 3422L, 3423L,
+    3511L, 3512L, 3513L, 3514L, 3522L,
+    4110L, 4120L, 4221L, 4222L, 4223L, 4225L,
+    4311L, 4312L, 4313L, 4411L, 4413L, 4415L,
     5165L, 5241L, 5244L, 5311L, 5312L,
-    7316L:7319L, 7533L
+    7316L, 7317L, 7318L, 7319L,
+    7533L
   )
   dt[, potential_telework := fifelse(!is.na(V4010) & V4010 %in% telework_cod, 1L, 0L)]
 
   # --- Maternity leave proxy ---
-  # V4006A: reason for absence (available Q4 2015+); category 2 = maternity leave
+  # V4006A: reason for absence (available Q4 2015+); category 2 = maternity/
+  # paternity leave.
   dt[, on_maternity_leave := fifelse(!is.na(V4006A) & V4006A == 2L, 1L, 0L)]
+
+  # --- Employment status outcomes (defined over the FULL sample) ---
+  # datazoom's `ocupado` (from VD4002) is NA for anyone out of the labor force
+  # (forca_trab == 0), so using it directly as a DiD outcome would silently drop
+  # out-of-labor-force women — i.e. condition on labor-force participation, which
+  # is itself a post-treatment outcome. We therefore build 0/1 indicators over
+  # ALL sample women (out-of-labor-force → not employed / not unemployed):
+  #   in_labor_force : = forca_trab (already 0/1, never NA)
+  #   employed       : in labor force AND ocupado  → 1, else 0
+  #   unemployed     : in labor force AND not ocupado (desocupado) → 1, else 0
+  # Note ocupado is non-NA exactly when forca_trab == 1, so these are well-defined.
+  dt[, in_labor_force := as.integer(forca_trab)]
+  dt[, employed   := fifelse(!is.na(ocupado) & ocupado == 1L, 1L, 0L)]
+  dt[, unemployed := fifelse(!is.na(ocupado) & ocupado == 0L, 1L, 0L)]
+
+  # --- CLT private-sector employee (sharp "law binds" indicator) ---
+  # Art. 75-F binds on CLT employees. datazoom's `formal` is broader (also public,
+  # military/statutory, and INSS-contributing self-employed), where the law does
+  # NOT bind. VD4009 == 1 = "empregado no setor privado com carteira" is the
+  # sharpest group the provision applies to. Used as the precise placebo/
+  # heterogeneity split in 05_heterogeneity.R; `formal`/`informal` (datazoom) are
+  # kept as the general informality measure. = 0 for everyone else (incl. non-employed).
+  dt[, clt_private := fifelse(!is.na(VD4009) & VD4009 == 1L, 1L, 0L)]
 
   # --- Panel identifier for TWFE regressions ---
   # load_pnadc(panel="advanced_3") produces id_rs3: the Stage 3 (Graph Theory
@@ -508,6 +556,17 @@ build_main_data <- function() {
     id_rs3,
     paste0("unmatched_", .I)
   )]
+  # id_rs3 is already globally unique across panels (confirmed: 0 collisions),
+  # so id_panel needs no V1014 prefix.
+
+  # --- Globally-unique household ID (for clustering & retention stats) ---
+  # Unlike id_rs3, the datazoom household ID id_dom is only unique WITHIN a
+  # V1014 rotation group (confirmed: ~197k id_dom values are reused across
+  # panels for genuinely different households). Clustering and
+  # the panel-retention diagnostics would otherwise pool two unrelated
+  # households across panels. Prefix with V1014 to make it globally unique.
+  # (This is done AFTER the Pass-2 merge, which needs the raw integer id_dom.)
+  dt[, id_dom := paste0(V1014, "_", id_dom)]
 
   # --- Treatment & post-policy indicators ---
   # Art. 75-F of MP 1108/2022 (enacted 25 March 2022; published 28 March 2022).
@@ -537,6 +596,10 @@ build_main_data <- function() {
     "VD4001", "VD4002", "VD4009",
     # Labor market (datazoom-derived)
     "ocupado", "forca_trab", "formal", "informal",
+    # Employment status outcomes (project-derived, defined over full sample)
+    "in_labor_force", "employed", "unemployed",
+    # CLT private-sector employee (sharp "law binds" heterogeneity indicator)
+    "clt_private",
     # Income
     "VD4019", "Habitual", "rendimento_habitual_real",
     # Hours

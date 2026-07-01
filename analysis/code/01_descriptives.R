@@ -62,8 +62,13 @@ dt_hs[, post := factor(post, levels = c("Pre-MP", "Post-MP (Q2 2022+)"))]
 # TABLE 1 — Sample means by group and pre/post
 # =============================================================================
 
+# Use the project-derived employment indicators (in_labor_force, employed),
+# which are defined over ALL sample women. Do NOT use datazoom's `ocupado`
+# directly here: it is NA for anyone out of the labor force, so its weighted
+# mean would be the employment rate AMONG labor-force participants, not the
+# share of all women who are employed (see build/01_pnadc.R).
 vars_desc <- c(
-  "home_office", "forca_trab", "ocupado",
+  "home_office", "in_labor_force", "employed",
   "rendimento_habitual_real", "VD4031", "VD4035",
   "on_maternity_leave", "formal", "potential_telework",
   "V2009"
@@ -167,7 +172,7 @@ make_latex_table1(
 
 
 # =============================================================================
-# TABLE 2 — Panel retention diagnostics
+# TABLE A0 — Panel retention diagnostics
 #
 # Validates, for the reader, that the datazoom.social advanced (Stage 3)
 # individual panel identification is actually capturing the rotating panel's
@@ -221,7 +226,7 @@ ind_pairs <- unique(dt_hs[panel_matched == 1, .(id_rs3, year_quarter)])
 hh_res  <- compute_retention(hh_pairs,  "id_dom")
 ind_res <- compute_retention(ind_pairs, "id_rs3")
 
-make_latex_table2 <- function(hh_res, ind_res, outfile) {
+make_latex_table2 <- function(hh_res, ind_res, outfile, range_str) {
   fmt_pct <- function(x) sprintf("%.1f\\%%", x)
 
   lines <- c(
@@ -249,7 +254,7 @@ make_latex_table2 <- function(hh_res, ind_res, outfile) {
     "\\end{tabular}",
     "\\begin{tablenotes}",
     "\\small",
-    "\\item \\textit{Notes:} Sample: women aged 18--49 who are household head or spouse, the main estimation sample used throughout the paper. Individuals are tracked across quarters using an advanced panel identification algorithm that links respondents via birth date and household composition, including fuzzy matching for interviews with incomplete or fragmented information; the sample is restricted to individuals for whom this linkage succeeded. Households are tracked using a time-invariant household identifier. Panel A reports retention rates: the share of households and individuals observed for at least $X$ quarterly interviews (the survey's rotating panel design caps any respondent at five). Panel B reports quarter-to-quarter transition probabilities: of all household-quarter or individual-quarter observations for which a subsequent quarter could in principle have been observed, the share that are. Statistics pool all quarters from 2018Q1 to 2026Q1.",
+    "\\item \\textit{Notes:} Sample: women aged 18--49 who are household head or spouse, the main estimation sample used throughout the paper. Individuals are tracked across quarters using an advanced panel identification algorithm that links respondents via birth date and household composition, including fuzzy matching for interviews with incomplete or fragmented information; the sample is restricted to individuals for whom this linkage succeeded. Households are tracked using a time-invariant household identifier. Panel A reports retention rates: the share of households and individuals observed for at least $X$ quarterly interviews (the survey's rotating panel design caps any respondent at five). Panel B reports quarter-to-quarter transition probabilities: of all household-quarter or individual-quarter observations for which a subsequent quarter could in principle have been observed, the share that are. Statistics pool all quarters from ", range_str, ".",
     "\\end{tablenotes}",
     "\\end{table}"
   )
@@ -257,10 +262,16 @@ make_latex_table2 <- function(hh_res, ind_res, outfile) {
   message("Table 2 saved: ", outfile)
 }
 
+# Dynamic sample date range (e.g. "2018Q1 to 2026Q1") for the table note.
+yq_to_str <- function(yq) sprintf("%dQ%d", yq %/% 10L, yq %% 10L)
+range_str <- paste0(yq_to_str(min(dt_hs$year_quarter)), " to ",
+                    yq_to_str(max(dt_hs$year_quarter)))
+
 make_latex_table2(
-  hh_res  = hh_res,
-  ind_res = ind_res,
-  outfile = file.path(TABLE_DIR, "tabA0_panel_retention.tex")
+  hh_res    = hh_res,
+  ind_res   = ind_res,
+  outfile   = file.path(TABLE_DIR, "tabA0_panel_retention.tex"),
+  range_str = range_str
 )
 
 
@@ -373,16 +384,16 @@ message("Figure 2 saved.")
 # FIGURE 3 — Labor force participation and employment rate by group
 # =============================================================================
 
-# NOTE on `ocupado` ("emp_rate" below): PNADC's VD4002 (employed/unemployed)
-# is only defined for people already in the labor force -- it is NA for anyone
-# out of the labor force (forca_trab == 0). So weighted.mean(ocupado, na.rm=TRUE)
-# is computed only over labor-force participants, i.e. it is the employment
-# rate AMONG the labor force (equivalently, 1 - unemployment rate), not the
-# employment rate among all women. Labelled explicitly below to avoid confusion
-# with an unconditional "share of all women who are employed" measure.
+# Both series are defined over ALL sample women, using the project-derived
+# indicators (see build/01_pnadc.R): `in_labor_force` (= forca_trab) and
+# `employed` (= 1 only if in the labor force AND occupied, else 0). So emp_rate
+# here is the unconditional share of all women who are employed -- NOT the
+# employment rate among labor-force participants. Using datazoom's raw `ocupado`
+# instead would silently condition on labor-force participation (it is NA for
+# anyone out of the labor force).
 lfp_trends <- dt_hs[, .(
-  lfp_rate = weighted.mean(forca_trab, w = V1028, na.rm = TRUE),
-  emp_rate = weighted.mean(ocupado,    w = V1028, na.rm = TRUE),
+  lfp_rate = weighted.mean(in_labor_force, w = V1028, na.rm = TRUE),
+  emp_rate = weighted.mean(employed,       w = V1028, na.rm = TRUE),
   n        = .N
 ), by = .(year_quarter, group)]
 
@@ -399,11 +410,11 @@ lfp_long <- melt(
 )
 lfp_long[, panel_label := fcase(
   outcome == "lfp_rate", "Labor force participation rate",
-  outcome == "emp_rate", "Employment rate among labor force participants"
+  outcome == "emp_rate", "Employment rate (share of all women)"
 )]
 lfp_long[, panel_label := factor(panel_label, levels = c(
   "Labor force participation rate",
-  "Employment rate among labor force participants"
+  "Employment rate (share of all women)"
 ))]
 
 fig3 <- ggplot(lfp_long, aes(x = date, y = rate * 100, colour = group)) +
