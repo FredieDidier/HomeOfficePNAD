@@ -19,6 +19,7 @@ postprocess_tex <- function(file, fontsize = "\\small", tabcolsep = 4, addspace 
   tx <- readLines(file)
   tx <- tx[!grepl("standard-errors in parentheses", tx, fixed = TRUE)]
   tx <- tx[!grepl("Signif. Codes", tx, fixed = TRUE)]  # our own legend is in the note
+  tx <- sub("\\begin{table}[htbp]", "\\begin{table}[H]", tx, fixed = TRUE)  # float placement
   tx <- sub("\\tabularnewline \\midrule \\midrule", "\\toprule", tx, fixed = TRUE)
   tx <- sub("^\\s*\\\\midrule \\\\midrule\\s*$", "\\\\bottomrule", tx)
   # Add a small vertical gap after each standard-error row (rows whose first cell

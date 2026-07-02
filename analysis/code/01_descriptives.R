@@ -102,7 +102,7 @@ make_latex_table1 <- function(tab, labels, outfile) {
   nvar <- nrow(tab)
   lines <- character(0)
   lines <- c(lines,
-    "\\begin{table}[htbp]",
+    "\\begin{table}[H]",
     "\\centering",
     "\\caption{Summary Statistics by Treatment Group}",
     "\\label{tab:descriptives}",
@@ -226,7 +226,7 @@ make_latex_table2 <- function(hh_res, ind_res, outfile, range_str) {
   fmt_pct <- function(x) sprintf("%.1f\\%%", x)
 
   lines <- c(
-    "\\begin{table}[htbp]",
+    "\\begin{table}[H]",
     "\\centering",
     "\\caption{Retention Rates of Households and Individuals Across Quarters}",
     "\\label{tab:panel_retention}",

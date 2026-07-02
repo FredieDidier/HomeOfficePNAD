@@ -74,7 +74,7 @@ etable(ddd_mods,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Triple Difference Across Outcomes",
        label = "tab:triple_diff_outcomes",
-       notes = paste("\\footnotesize\\textit{Notes:} Each column is a triple-difference regression with the same specification as the first-stage triple difference. The table reports the men effect (Treated $\\times$ Post) and the female differential (Treated $\\times$ Post $\\times$ Female). Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste("\\footnotesize\\textit{Notes:} Each column is a triple-difference regression with the same specification as the first-stage triple difference. The table reports the men effect (Treated $\\times$ Post) and the female differential (Treated $\\times$ Post $\\times$ Female). Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; real income is in reais per month and usual hours in hours per week, both observed for workers only. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
 postprocess_tex(tab08b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 # ---- Console ---------------------------------------------------------------

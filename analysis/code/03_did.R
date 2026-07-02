@@ -97,7 +97,7 @@ etable(mods_A,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control A",
        label = "tab:did_outcomes_A",
-       notes = paste("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Real income and usual hours are observed for workers only. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; real income is in reais per month and usual hours in hours per week, both observed for workers only. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
 postprocess_tex(tab03a_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 tab03b_file <- file.path(TABLE_DIR, "tab03b_did_outcomes_B.tex")
@@ -106,7 +106,7 @@ etable(mods_B,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control B",
        label = "tab:did_outcomes_B",
-       notes = paste("\\footnotesize\\textit{Notes:} As in the Control~A outcome table, using the broad comparison group (women with no child aged 0--7). Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste("\\footnotesize\\textit{Notes:} As in the Control~A outcome table, using the broad comparison group (women with no child aged 0--7). Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; real income is in reais per month and usual hours in hours per week, both observed for workers only. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
 postprocess_tex(tab03b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 # ---- A-vs-B placebo (home office) ------------------------------------------

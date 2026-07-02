@@ -95,7 +95,7 @@ row_tex <- function(r, d = 2) c(
   sprintf("%s & %s$^{%s}$ & %s \\\\", r$label, fmt(r$est, d), r$star, fmt0(r$n)),
   sprintf(" & (%s) & \\\\", fmt(r$se, d)))
 tab <- c(
-  "\\begin{table}[htbp]\\centering",
+  "\\begin{table}[H]\\centering",
   "\\caption{Robustness of the First-Stage Home-Office Effect}",
   "\\label{tab:robustness}\\small",
   "\\begin{tabular}{lcc}",

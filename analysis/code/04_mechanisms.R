@@ -61,7 +61,7 @@ etable(fe(A, "potential_telework"), fe(B, "potential_telework"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Occupational Sorting: Telework-Eligible Occupation as Outcome",
        label = "tab:mech_allocation",
-       notes = paste("\\footnotesize\\textit{Notes:} The outcome is an indicator for being in a telework-eligible occupation. A positive Treated $\\times$ Post coefficient would mean treated mothers move into eligible occupations after the reform. Same specification as the moderation table; standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste("\\footnotesize\\textit{Notes:} The outcome is an indicator for being in a telework-eligible occupation. A positive Treated $\\times$ Post coefficient would mean treated mothers move into eligible occupations after the reform. The specification is the same preferred difference-in-differences used for the first stage: the treated main effect with individual and year-quarter fixed effects, weighted by the survey weights. Standard errors are clustered at the household in parentheses.", SIGNIF_NOTE))
 postprocess_tex(tab05_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5b: occupation transition matrix (descriptive) ------------------
@@ -82,7 +82,7 @@ trans_tab <- function(g, lbl) {
     sprintf("$\\quad$ Pre: not eligible & %s & %s \\\\", p(0, 0), p(0, 1)),
     sprintf("$\\quad$ Pre: eligible & %s & %s \\\\", p(1, 0), p(1, 1)))
 }
-tb <- c("\\begin{table}[htbp]\\centering",
+tb <- c("\\begin{table}[H]\\centering",
   "\\caption{Occupation Transitions Around the Reform}",
   "\\label{tab:occ_transition}\\small",
   "\\begin{tabular}{lcc}", "\\toprule",

@@ -74,7 +74,7 @@ grp <- function(title, labs) {
         sprintf(" & (%s) & \\\\", fmt(r$se)))
     })))
 }
-tab <- c("\\begin{table}[htbp]\\centering",
+tab <- c("\\begin{table}[H]\\centering",
   "\\caption{Heterogeneity of the First-Stage Home-Office Effect (pp)}",
   "\\label{tab:heterogeneity}\\small",
   "\\begin{tabular}{lcc}", "\\toprule",
