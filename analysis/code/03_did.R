@@ -69,7 +69,7 @@ m4 <- feols(home_office ~ treated + treat_x_post + I(V2009^2) |
 
 tab02_file <- file.path(TABLE_DIR, "tab02_did_firststage.tex")
 etable(m1, m2, m3, m4,
-       tex = TRUE, file = tab02_file, replace = TRUE, signif.code = NA,
+       tex = TRUE, file = tab02_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, drop = c("post_mp", "V2009", "V2010", "regiao", "higher_educ", "Constant"),
        extralines = list("Demographic controls" = c("Yes", "Yes", "No", "Age$^2$ only")),
        fitstat = ~ n + r2 + wr2, digits = 3, digits.stats = 3,
@@ -93,7 +93,7 @@ mods_B <- run_all(samp_B)
 
 tab03a_file <- file.path(TABLE_DIR, "tab03a_did_outcomes_A.tex")
 etable(mods_A,
-       tex = TRUE, file = tab03a_file, replace = TRUE, signif.code = NA,
+       tex = TRUE, file = tab03a_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control A",
        label = "tab:did_outcomes_A",
@@ -102,7 +102,7 @@ postprocess_tex(tab03a_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 tab03b_file <- file.path(TABLE_DIR, "tab03b_did_outcomes_B.tex")
 etable(mods_B,
-       tex = TRUE, file = tab03b_file, replace = TRUE, signif.code = NA,
+       tex = TRUE, file = tab03b_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control B",
        label = "tab:did_outcomes_B",

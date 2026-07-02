@@ -15,11 +15,23 @@
 # `signif.code = NA` (which removes the redundant "Signif. Codes" row).
 # =============================================================================
 
-postprocess_tex <- function(file, fontsize = "\\small", tabcolsep = 4) {
+postprocess_tex <- function(file, fontsize = "\\small", tabcolsep = 4, addspace = TRUE) {
   tx <- readLines(file)
   tx <- tx[!grepl("standard-errors in parentheses", tx, fixed = TRUE)]
+  tx <- tx[!grepl("Signif. Codes", tx, fixed = TRUE)]  # our own legend is in the note
   tx <- sub("\\tabularnewline \\midrule \\midrule", "\\toprule", tx, fixed = TRUE)
   tx <- sub("^\\s*\\\\midrule \\\\midrule\\s*$", "\\\\bottomrule", tx)
+  # Add a small vertical gap after each standard-error row (rows whose first cell
+  # is empty and that carry a parenthesized SE) so each coefficient is visually
+  # grouped with its own SE, keeping successive variables clearly separated.
+  if (addspace) {
+    se <- grepl("^\\s*&.*\\([0-9]", tx)
+    if (any(se)) {
+      out <- vector("list", length(tx))
+      for (k in seq_along(tx)) out[[k]] <- if (se[k]) c(tx[k], "\\addlinespace[2pt]") else tx[k]
+      tx <- unlist(out)
+    }
+  }
   i  <- grep("\\begin{tabular}", tx, fixed = TRUE)[1]
   tx <- append(tx, paste0(fontsize, "\\setlength{\\tabcolsep}{", tabcolsep, "pt}"),
                after = i - 1)

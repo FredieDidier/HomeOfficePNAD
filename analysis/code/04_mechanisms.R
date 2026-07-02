@@ -45,7 +45,7 @@ fe <- function(sample, y = "home_office")
 # ---- Table 4: moderation by baseline telework eligibility -------------------
 tab04_file <- file.path(TABLE_DIR, "tab04_mechanism_moderation.tex")
 etable(fe(A), fe(A[pt_base == 1]), fe(A[pt_base == 0]),
-       tex = TRUE, file = tab04_file, replace = TRUE, signif.code = NA,
+       tex = TRUE, file = tab04_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, headers = c("All", "Telework-eligible", "Not eligible"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect by Baseline Telework Eligibility",
@@ -56,7 +56,7 @@ postprocess_tex(tab04_file, fontsize = "\\small", tabcolsep = 5)
 # ---- Table 5: occupational sorting (potential_telework as outcome) ----------
 tab05_file <- file.path(TABLE_DIR, "tab05_mechanism_allocation.tex")
 etable(fe(A, "potential_telework"), fe(B, "potential_telework"),
-       tex = TRUE, file = tab05_file, replace = TRUE, signif.code = NA,
+       tex = TRUE, file = tab05_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, headers = c("Control A (5--7)", "Control B (no child 0--7)"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Occupational Sorting: Telework-Eligible Occupation as Outcome",

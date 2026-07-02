@@ -96,4 +96,28 @@ ggsave(file.path(GRAPH_DIR, "fig09_event_study_maternity.pdf"), fig9, width = 8,
 ggsave(file.path(GRAPH_DIR, "fig09_event_study_maternity.png"), fig9, width = 8, height = 7, dpi = 300)
 message("Figure 9 (maternity-leave event study) saved.")
 
+# ---- Pre-trend joint test ---------------------------------------------------
+# Joint Wald test that all pre-reform leads are zero (H0: parallel pre-trends),
+# for home office, using the clustered vcov. Pre-period terms are the treated x
+# quarter interactions for 2018Q1-2021Q4 (2022Q1 is the omitted reference).
+pretrend_test <- function(control_flag, label, yvar = "home_office") {
+  d <- dt[has_child_u4 == 1 | control_flag]
+  d[, treated := as.integer(has_child_u4 == 1)]
+  m <- feols(as.formula(sprintf("%s ~ i(year_quarter, treated, ref = %d) | id_panel + year_quarter",
+                                yvar, REF_QUARTER)),
+             data = d, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
+  b <- coef(m); V <- vcov(m)
+  pre <- grep("year_quarter::20(18|19|20|21)[1-4]:treated", names(b), value = TRUE)
+  bb <- b[pre]; VV <- V[pre, pre]
+  chi2 <- as.numeric(t(bb) %*% solve(VV) %*% bb)
+  k <- length(pre); p <- pchisq(chi2, df = k, lower.tail = FALSE)
+  cat(sprintf("Pre-trend joint test [%s, %s]: chi2(%d) = %.2f, p = %.3f\n",
+              label, yvar, k, chi2, p))
+  invisible(list(chi2 = chi2, df = k, p = p))
+}
+cat("\n=== Pre-trend joint tests (H0: all pre-reform leads = 0) ===\n")
+pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "home_office")
+pretrend_test(dt$has_child_u4 == 0 & dt$has_child_5_7 == 0, "Control B", "home_office")
+pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "on_maternity_leave")
+
 message("\n=== 02_event_study.R complete ===")
