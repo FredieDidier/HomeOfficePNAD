@@ -76,8 +76,9 @@ n_tr   <- nrow(tr[grp == 1])
 n_ctrl <- nrow(tr[grp == 0])
 trans_tab <- function(g, lbl) {
   s <- tr[grp == g]
+  ng <- formatC(nrow(s), big.mark = ",", format = "d")
   p <- function(a, b) sprintf("%.1f\\%%", 100 * mean(s$pt_pre == a & s$pt_post == b))
-  c(sprintf("\\multicolumn{3}{l}{\\textit{%s}} \\\\", lbl),
+  c(sprintf("\\multicolumn{3}{l}{\\textit{%s} --- %s women} \\\\", lbl, ng),
     " & Post: not eligible & Post: eligible \\\\",
     sprintf("$\\quad$ Pre: not eligible & %s & %s \\\\", p(0, 0), p(0, 1)),
     sprintf("$\\quad$ Pre: eligible & %s & %s \\\\", p(1, 0), p(1, 1)))
@@ -88,8 +89,7 @@ tb <- c("\\begin{table}[H]\\centering",
   "\\begin{tabular}{lcc}", "\\toprule",
   trans_tab(1, "Treated (child $\\leq$4)"), "\\midrule",
   trans_tab(0, "Control A (child 5--7)"), "\\bottomrule\\end{tabular}",
-  sprintf("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each cell is the share of women in a given pre-to-post telework-eligibility transition, among matched women observed both before and after the second quarter of 2022 (%s treated and %s control women). Off-diagonal cells are occupation switches. The treated and control distributions are similar, consistent with the null in Table~\\ref{tab:mech_allocation}.",
-          formatC(n_tr, big.mark = ",", format = "d"), formatC(n_ctrl, big.mark = ",", format = "d")),
+  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each cell is the share of women in a given pre-to-post telework-eligibility transition, among matched women observed both before and after the second quarter of 2022 (the number of women in each group is shown in the panel headers). Off-diagonal cells are occupation switches. The treated and control distributions are similar, consistent with the null in Table~\\ref{tab:mech_allocation}.",
   "\\end{table}")
 writeLines(tb, file.path(TABLE_DIR, "tab05b_occupation_transition.tex"))
 

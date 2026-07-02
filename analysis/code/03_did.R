@@ -77,6 +77,12 @@ etable(m1, m2, m3, m4,
        label = "tab:did_firststage",
        notes = paste("\\footnotesize\\textit{Notes:} Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Outcome: an indicator for working from home. Demographic controls are age, age$^2$, completed higher education, race, and region. All columns are weighted by the survey sampling weights. Columns (3) and (4) add individual fixed effects. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
 postprocess_tex(tab02_file, fontsize = "\\small", tabcolsep = 5)
+# Show an explicit "No" where a fixed effect is absent (etable leaves it blank).
+# Ladder: year-quarter FE enters from col 2, individual FE from col 3.
+.tx <- readLines(tab02_file)
+.tx[grepl("^\\s*Year-quarter\\s*&", .tx)] <- "      Year-quarter & No & Yes & Yes & Yes\\\\"
+.tx[grepl("^\\s*Individual\\s*&",  .tx)]  <- "      Individual & No & No & Yes & Yes\\\\"
+writeLines(.tx, tab02_file)
 
 # =============================================================================
 # Table 3 — all outcomes, preferred spec, Control A and Control B

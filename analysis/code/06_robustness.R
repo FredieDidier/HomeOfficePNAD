@@ -61,8 +61,15 @@ mk <- function(treat_col, ctrl_col, post_col = "post_mp", extra = NULL) {
 
 A_main <- mk("has_child_u4", "has_child_5_7")
 
+# A-vs-B placebo: among the two control groups (youngest child 5-7 vs no child
+# 0-7), neither covered by the law, assign a fake treatment to the 5-7 group. A
+# ~zero coefficient licenses treating the 5-7 group as a clean control.
+Pl <- dt[(has_child_5_7 == 1 & has_child_u4 == 0) | (has_child_u4 == 0 & has_child_5_7 == 0)]
+Pl[, tr := as.integer(has_child_5_7 == 1)][, trxp := tr * post_mp]
+
 rows <- rbindlist(list(
   fs(A_main,                                              "Baseline"),
+  fs(Pl,                                                  "Placebo: youngest child 5--7 vs.\\ no child 0--7"),
   fs(mk("has_child_u4", "has_child_5_7", "post_mp_alt"),  "Alternative cutoff (2022Q1 post)"),
   fs(mk("has_child_u4_no_gc", "has_child_5_7_no_gc"),     "Treated, excluding grandchildren"),
   fs(mk("has_child_u4_no_sc", "has_child_5_7_no_sc"),     "Treated, excluding stepchildren"),

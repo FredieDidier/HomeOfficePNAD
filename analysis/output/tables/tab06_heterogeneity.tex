@@ -1,39 +1,45 @@
 \begin{table}[H]\centering
 \caption{Heterogeneity of the First-Stage Home-Office Effect (pp)}
 \label{tab:heterogeneity}\small
-\begin{tabular}{lcc}
+\begin{tabular}{lcccc}
 \toprule
- & Treated $\times$ Post & Obs. \\
+ & Treated $\times$ Post & $p$-value & Bonferroni $p$ & Obs. \\
 \midrule
-\multicolumn{3}{l}{\textit{By formality (placebo: effect only where the law binds)}} \\
-$\quad$ Formal & -0.03$^{}$ & 261,866 \\
- & (0.50) & \\
-$\quad$ Informal & -0.13$^{}$ & 728,032 \\
- & (0.38) & \\
-$\quad$ Private, signed card (CLT) & 0.27$^{}$ & 152,995 \\
- & (0.65) & \\
-$\quad$ Other & -0.19$^{}$ & 836,903 \\
- & (0.34) & \\
+\multicolumn{5}{l}{\textit{By formality (placebo: effect only where the law binds)}} \\
+$\quad$ Formal & -0.03$^{}$ & 0.950 & 1.00 & 261,866 \\
+ & (0.50) & & & \\
+$\quad$ Informal & -0.13$^{}$ & 0.727 & 1.00 & 728,032 \\
+ & (0.38) & & & \\
+$\quad$ Private, signed card (CLT) & 0.27$^{}$ & 0.681 & 1.00 & 152,995 \\
+ & (0.65) & & & \\
+$\quad$ Non-CLT & -0.19$^{}$ & 0.572 & 1.00 & 836,903 \\
+ & (0.34) & & & \\
 \midrule
-\multicolumn{3}{l}{\textit{By sector (placebo: private only)}} \\
-$\quad$ Private employee & 0.18$^{}$ & 197,959 \\
- & (0.58) & \\
-$\quad$ Public employee & -0.20$^{}$ & 91,735 \\
- & (0.31) & \\
+\multicolumn{5}{l}{\textit{By sector (placebo: private only)}} \\
+$\quad$ Private employee & 0.18$^{}$ & 0.752 & 1.00 & 197,959 \\
+ & (0.58) & & & \\
+$\quad$ Public employee & -0.20$^{}$ & 0.515 & 1.00 & 91,735 \\
+ & (0.31) & & & \\
 \midrule
-\multicolumn{3}{l}{\textit{By education}} \\
-$\quad$ Higher education & 0.39$^{}$ & 177,666 \\
- & (0.83) & \\
-$\quad$ No higher education & -0.21$^{}$ & 812,232 \\
- & (0.31) & \\
+\multicolumn{5}{l}{\textit{By education}} \\
+$\quad$ With higher education & 0.39$^{}$ & 0.641 & 1.00 & 177,666 \\
+ & (0.83) & & & \\
+$\quad$ Without higher education & -0.21$^{}$ & 0.509 & 1.00 & 812,232 \\
+ & (0.31) & & & \\
 \midrule
-\multicolumn{3}{l}{\textit{By age band}} \\
-$\quad$ Age 18--29 & -0.31$^{}$ & 348,793 \\
- & (0.49) & \\
-$\quad$ Age 30--39 & -0.49$^{}$ & 450,783 \\
- & (0.44) & \\
-$\quad$ Age 40--49 & 1.39$^{**}$ & 190,322 \\
- & (0.69) & \\
+\multicolumn{5}{l}{\textit{By race}} \\
+$\quad$ White & -0.20$^{}$ & 0.693 & 1.00 & 341,737 \\
+ & (0.50) & & & \\
+$\quad$ Non-white & -0.00$^{}$ & 0.997 & 1.00 & 648,161 \\
+ & (0.37) & & & \\
+\midrule
+\multicolumn{5}{l}{\textit{By age band}} \\
+$\quad$ Age 18--29 & -0.31$^{}$ & 0.534 & 1.00 & 348,793 \\
+ & (0.49) & & & \\
+$\quad$ Age 30--39 & -0.49$^{}$ & 0.272 & 1.00 & 450,783 \\
+ & (0.44) & & & \\
+$\quad$ Age 40--49 & 1.39$^{**}$ & 0.042 & 0.55 & 190,322 \\
+ & (0.69) & & & \\
 \bottomrule\end{tabular}
-\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\ Control A), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights, with standard errors clustered at the household in parentheses. Subgroups are defined at baseline (first observed quarter). Across the 11 subgroups only women aged 40--49 are individually significant ($p=0.042$); adjusting for the number of tests (Bonferroni) leaves nothing significant, as this smallest $p$-value becomes $0.47$ after adjustment. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\ Control A), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights, with standard errors clustered at the household in parentheses. Subgroups are defined at baseline (first observed quarter). The Bonferroni $p$ is the raw $p$-value multiplied by the 13 subgroups and capped at one---the family-wise adjustment for testing this many subgroups---so a Bonferroni $p$ of $1.00$ marks a subgroup whose raw $p$-value was already far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $0.55$, for women aged 40--49. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}
