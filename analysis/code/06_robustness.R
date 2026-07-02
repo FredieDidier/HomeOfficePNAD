@@ -9,7 +9,6 @@
 #   - Alternative post-MP cutoff (Q1 2022)
 #   - Treatment variants (exclude grandchildren / stepchildren)
 #   - COVID window (drop 2020-2021)
-#   - Age-restricted samples (20-35, 20-40)
 #   - State x quarter fixed effects; two-way (household, PSU) clustering
 #   - Telework-eligible-only sample (baseline)
 #   - Log real earnings, raw and winsorized at the top 1%
@@ -68,10 +67,6 @@ rows <- rbindlist(list(
   fs(mk("has_child_u4_no_gc", "has_child_5_7_no_gc"),     "Treated, excluding grandchildren"),
   fs(mk("has_child_u4_no_sc", "has_child_5_7_no_sc"),     "Treated, excluding stepchildren"),
   fs(A_main[!(year_quarter %/% 10L %in% c(2020L, 2021L))],"Excluding 2020--2021 (COVID)"),
-  fs(A_main[V2009 >= 20 & V2009 <= 35],                   "Ages 20--35"),
-  fs(A_main[V2009 >= 20 & V2009 <= 40],                   "Ages 20--40"),
-  fs(A_main[V2009 >= 25 & V2009 <= 40],                   "Ages 25--40"),
-  fs(A_main[V2009 >= 25 & V2009 <= 45],                   "Ages 25--45"),
   fs(A_main, "State $\\times$ quarter fixed effects", fes = "id_panel + sigla_uf^year_quarter"),
   fs(A_main, "Two-way cluster (household, PSU)", clu = ~id_dom + UPA),
   fs(A_main[pt_base == 1],                                "Telework-eligible only")

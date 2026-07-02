@@ -49,7 +49,7 @@ Pre-period overlaps the pandemic home-office spike (2020–2021), a potential co
 
 ### Sample
 Women 18–49, head/spouse (`is_head_or_spouse == 1`), from Q1 2018 (V4022 availability), matched panel (`panel_matched == 1`). Unit: individual × quarter (`id_panel` + `year_quarter`); each appears 1–5 quarters (rotating panel). Every women-only script filters `female == 1 & is_head_or_spouse == 1 & panel_matched == 1`.
-- **Age robustness:** also 20–35, 20–40, 25–40, 25–45. (Only 25–40 is marginally significant, −0.6pp*, and points opposite to the one significant heterogeneity cell, ages 40–49 +1.4pp** → both read as multiple-testing noise; **kept, not dropped**.)
+- **Age:** examined ONLY as heterogeneity bands (18–29, 30–39, 40–49; baseline age) in `05_heterogeneity.R` — **not** as robustness windows (the old 20–35/20–40/25–40/25–45 windows were **removed** from `06_robustness.R`: redundant with the bands, and the age dimension is a subgroup question, not a design-robustness one). Only the 40–49 band is individually significant (+1.4pp**), but a **Bonferroni** correction across the 11 heterogeneity subgroups (min p 0.042 → 0.47) leaves nothing significant, and that cell shows no downstream response (only home office moves; earnings/hours/employment/LFP/maternity all null). Cite `romanoshaikhwolf2010` for the multiple-testing method. Table 6 note reports the Bonferroni result.
 - **Do NOT restrict to formal/CLT** (selection on a post-treatment variable). Use `clt_private` (VD4009==1) only as the sharp heterogeneity/placebo split, never as a restriction.
 
 ---

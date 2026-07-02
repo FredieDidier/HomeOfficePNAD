@@ -72,7 +72,7 @@ etable(m1, m2, m3, m4,
        tex = TRUE, file = tab02_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, drop = c("post_mp", "V2009", "V2010", "regiao", "higher_educ", "Constant"),
        extralines = list("Demographic controls" = c("Yes", "Yes", "No", "Age$^2$ only")),
-       fitstat = ~ n + r2 + wr2, digits = 3, digits.stats = 3,
+       fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect: Specification Ladder (Control A)",
        label = "tab:did_firststage",
        notes = paste("\\footnotesize\\textit{Notes:} Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Outcome: an indicator for working from home. Demographic controls are age, age$^2$, completed higher education, race, and region. All columns are weighted by the survey sampling weights. Columns (3) and (4) add individual fixed effects. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))

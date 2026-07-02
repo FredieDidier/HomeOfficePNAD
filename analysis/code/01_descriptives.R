@@ -139,7 +139,7 @@ make_latex_table1 <- function(tab, labels, outfile) {
     paste0("Observations & ", paste(n_vals, collapse = " & "), " \\\\"),
     "\\bottomrule",
     "\\end{tabular}",
-    "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Sample restricted to women aged 18--49 who are household head or spouse, with at least one interview from 2018 onwards. Means are weighted by the survey sampling weights. Post refers to the second quarter of 2022 onwards, the first period after the reform. Treated women have a youngest child aged 0--4 in the household; Control A women have a youngest child aged 5--7; Control B women have no child aged 0--7 in the household. Earnings are deflated to real terms.",
+    "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Sample restricted to women aged 18--49 who are household head or spouse, with at least one interview from 2018 onwards. Means are weighted by the survey sampling weights. Post refers to the second quarter of 2022 onwards, the first period after the reform. Treated women have a youngest child aged 0--4 in the household; Control A women have a youngest child aged 5--7; Control B women have no child aged 0--7 in the household. Earnings are in constant first-quarter-2026 reais, deflated with IBGE's official PNADC deflator.",
     "\\end{table}"
   )
   writeLines(lines, outfile)

@@ -39,11 +39,11 @@ A <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
 star <- function(p) ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.1, "*", "")))
 did_row <- function(sub, label) {
   if (nrow(sub) < 1000 || sub[, uniqueN(treat_x_post)] < 2)
-    return(data.table(label = label, est = NA, se = NA, star = "", n = nrow(sub)))
+    return(data.table(label = label, est = NA, se = NA, star = "", n = nrow(sub), p = NA_real_))
   m <- feols(home_office ~ treated + treat_x_post | id_panel + year_quarter,
              sub, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
   ct <- coeftable(m)["treat_x_post", ]
-  data.table(label = label, est = ct[1] * 100, se = ct[2] * 100, star = star(ct[4]), n = nobs(m))
+  data.table(label = label, est = ct[1] * 100, se = ct[2] * 100, star = star(ct[4]), n = nobs(m), p = ct[4])
 }
 
 rows <- rbindlist(list(
@@ -61,6 +61,17 @@ rows <- rbindlist(list(
   did_row(A[age_band == "Age 40--49"],    "Age 40--49")
 ))
 rows[, ci_lo := est - 1.96 * se][, ci_hi := est + 1.96 * se]
+
+# Multiple-testing correction across the displayed subgroups (Bonferroni). Only
+# one of the 11 subgroups is individually significant; correcting for the number
+# of tests leaves nothing significant.
+het_subs <- c("Formal", "Informal", "Private, signed card (CLT)", "Other",
+              "Private employee", "Public employee", "Higher education",
+              "No higher education", "Age 18--29", "Age 30--39", "Age 40--49")
+pv <- rows[label %in% het_subs & !is.na(p), p]
+K_tests <- length(pv)
+bonf_min <- min(min(pv) * K_tests, 1)
+mt_note <- sprintf("Across the %d subgroups only women aged 40--49 are individually significant ($p=%.3f$); adjusting for the number of tests (Bonferroni) leaves nothing significant, as this smallest $p$-value becomes $%.2f$ after adjustment.", K_tests, min(pv), bonf_min)
 
 # ---- Table 6 (two-line journal format: estimate; (se) below) ----------------
 fmt <- function(x) formatC(x, format = "f", digits = 2)
@@ -85,7 +96,7 @@ tab <- c("\\begin{table}[H]\\centering",
   grp("By education", c("Higher education", "No higher education")), "\\midrule",
   grp("By age band", c("Age 18--29", "Age 30--39", "Age 40--49")),
   "\\bottomrule\\end{tabular}",
-  paste("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control A), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights, with standard errors clustered at the household in parentheses. Subgroups are defined at baseline (first observed quarter).", SIGNIF_NOTE),
+  paste("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control A), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights, with standard errors clustered at the household in parentheses. Subgroups are defined at baseline (first observed quarter).", mt_note, SIGNIF_NOTE),
   "\\end{table}")
 writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
 
