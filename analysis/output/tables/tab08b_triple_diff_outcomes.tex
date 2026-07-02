@@ -2,35 +2,34 @@
 \begin{table}[htbp]
    \caption{\label{tab:triple_diff_outcomes} Triple Difference Across Outcomes}
    \centering
+\footnotesize\setlength{\tabcolsep}{3pt}
    \begin{tabular}{lcccccc}
-      \tabularnewline \midrule \midrule
-      Dependent Variables:                    & Home office   & Real income   & Usual hours & Employed  & In labor force & Maternity leave\\  
-      Model:                                  & (1)           & (2)           & (3)         & (4)       & (5)            & (6)\\  
+      \toprule
+      Dependent Variables:                    & Home office & Real income & Usual hours & Employed  & In labor force & Maternity leave\\  
+      Model:                                  & (1)         & (2)         & (3)         & (4)       & (5)            & (6)\\  
       \midrule
       \emph{Variables}\\
-      Treated (child $\leq$4)                 & -0.004$^{**}$ & -40.1         & 0.040       & -0.0006   & 0.005$^{**}$   & 0.0002\\   
-                                              & (0.002)       & (42.0)        & (0.118)     & (0.003)   & (0.002)        & (0.0002)\\   
-      Treated $\times$ Female                 & 0.007$^{***}$ & 18.0          & -0.287      & -0.009    & -0.012$^{**}$  & 0.013$^{***}$\\   
-                                              & (0.003)       & (44.5)        & (0.181)     & (0.006)   & (0.005)        & (0.002)\\   
-      Treated $\times$ Post                   & 0.002         & 161.8$^{***}$ & 0.129       & 0.005     & -0.0006        & -0.0002\\   
-                                              & (0.002)       & (58.0)        & (0.148)     & (0.004)   & (0.003)        & (0.0002)\\   
-      Treated $\times$ Post $\times$ Female   & -0.003        & -129.5$^{**}$ & -0.054      & 0.005     & 0.011$^{**}$   & -0.008$^{***}$\\   
-                                              & (0.004)       & (60.7)        & (0.237)     & (0.006)   & (0.006)        & (0.002)\\   
+      Treated (child $\leq$4)                 & -0.004      & -40.1       & 0.040       & -0.0006   & 0.005          & 0.0002\\   
+                                              & (0.002)     & (42.0)      & (0.118)     & (0.003)   & (0.002)        & (0.0002)\\   
+      Treated $\times$ Female                 & 0.007       & 17.9        & -0.287      & -0.009    & -0.012         & 0.013\\   
+                                              & (0.003)     & (44.5)      & (0.181)     & (0.006)   & (0.005)        & (0.002)\\   
+      Treated $\times$ Post                   & 0.002       & 161.8       & 0.129       & 0.005     & -0.0006        & -0.0002\\   
+                                              & (0.002)     & (58.0)      & (0.148)     & (0.004)   & (0.003)        & (0.0002)\\   
+      Treated $\times$ Post $\times$ Female   & -0.003      & -129.5      & -0.055      & 0.005     & 0.011          & -0.008\\   
+                                              & (0.004)     & (60.7)      & (0.237)     & (0.006)   & (0.006)        & (0.002)\\   
       \midrule
       \emph{Fixed-effects}\\
-      Individual                              & Yes           & Yes           & Yes         & Yes       & Yes            & Yes\\  
-      Female-Year-quarter                     & Yes           & Yes           & Yes         & Yes       & Yes            & Yes\\  
+      Individual                              & Yes         & Yes         & Yes         & Yes       & Yes            & Yes\\  
+      Female-Year-quarter                     & Yes         & Yes         & Yes         & Yes       & Yes            & Yes\\  
       \midrule
       \emph{Fit statistics}\\
-      Observations                            & 1,765,944     & 1,169,170     & 1,194,564   & 1,765,944 & 1,765,944      & 1,765,944\\  
-      R$^2$                                   & 0.658         & 0.885         & 0.753       & 0.796     & 0.788          & 0.542\\  
-      \midrule \midrule
-      \multicolumn{7}{l}{\emph{Clustered (Household) standard-errors in parentheses}}\\
-      \multicolumn{7}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+      Observations                            & 1,765,944   & 1,169,170   & 1,194,564   & 1,765,944 & 1,765,944      & 1,765,944\\  
+      R$^2$                                   & 0.658       & 0.885       & 0.753       & 0.796     & 0.788          & 0.542\\  
+\bottomrule
    \end{tabular}
    
    \par \raggedright 
-   Each column is a triple-difference regression with the same specification as the first-stage triple difference. Reported: the men effect (Treated $\times$ Post) and the female differential (Treated $\times$ Post $\times$ Female). $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+   \footnotesize\textit{Notes:} Each column is a triple-difference regression with the same specification as the first-stage triple difference. The table reports the men effect (Treated $\times$ Post) and the female differential (Treated $\times$ Post $\times$ Female). Standard errors clustered at the household in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}
 
 

@@ -23,6 +23,7 @@
 library(data.table)
 library(fixest)
 library(here)
+source(here("analysis", "code", "00_utils.R"))
 
 DROPBOX_ROOT <- "/Users/fredie/Library/CloudStorage/Dropbox/HomeOfficePNAD"
 OUTPUT_PATH  <- file.path(DROPBOX_ROOT, "build", "output")
@@ -66,14 +67,16 @@ m4 <- feols(home_office ~ treated + treat_x_post + I(V2009^2) |
               id_panel + year_quarter,
             samp_A, weights = ~V1028, cluster = ~id_dom)
 
+tab02_file <- file.path(TABLE_DIR, "tab02_did_firststage.tex")
 etable(m1, m2, m3, m4,
-       tex = TRUE, file = file.path(TABLE_DIR, "tab02_did_firststage.tex"), replace = TRUE,
+       tex = TRUE, file = tab02_file, replace = TRUE, signif.code = NA,
        dict = dict, drop = c("post_mp", "V2009", "V2010", "regiao", "higher_educ", "Constant"),
        extralines = list("Demographic controls" = c("Yes", "Yes", "No", "Age$^2$ only")),
        fitstat = ~ n + r2 + wr2, digits = 3, digits.stats = 3,
-       title = "First-Stage Home-Office Effect: Specification Ladder (Control A, child 5--7)",
+       title = "First-Stage Home-Office Effect: Specification Ladder (Control A)",
        label = "tab:did_firststage",
-       notes = "Sample: women 18--49, head/spouse, treated (child $\\leq$4) vs.\\ Control A (child 5--7). Outcome: home office (0/1). Demographic controls: age, age$^2$, higher education, race, region. Weighted by survey weights; SE clustered at the household in parentheses. Columns (3)--(4) add individual fixed effects. $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
+       notes = paste("\\footnotesize\\textit{Notes:} Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Outcome: an indicator for working from home. Demographic controls are age, age$^2$, completed higher education, race, and region. All columns are weighted by the survey sampling weights. Columns (3) and (4) add individual fixed effects. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+postprocess_tex(tab02_file, fontsize = "\\small", tabcolsep = 5)
 
 # =============================================================================
 # Table 3 — all outcomes, preferred spec, Control A and Control B
@@ -88,19 +91,23 @@ run_all <- function(sample) {
 mods_A <- run_all(samp_A)
 mods_B <- run_all(samp_B)
 
+tab03a_file <- file.path(TABLE_DIR, "tab03a_did_outcomes_A.tex")
 etable(mods_A,
-       tex = TRUE, file = file.path(TABLE_DIR, "tab03a_did_outcomes_A.tex"), replace = TRUE,
+       tex = TRUE, file = tab03a_file, replace = TRUE, signif.code = NA,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
-       title = "DiD Estimates by Outcome --- Control A (child 5--7)",
+       title = "Difference-in-Differences Estimates by Outcome, Control A",
        label = "tab:did_outcomes_A",
-       notes = "Each column is a separate DiD (preferred spec: treated main effect + individual and year-quarter FE, weighted, clustered at the household). Sample: women 18--49, head/spouse. Real income and usual hours are observed for workers only. $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
+       notes = paste("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Real income and usual hours are observed for workers only. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+postprocess_tex(tab03a_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
+tab03b_file <- file.path(TABLE_DIR, "tab03b_did_outcomes_B.tex")
 etable(mods_B,
-       tex = TRUE, file = file.path(TABLE_DIR, "tab03b_did_outcomes_B.tex"), replace = TRUE,
+       tex = TRUE, file = tab03b_file, replace = TRUE, signif.code = NA,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
-       title = "DiD Estimates by Outcome --- Control B (no child 0--7)",
+       title = "Difference-in-Differences Estimates by Outcome, Control B",
        label = "tab:did_outcomes_B",
-       notes = "As in the Control~A outcome table, using the broad comparison group (women with no child aged 0--7). Each column is a separate DiD (preferred spec: treated main effect + individual and year-quarter FE, weighted, clustered at the household). $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
+       notes = paste("\\footnotesize\\textit{Notes:} As in the Control~A outcome table, using the broad comparison group (women with no child aged 0--7). Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+postprocess_tex(tab03b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 # ---- A-vs-B placebo (home office) ------------------------------------------
 samp_P <- dt[(has_child_5_7 == 1 & has_child_u4 == 0) | (has_child_u4 == 0 & has_child_5_7 == 0)]

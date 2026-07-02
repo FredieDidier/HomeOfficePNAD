@@ -19,6 +19,7 @@
 library(data.table)
 library(fixest)
 library(here)
+source(here("analysis", "code", "00_utils.R"))
 
 DROPBOX_ROOT <- "/Users/fredie/Library/CloudStorage/Dropbox/HomeOfficePNAD"
 OUTPUT_PATH  <- file.path(DROPBOX_ROOT, "build", "output")
@@ -31,7 +32,7 @@ setorder(dt, id_panel, year_quarter)
 dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
 
 dict <- c(treat_x_post = "Treated $\\times$ Post", treated = "Treated (child $\\leq$4)",
-          home_office = "Home office", potential_telework = "Telework-eligible occ.",
+          home_office = "Home office", potential_telework = "Telework-eligible occupation",
           id_panel = "Individual", id_dom = "Household", year_quarter = "Year-quarter")
 
 A <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
@@ -42,22 +43,26 @@ fe <- function(sample, y = "home_office")
         sample, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
 
 # ---- Table 4: moderation by baseline telework eligibility -------------------
+tab04_file <- file.path(TABLE_DIR, "tab04_mechanism_moderation.tex")
 etable(fe(A), fe(A[pt_base == 1]), fe(A[pt_base == 0]),
-       tex = TRUE, file = file.path(TABLE_DIR, "tab04_mechanism_moderation.tex"), replace = TRUE,
-       dict = dict, headers = c("All", "Telework-elig.", "Not eligible"),
+       tex = TRUE, file = tab04_file, replace = TRUE, signif.code = NA,
+       dict = dict, headers = c("All", "Telework-eligible", "Not eligible"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect by Baseline Telework Eligibility",
        label = "tab:mech_moderation",
-       notes = "Sample: women 18--49, head/spouse, treated (child $\\leq$4) vs.\\ Control A (child 5--7). Baseline telework eligibility is the woman's occupation eligibility (Costa et al.\\ 2024) in her first observed quarter, held fixed. Individual and year-quarter FE, weighted, SE clustered at the household. $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
+       notes = paste("\\footnotesize\\textit{Notes:} Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Baseline telework eligibility is the woman's occupation eligibility, following \\citet{costa2024}, measured in her first observed quarter and held fixed. All columns include individual and year-quarter fixed effects, are weighted by the survey weights, and cluster standard errors at the household in parentheses.", SIGNIF_NOTE))
+postprocess_tex(tab04_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5: occupational sorting (potential_telework as outcome) ----------
+tab05_file <- file.path(TABLE_DIR, "tab05_mechanism_allocation.tex")
 etable(fe(A, "potential_telework"), fe(B, "potential_telework"),
-       tex = TRUE, file = file.path(TABLE_DIR, "tab05_mechanism_allocation.tex"), replace = TRUE,
+       tex = TRUE, file = tab05_file, replace = TRUE, signif.code = NA,
        dict = dict, headers = c("Control A (5--7)", "Control B (no child 0--7)"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Occupational Sorting: Telework-Eligible Occupation as Outcome",
        label = "tab:mech_allocation",
-       notes = "Outcome: indicator for being in a telework-eligible occupation. A positive Treated $\\times$ Post means treated mothers move into eligible occupations after the reform. Same specification as the moderation table. $^{*}$/$^{**}$/$^{***}$: 10/5/1\\%.")
+       notes = paste("\\footnotesize\\textit{Notes:} The outcome is an indicator for being in a telework-eligible occupation. A positive Treated $\\times$ Post coefficient would mean treated mothers move into eligible occupations after the reform. Same specification as the moderation table; standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+postprocess_tex(tab05_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5b: occupation transition matrix (descriptive) ------------------
 # Among matched women observed both pre- and post-MP: baseline (first pre-MP)
@@ -67,22 +72,24 @@ pre  <- m[post_mp == 0, .(pt_pre  = potential_telework[.N]), by = .(id_panel, gr
 post <- m[post_mp == 1, .(pt_post = potential_telework[1]),  by = .(id_panel)]
 tr   <- merge(pre, post, by = "id_panel")
 
+n_tr   <- nrow(tr[grp == 1])
+n_ctrl <- nrow(tr[grp == 0])
 trans_tab <- function(g, lbl) {
   s <- tr[grp == g]
-  n <- nrow(s)
   p <- function(a, b) sprintf("%.1f\\%%", 100 * mean(s$pt_pre == a & s$pt_post == b))
-  c(sprintf("\\multicolumn{3}{l}{\\textit{%s (N = %s)}} \\\\", lbl, formatC(n, big.mark = ",", format = "d")),
-    "$\\quad$ & Post: not elig. & Post: eligible \\\\",
-    sprintf("$\\quad$ Pre: not elig. & %s & %s \\\\", p(0, 0), p(0, 1)),
+  c(sprintf("\\multicolumn{3}{l}{\\textit{%s}} \\\\", lbl),
+    " & Post: not eligible & Post: eligible \\\\",
+    sprintf("$\\quad$ Pre: not eligible & %s & %s \\\\", p(0, 0), p(0, 1)),
     sprintf("$\\quad$ Pre: eligible & %s & %s \\\\", p(1, 0), p(1, 1)))
 }
 tb <- c("\\begin{table}[htbp]\\centering",
-  "\\caption{Occupation Transitions Around the MP (matched women, pre vs.\\ post)}",
+  "\\caption{Occupation Transitions Around the Reform}",
   "\\label{tab:occ_transition}\\small",
   "\\begin{tabular}{lcc}", "\\toprule",
   trans_tab(1, "Treated (child $\\leq$4)"), "\\midrule",
   trans_tab(0, "Control A (child 5--7)"), "\\bottomrule\\end{tabular}",
-  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Cells are the share of women in each pre$\\to$post telework-eligibility transition, among panel women observed both before and after 2022Q2. Off-diagonal cells are occupation switches; the treated and control distributions are similar, consistent with the null in Table \\ref{tab:mech_allocation}.",
+  sprintf("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each cell is the share of women in a given pre-to-post telework-eligibility transition, among matched women observed both before and after the second quarter of 2022 (%s treated and %s control women). Off-diagonal cells are occupation switches. The treated and control distributions are similar, consistent with the null in Table~\\ref{tab:mech_allocation}.",
+          formatC(n_tr, big.mark = ",", format = "d"), formatC(n_ctrl, big.mark = ",", format = "d")),
   "\\end{table}")
 writeLines(tb, file.path(TABLE_DIR, "tab05b_occupation_transition.tex"))
 

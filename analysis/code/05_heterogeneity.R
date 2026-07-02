@@ -16,6 +16,7 @@ library(data.table)
 library(fixest)
 library(ggplot2)
 library(here)
+source(here("analysis", "code", "00_utils.R"))
 
 DROPBOX_ROOT <- "/Users/fredie/Library/CloudStorage/Dropbox/HomeOfficePNAD"
 OUTPUT_PATH  <- file.path(DROPBOX_ROOT, "build", "output")
@@ -84,7 +85,7 @@ tab <- c("\\begin{table}[htbp]\\centering",
   grp("By education", c("Higher education", "No higher education")), "\\midrule",
   grp("By age band", c("Age 18--29", "Age 30--39", "Age 40--49")),
   "\\bottomrule\\end{tabular}",
-  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control A), including the treated main effect, individual and year-quarter fixed effects, weighted by survey weights, with standard errors clustered at the household (in parentheses). Subgroups are defined at baseline (first observed quarter). $^{*}$/$^{**}$/$^{***}$ denote significance at 10/5/1\\%.",
+  paste("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control A), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights, with standard errors clustered at the household in parentheses. Subgroups are defined at baseline (first observed quarter).", SIGNIF_NOTE),
   "\\end{table}")
 writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
 

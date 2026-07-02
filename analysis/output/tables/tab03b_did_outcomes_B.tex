@@ -1,32 +1,31 @@
 
 \begin{table}[htbp]
-   \caption{\label{tab:did_outcomes_B} DiD Estimates by Outcome --- Control B (no child 0--7)}
+   \caption{\label{tab:did_outcomes_B} Difference-in-Differences Estimates by Outcome, Control B}
    \centering
+\footnotesize\setlength{\tabcolsep}{3pt}
    \begin{tabular}{lcccccc}
-      \tabularnewline \midrule \midrule
-      Dependent Variables:     & Home office & Real income & Usual hours    & Employed       & In labor force & Maternity leave\\  
-      Model:                   & (1)         & (2)         & (3)            & (4)            & (5)            & (6)\\  
+      \toprule
+      Dependent Variables:     & Home office & Real income & Usual hours & Employed  & In labor force & Maternity leave\\  
+      Model:                   & (1)         & (2)         & (3)         & (4)       & (5)            & (6)\\  
       \midrule
       \emph{Variables}\\
-      Treated (child $\leq$4)  & -0.003      & -20.3       & -0.645$^{***}$ & -0.065$^{***}$ & -0.071$^{***}$ & 0.114$^{***}$\\   
-                               & (0.002)     & (36.4)      & (0.177)        & (0.004)        & (0.004)        & (0.004)\\   
-      Treated $\times$ Post    & 0.004       & 14.3        & -0.093         & 0.008$^{*}$    & 0.008$^{**}$   & -0.011$^{***}$\\   
-                               & (0.003)     & (39.5)      & (0.177)        & (0.004)        & (0.004)        & (0.002)\\   
+      Treated (child $\leq$4)  & -0.003      & -20.3       & -0.645      & -0.065    & -0.071         & 0.114\\   
+                               & (0.002)     & (36.4)      & (0.177)     & (0.004)   & (0.004)        & (0.004)\\   
+      Treated $\times$ Post    & 0.004       & 14.3        & -0.093      & 0.008     & 0.008          & -0.011\\   
+                               & (0.003)     & (39.5)      & (0.177)     & (0.004)   & (0.004)        & (0.002)\\   
       \midrule
       \emph{Fixed-effects}\\
-      Individual               & Yes         & Yes         & Yes            & Yes            & Yes            & Yes\\  
-      Year-quarter             & Yes         & Yes         & Yes            & Yes            & Yes            & Yes\\  
+      Individual               & Yes         & Yes         & Yes         & Yes       & Yes            & Yes\\  
+      Year-quarter             & Yes         & Yes         & Yes         & Yes       & Yes            & Yes\\  
       \midrule
       \emph{Fit statistics}\\
-      Observations             & 2,192,875   & 1,251,406   & 1,302,376      & 2,192,875      & 2,192,875      & 2,192,875\\  
-      R$^2$                    & 0.664       & 0.889       & 0.765          & 0.797          & 0.778          & 0.475\\  
-      \midrule \midrule
-      \multicolumn{7}{l}{\emph{Clustered (Household) standard-errors in parentheses}}\\
-      \multicolumn{7}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+      Observations             & 2,192,875   & 1,251,406   & 1,302,376   & 2,192,875 & 2,192,875      & 2,192,875\\  
+      R$^2$                    & 0.664       & 0.889       & 0.765       & 0.797     & 0.778          & 0.475\\  
+\bottomrule
    \end{tabular}
    
    \par \raggedright 
-   As in the Control~A outcome table, using the broad comparison group (women with no child aged 0--7). Each column is a separate DiD (preferred spec: treated main effect + individual and year-quarter FE, weighted, clustered at the household). $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+   \footnotesize\textit{Notes:} As in the Control~A outcome table, using the broad comparison group (women with no child aged 0--7). Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Standard errors clustered at the household in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}
 
 

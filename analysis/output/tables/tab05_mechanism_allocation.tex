@@ -2,14 +2,15 @@
 \begin{table}[htbp]
    \caption{\label{tab:mech_allocation} Occupational Sorting: Telework-Eligible Occupation as Outcome}
    \centering
+\small\setlength{\tabcolsep}{5pt}
    \begin{tabular}{lcc}
-      \tabularnewline \midrule \midrule
-      Dependent Variable: & \multicolumn{2}{c}{Telework-eligible occ.}\\
+      \toprule
+      Dependent Variable: & \multicolumn{2}{c}{Telework-eligible occupation}\\
                                & Control A (5--7) & Control B (no child 0--7) \\   
       Model:                   & (1)              & (2)\\  
       \midrule
       \emph{Variables}\\
-      Treated (child $\leq$4)  & -0.001           & -0.010$^{***}$\\   
+      Treated (child $\leq$4)  & -0.001           & -0.010\\   
                                & (0.003)          & (0.003)\\   
       Treated $\times$ Post    & 0.0006           & -0.002\\   
                                & (0.003)          & (0.003)\\   
@@ -21,13 +22,11 @@
       \emph{Fit statistics}\\
       Observations             & 989,898          & 2,192,875\\  
       R$^2$                    & 0.824            & 0.830\\  
-      \midrule \midrule
-      \multicolumn{3}{l}{\emph{Clustered (Household) standard-errors in parentheses}}\\
-      \multicolumn{3}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+\bottomrule
    \end{tabular}
    
    \par \raggedright 
-   Outcome: indicator for being in a telework-eligible occupation. A positive Treated $\times$ Post means treated mothers move into eligible occupations after the reform. Same specification as the moderation table. $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+   \footnotesize\textit{Notes:} The outcome is an indicator for being in a telework-eligible occupation. A positive Treated $\times$ Post coefficient would mean treated mothers move into eligible occupations after the reform. Same specification as the moderation table; standard errors clustered at the household in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}
 
 

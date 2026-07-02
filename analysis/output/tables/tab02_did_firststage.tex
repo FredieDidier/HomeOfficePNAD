@@ -1,34 +1,33 @@
 
 \begin{table}[htbp]
-   \caption{\label{tab:did_firststage} First-Stage Home-Office Effect: Specification Ladder (Control A, child 5--7)}
+   \caption{\label{tab:did_firststage} First-Stage Home-Office Effect: Specification Ladder (Control A)}
    \centering
+\small\setlength{\tabcolsep}{5pt}
    \begin{tabular}{lcccc}
-      \tabularnewline \midrule \midrule
+      \toprule
       Dependent Variable: & \multicolumn{4}{c}{Home office}\\
-      Model:                   & (1)            & (2)            & (3)                   & (4)\\  
+      Model:                   & (1)     & (2)     & (3)                   & (4)\\  
       \midrule
       \emph{Variables}\\
-      Treated (child $\leq$4)  & -0.004$^{***}$ & -0.004$^{***}$ & 0.003                 & 0.003\\   
-                               & (0.002)        & (0.002)        & (0.002)               & (0.002)\\   
-      Treated $\times$ Post    & 0.004$^{*}$    & 0.004$^{*}$    & -0.0008               & -0.0008\\   
-                               & (0.002)        & (0.002)        & (0.003)               & (0.003)\\   
-      Demographic controls     & Yes            & Yes            & No                    & Age$^2$ only\\  
+      Treated (child $\leq$4)  & -0.004  & -0.004  & 0.003                 & 0.003\\   
+                               & (0.002) & (0.002) & (0.002)               & (0.002)\\   
+      Treated $\times$ Post    & 0.004   & 0.004   & -0.0008               & -0.0008\\   
+                               & (0.002) & (0.002) & (0.003)               & (0.003)\\   
+      Demographic controls     & Yes     & Yes     & No                    & Age$^2$ only\\  
       \midrule
       \emph{Fixed-effects}\\
-      Year-quarter             &                & Yes            & Yes                   & Yes\\  
-      Individual               &                &                & Yes                   & Yes\\  
+      Year-quarter             &         & Yes     & Yes                   & Yes\\  
+      Individual               &         &         & Yes                   & Yes\\  
       \midrule
       \emph{Fit statistics}\\
-      Observations             & 989,898        & 989,898        & 989,898               & 989,898\\  
-      R$^2$                    & 0.003          & 0.004          & 0.654                 & 0.654\\  
-      Within R$^2$             &                & 0.002          & $1.04\times 10^{-5}$  & $1.05\times 10^{-5}$\\   
-      \midrule \midrule
-      \multicolumn{5}{l}{\emph{Clustered (Household) standard-errors in parentheses}}\\
-      \multicolumn{5}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+      Observations             & 989,898 & 989,898 & 989,898               & 989,898\\  
+      R$^2$                    & 0.003   & 0.004   & 0.654                 & 0.654\\  
+      Within R$^2$             &         & 0.002   & $1.04\times 10^{-5}$  & $1.05\times 10^{-5}$\\   
+\bottomrule
    \end{tabular}
    
    \par \raggedright 
-   Sample: women 18--49, head/spouse, treated (child $\leq$4) vs.\ Control A (child 5--7). Outcome: home office (0/1). Demographic controls: age, age$^2$, higher education, race, region. Weighted by survey weights; SE clustered at the household in parentheses. Columns (3)--(4) add individual fixed effects. $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+   \footnotesize\textit{Notes:} Sample: women 18--49, household head or spouse, treated (child $\leq$4) vs.\ Control A (youngest child 5--7). Outcome: an indicator for working from home. Demographic controls are age, age$^2$, completed higher education, race, and region. All columns are weighted by the survey sampling weights. Columns (3) and (4) add individual fixed effects. Standard errors clustered at the household in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}
 
 

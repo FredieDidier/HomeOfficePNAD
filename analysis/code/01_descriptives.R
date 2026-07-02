@@ -77,7 +77,7 @@ vars_desc <- c(
 labels_desc <- c(
   "Home office (\\%)", "In labor force (\\%)", "Employed (\\%)",
   "Real monthly earnings (R\\$)", "Usual weekly hours", "Effective weekly hours",
-  "On maternity leave (\\%)", "Formal employment (\\%)", "Telework-eligible occ.\\ (\\%)",
+  "On maternity leave (\\%)", "Formal employment (\\%)", "Telework-eligible occupation (\\%)",
   "Age (years)"
 )
 
@@ -106,12 +106,12 @@ make_latex_table1 <- function(tab, labels, outfile) {
     "\\centering",
     "\\caption{Summary Statistics by Treatment Group}",
     "\\label{tab:descriptives}",
-    "\\small",
+    "\\footnotesize\\setlength{\\tabcolsep}{4pt}",
     "\\begin{tabular}{lcccccc}",
     "\\toprule",
-    " & \\multicolumn{2}{c}{Treated (child $\\leq$ 4 years)} & \\multicolumn{2}{c}{Control A (child 5--7 years)} & \\multicolumn{2}{c}{Control B (no child 0--7 years)} \\\\",
+    " & \\multicolumn{2}{c}{Treated (child $\\leq$ 4)} & \\multicolumn{2}{c}{Control A (child 5--7)} & \\multicolumn{2}{c}{Control B (no child 0--7)} \\\\",
     "\\cmidrule(lr){2-3} \\cmidrule(lr){4-5} \\cmidrule(lr){6-7}",
-    " & Pre-MP & Post-MP & Pre-MP & Post-MP & Pre-MP & Post-MP \\\\",
+    " & Pre & Post & Pre & Post & Pre & Post \\\\",
     "\\midrule"
   )
   pp_vars <- c("home_office", "in_labor_force", "employed",
@@ -139,7 +139,7 @@ make_latex_table1 <- function(tab, labels, outfile) {
     paste0("Observations & ", paste(n_vals, collapse = " & "), " \\\\"),
     "\\bottomrule",
     "\\end{tabular}",
-    "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Sample restricted to women aged 18--49 who are household head or spouse, with at least one interview from 2018 onwards. Means are weighted using survey sampling weights. Post refers to the second quarter of 2022 onwards. Treated women have a youngest child aged 0--4 in the household; Control A women have a youngest child aged 5--7; Control B women have no child aged 0--7 in the household. Earnings are deflated to real terms.",
+    "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Sample restricted to women aged 18--49 who are household head or spouse, with at least one interview from 2018 onwards. Means are weighted by the survey sampling weights. Post refers to the second quarter of 2022 onwards, the first period after the reform. Treated women have a youngest child aged 0--4 in the household; Control A women have a youngest child aged 5--7; Control B women have no child aged 0--7 in the household. Earnings are deflated to real terms.",
     "\\end{table}"
   )
   writeLines(lines, outfile)

@@ -23,6 +23,7 @@ library(data.table)
 library(fixest)
 library(ggplot2)
 library(here)
+source(here("analysis", "code", "00_utils.R"))
 
 DROPBOX_ROOT <- "/Users/fredie/Library/CloudStorage/Dropbox/HomeOfficePNAD"
 OUTPUT_PATH  <- file.path(DROPBOX_ROOT, "build", "output")
@@ -64,11 +65,13 @@ A_main <- mk("has_child_u4", "has_child_5_7")
 rows <- rbindlist(list(
   fs(A_main,                                              "Baseline"),
   fs(mk("has_child_u4", "has_child_5_7", "post_mp_alt"),  "Alternative cutoff (2022Q1 post)"),
-  fs(mk("has_child_u4_no_gc", "has_child_5_7_no_gc"),     "Treated excl.\\ grandchildren"),
-  fs(mk("has_child_u4_no_sc", "has_child_5_7_no_sc"),     "Treated excl.\\ stepchildren"),
+  fs(mk("has_child_u4_no_gc", "has_child_5_7_no_gc"),     "Treated, excluding grandchildren"),
+  fs(mk("has_child_u4_no_sc", "has_child_5_7_no_sc"),     "Treated, excluding stepchildren"),
   fs(A_main[!(year_quarter %/% 10L %in% c(2020L, 2021L))],"Excluding 2020--2021 (COVID)"),
   fs(A_main[V2009 >= 20 & V2009 <= 35],                   "Ages 20--35"),
   fs(A_main[V2009 >= 20 & V2009 <= 40],                   "Ages 20--40"),
+  fs(A_main[V2009 >= 25 & V2009 <= 40],                   "Ages 25--40"),
+  fs(A_main[V2009 >= 25 & V2009 <= 45],                   "Ages 25--45"),
   fs(A_main, "State $\\times$ quarter fixed effects", fes = "id_panel + sigla_uf^year_quarter"),
   fs(A_main, "Two-way cluster (household, PSU)", clu = ~id_dom + UPA),
   fs(A_main[pt_base == 1],                                "Telework-eligible only")
@@ -106,7 +109,7 @@ tab <- c(
   row_tex(inc_log, 3),
   row_tex(inc_logw, 3),
   "\\bottomrule\\end{tabular}",
-  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression on the preferred sample (treated vs.\\ Control A, child 5--7), including the treated main effect, individual and year-quarter fixed effects, and survey weights; standard errors clustered at the household in parentheses (except the two-way row, clustered at the household and primary sampling unit). $^{*}$/$^{**}$/$^{***}$ denote significance at 10/5/1\\%. The placebo on men is reported in Table \\ref{tab:triple_diff}.",
+  paste("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression on the preferred sample (treated vs.\\ Control A, youngest child 5--7), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights. Standard errors are clustered at the household in parentheses, except the two-way row, which clusters at the household and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum).", SIGNIF_NOTE, "The placebo on men is reported in Table~\\ref{tab:triple_diff}."),
   "\\end{table}"
 )
 writeLines(tab, file.path(TABLE_DIR, "tab07_robustness.tex"))

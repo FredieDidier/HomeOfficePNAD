@@ -2,37 +2,36 @@
 \begin{table}[htbp]
    \caption{\label{tab:triple_diff} Triple Difference: Home Office, Men vs.\ Women}
    \centering
+\small\setlength{\tabcolsep}{5pt}
    \begin{tabular}{lccc}
-      \tabularnewline \midrule \midrule
+      \toprule
       Dependent Variable: & \multicolumn{3}{c}{Home office}\\
-                                              & Men           & Women   & DDD \\   
-      Model:                                  & (1)           & (2)     & (3)\\  
+                                              & Men     & Women   & DDD \\   
+      Model:                                  & (1)     & (2)     & (3)\\  
       \midrule
       \emph{Variables}\\
-      Treated (child $\leq$4)                 & -0.004$^{**}$ & 0.003   & -0.004$^{**}$\\   
-                                              & (0.002)       & (0.002) & (0.002)\\   
-      Treated $\times$ Post                   & 0.002         & -0.0008 & 0.002\\   
-                                              & (0.002)       & (0.003) & (0.002)\\   
-      Treated $\times$ Female                 &               &         & 0.007$^{***}$\\   
-                                              &               &         & (0.003)\\   
-      Treated $\times$ Post $\times$ Female   &               &         & -0.003\\   
-                                              &               &         & (0.004)\\   
+      Treated (child $\leq$4)                 & -0.004  & 0.003   & -0.004\\   
+                                              & (0.002) & (0.002) & (0.002)\\   
+      Treated $\times$ Post                   & 0.002   & -0.0008 & 0.002\\   
+                                              & (0.002) & (0.003) & (0.002)\\   
+      Treated $\times$ Female                 &         &         & 0.007\\   
+                                              &         &         & (0.003)\\   
+      Treated $\times$ Post $\times$ Female   &         &         & -0.003\\   
+                                              &         &         & (0.004)\\   
       \midrule
       \emph{Fixed-effects}\\
-      Individual                              & Yes           & Yes     & Yes\\  
-      Year-quarter                            & Yes           & Yes     & \\  
-      Female-Year-quarter                     &               &         & Yes\\  
+      Individual                              & Yes     & Yes     & Yes\\  
+      Year-quarter                            & Yes     & Yes     & \\  
+      Female-Year-quarter                     &         &         & Yes\\  
       \midrule
       \emph{Fit statistics}\\
-      Observations                            & 776,046       & 989,898 & 1,765,944\\  
-      R$^2$                                   & 0.664         & 0.654   & 0.658\\  
-      \midrule \midrule
-      \multicolumn{4}{l}{\emph{Clustered (Household) standard-errors in parentheses}}\\
-      \multicolumn{4}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+      Observations                            & 776,046 & 989,898 & 1,765,944\\  
+      R$^2$                                   & 0.664   & 0.654   & 0.658\\  
+\bottomrule
    \end{tabular}
    
    \par \raggedright 
-   Columns 1--2 are separate DiDs for men and women (treated $=$ child $\leq$4 vs.\ Control A). Column 3 is the pooled triple difference; the coefficient Treated $\times$ Post $\times$ Female is the extra effect for women relative to men, with female$\times$year-quarter fixed effects absorbing any sex-specific time shock. Individual FE throughout; weighted; SE clustered at the household. $^{*}$/$^{**}$/$^{***}$: 10/5/1\%.
+   \footnotesize\textit{Notes:} Columns 1 and 2 are separate difference-in-differences regressions for men and women (treated $=$ child $\leq$4 vs.\ Control A). Column 3 is the pooled triple difference; the coefficient on Treated $\times$ Post $\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock. All columns include individual fixed effects, are weighted by the survey weights, and cluster standard errors at the household in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}
 
 
