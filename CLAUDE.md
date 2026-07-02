@@ -50,11 +50,11 @@ The pre-period overlaps with the COVID-19 pandemic, which caused a massive tempo
 - **2018–2019**: Clean pre-period (low, stable home office)
 - **2020–2021**: COVID shock drives home office up for everyone — **contaminated pre-period**
 - **2022**: MP enacted while home office is still elevated post-COVID
-- **2022–2025**: Post-MP, home office gradually returns toward pre-COVID baseline
+- **2022–2026**: Post-MP, home office gradually returns toward pre-COVID baseline
 
-**Main spec**: TWFE on full 2018–2025, with individual + quarter FE. Quarter FE absorb aggregate time trends (including COVID) in levels. Standard and transparent. Concern: if COVID *differentially* affected home office for mothers of young children (e.g. school closures may have pushed treated women into home office more in 2020–2021), then pre-trends during the pandemic will not be parallel — visible in the event study plot.
+**Main spec**: TWFE on the full 2018Q1–2026Q1 panel, with individual + quarter FE. Quarter FE absorb aggregate time trends (including COVID) in levels. Standard and transparent. Concern: if COVID *differentially* affected home office for mothers of young children (e.g. school closures may have pushed treated women into home office more in 2020–2021), then pre-trends during the pandemic will not be parallel — visible in the event study plot.
 
-**Robustness — COVID window (Robustness A)**: Drop 2020 and 2021 entirely. Use 2018–2019 as clean pre-period and 2022–2025 as post-period. Most credible alternative — completely removes the COVID contamination. If estimates are similar to the main spec, the pandemic years are not driving results.
+**Robustness — COVID window (Robustness A)**: Drop 2020 and 2021 entirely. Use 2018–2019 as clean pre-period and 2022–2026 as post-period. Most credible alternative — completely removes the COVID contamination. If estimates are similar to the main spec, the pandemic years are not driving results.
 
 **Robustness B**: `post_mp_alt` (Q1 2022 as post-period).
 
@@ -63,7 +63,7 @@ The event study plot (2018Q1–2026Q1, full sample) is the key diagnostic: inspe
 ### Telework Eligibility (Potential Telework)
 Following Góes et al. (2020) / Dingel & Neiman (2020) adapted for the Brazilian COD/PNADC (V4010), a list of ~120 occupation codes eligible for telework is available (see Table 2 of Costa et al. 2024, *Revista Brasileira de Economia de Empresas*).
 
-> **Telework code list — reconciled (2026-07-01).** `telework_cod` in `build/01_pnadc.R` is now the **exact 126-code list transcribed from Table 2 of Costa et al. (2024)** ([source PDF](https://savearchive.zbw.eu/bitstream/11159/709467/1/1931566534_0.pdf)), replacing the earlier range-based approximation (which both over-included — e.g. `2310:2359` pulled 50 codes where the table lists 12 — and omitted valid codes such as 3423). On the built data this now flags **29.8% of employed women** (16.9% of all sample women) as being in a telework-eligible occupation.
+> **Telework code list — reconciled (2026-07-01).** `telework_cod` in `build/01_pnadc.R` is now the **exact 126-code list transcribed from Table 2 of Costa et al. (2024)** ([source PDF](https://savearchive.zbw.eu/bitstream/11159/709467/1/1931566534_0.pdf)). On the built data this flags **29.8% of employed women** (16.9% of all sample women) as being in a telework-eligible occupation.
 
 **Strategy:**
 - **Main sample**: all women (estimates ITT effect of the MP across all workers)
@@ -236,7 +236,7 @@ Open `config/00_master_analysis.R` and run it. Uncomment scripts as they are cre
 - GitHub paths via `here::here()`; Dropbox via `DROPBOX_ROOT` global.
 - Analysis output goes to `analysis/output/tables/` and `analysis/output/graphs/` — committed to git.
 - Table outputs are `.tex` fragments for `\input{}` into LaTeX, not full documents.
-- **`main_data.RData` holds BOTH sexes.** Women are the analysis sample; men enter only the triple-difference (`07_triple_diff.R`). Every women-only script filters `female == 1 & is_head_or_spouse == 1` explicitly at the top.
+- **`main_data.RData` holds BOTH sexes.** Women are the analysis sample; men enter only the triple-difference (`07_triple_diff.R`). Every women-only script filters `female == 1 & is_head_or_spouse == 1 & panel_matched == 1` explicitly at the top.
 - The `treated` variable is always `has_child_u4` (V2005 ∈ {4,5,6,10,11}, inclusive of stepchildren and grandchildren/great-grandchildren). Robustness: `has_child_u4_no_gc` (no grandchildren/great-grandchildren), `has_child_u4_no_sc` (no stepchildren).
 - **V2005 code note:** "grandchild" (10) and "great-grandchild" (11) are SEPARATE PNADC codes — do not assume 10 covers both. `has_child_u4` includes both; `has_child_u4_no_gc` excludes both.
 - DiD main interaction: `treat_x_post`. Robustness (Q1 2022 cutoff): `treat_x_post_alt`.
@@ -264,7 +264,7 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 
 **Individual FE (`id_panel`):** YES — always include. The rotating panel lets us control for all time-invariant individual characteristics (ability, preferences, baseline education, race, region). **The specification ladder in Table 2 shows why this matters:** without individual FE (OLS + demographic controls), the first stage is +0.4pp (p≈0.05); adding individual FE drives it to ≈0 (n.s.). The apparent positive is **selection** — which women have a child ≤4 vs. 5–7 differs in unobservables correlated with home-office trends — and individual FE removes it. So the FE are not optional dressing; dropping them (as one might be tempted to, given the short panel) reintroduces selection bias. **Always use `id_panel`, never `id_rs3` alone** (unmatched observations would be pooled into one spurious FE).
 
-**Checking `id_rs3` match quality (confirmed on the actual build, rebuilt 2026-07-01):** `table(dt$panel_matched)` → 136,684 unmatched vs. 3,539,966 matched, i.e. **3.72% unmatched** out of 3,676,650 total observations. This is small, so `id_panel` behaves essentially like `id_rs3` and individual FE absorb what we expect — **use `id_panel` in the main spec**, and additionally run `panel_matched == 1` as a robustness subsample (Table A6) to confirm the small unmatched share isn't driving results.
+**Main sample is the matched panel (`panel_matched == 1`).** All analysis scripts filter `female == 1 & is_head_or_spouse == 1 & panel_matched == 1`. The unmatched (`table(dt$panel_matched)` → 136,684 of 3,676,650 women, **3.72%**) are singletons — each gets its own `id_panel`, so they contribute nothing to the within-person identification under individual FE — and are dropped for a balanced linked panel. This is a sample choice, not a robustness axis: the FE estimates are numerically identical with or without them; only $N$ changes. The appendix notes the 3.72% excluded. **Use `id_panel`, never `id_rs3` alone**, as the FE variable.
 
 **Hours worked is an OUTCOME, not a covariate.** `VD4031`/`VD4035` (`hours_usual`/`hours_effective`) are one of the key dependent variables (see Key Outcomes above) — telework access is expected to change how many hours women work (e.g., better scheduling flexibility, or conversely more unpaid domestic substitution). Including hours as a control on the right-hand side of the outcome regressions would condition on a post-treatment variable. Never use hours as a covariate; only as `outcome` in `feols(hours_usual ~ treat_x_post | id_panel + year_quarter)`.
 
@@ -351,10 +351,9 @@ Subgroup splits of the main DiD. **Interpretation note:** the `formal` and publi
 | Table A3 | COVID window robustness (drop 2020–2021) | `06_robustness.R` |
 | Table A4 | Age-restricted samples (20–35, 20–40) | `06_robustness.R` |
 | Table A5 | `UPA`-level clustering (vs. main `id_dom`) | `06_robustness.R` |
-| Table A6 | Balanced/matched subsample (`panel_matched == 1` only) | `06_robustness.R` |
 | Table A7 | Restricted sample: `potential_telework == 1` only | `06_robustness.R` |
 | Table 8 | Triple difference (men / women / DDD) + men placebo | `07_triple_diff.R` |
-| Table A9 | Outlier sensitivity — winsorize `rendimento_habitual_real` at top 1% (and/or logs) | `06_robustness.R` |
+| Table A9 | Log real earnings (workers w/ positive earnings), raw and winsorized at top 1% | `06_robustness.R` |
 | Figure A1 | Labor force participation / employment trends (currently `fig03`) | `01_descriptives.R` (done) |
 | Figure A2 | Home office trends, `potential_telework == 1` subgroup (currently `fig04`) | `01_descriptives.R` (done) |
 | Figure A3 | Two-panel trends: Treated vs. A / Treated vs. B separately (currently `fig02`) | `01_descriptives.R` (done) |

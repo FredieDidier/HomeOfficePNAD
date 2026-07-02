@@ -6,18 +6,17 @@
 # one design choice at a time. Confirms the null is not an artifact of any
 # single specification choice.
 #
-#   Table A1  Alternative post-MP cutoff (Q1 2022, post_mp_alt)
-#   Table A2  Treatment variants (exclude grandchildren / stepchildren)
-#   Table A3  COVID window (drop 2020-2021)
-#   Table A4  Age-restricted samples (20-35, 20-40)
-#   Table A5  UPA-level clustering
-#   Table A6  Matched-panel subsample (panel_matched == 1)
-#   Table A7  Telework-eligible-only sample (baseline)
-#   Table A9  Outlier sensitivity: winsorized real income (income outcome)
-#   Figure A5 Control-window sweep (5-6 ... 5-12) coefplot
+#   - Alternative post-MP cutoff (Q1 2022)
+#   - Treatment variants (exclude grandchildren / stepchildren)
+#   - COVID window (drop 2020-2021)
+#   - Age-restricted samples (20-35, 20-40)
+#   - State x quarter fixed effects; two-way (household, PSU) clustering
+#   - Telework-eligible-only sample (baseline)
+#   - Log real earnings, raw and winsorized at the top 1%
+#   - Control-window sweep (5-6 ... 5-12) coefplot
 #
-# Table A8 (placebo — men) needs a separate parallel extraction
-# (build_placebo_men_data, V2007==1) and is deferred; see the Paper Output Plan.
+# The estimation sample is the matched panel (panel_matched == 1), the main
+# sample throughout the paper; the men placebo is in 07_triple_diff.R.
 # =============================================================================
 
 library(data.table)
@@ -32,7 +31,7 @@ GRAPH_DIR    <- here("analysis", "output", "graphs")
 
 load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
-dt <- dt[female == 1 & is_head_or_spouse == 1]
+dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
 dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
 
@@ -72,16 +71,19 @@ rows <- rbindlist(list(
   fs(A_main[V2009 >= 20 & V2009 <= 40],                   "Ages 20--40"),
   fs(A_main, "State $\\times$ quarter fixed effects", fes = "id_panel + sigla_uf^year_quarter"),
   fs(A_main, "Two-way cluster (household, PSU)", clu = ~id_dom + UPA),
-  fs(A_main[panel_matched == 1],                          "Matched panel only"),
   fs(A_main[pt_base == 1],                                "Telework-eligible only")
 ))
 
-# ---- A9: winsorized real income (top 1%), income outcome --------------------
-A_inc <- copy(A_main)
-cap <- A_inc[!is.na(rendimento_habitual_real), quantile(rendimento_habitual_real, 0.99, na.rm = TRUE)]
-A_inc[rendimento_habitual_real > cap, rendimento_habitual_real := cap]
-inc_raw  <- fs(A_main, "Income: raw",        y = "rendimento_habitual_real", pp = FALSE)
-inc_wins <- fs(A_inc,  "Income: winsor. 1\\%", y = "rendimento_habitual_real", pp = FALSE)
+# ---- Earnings: log real earnings, with a winsorized version -----------------
+# Earnings are observed only for workers with positive income; the outcome is
+# the log of real monthly earnings, so the coefficient is a proportional effect.
+# The winsorized version caps earnings at the 99th percentile before taking logs.
+A_inc <- A_main[!is.na(rendimento_habitual_real) & rendimento_habitual_real > 0]
+cap <- A_inc[, quantile(rendimento_habitual_real, 0.99)]
+A_inc[, log_earn   := log(rendimento_habitual_real)]
+A_inc[, log_earn_w := log(pmin(rendimento_habitual_real, cap))]
+inc_log  <- fs(A_inc, "Log real earnings",                       y = "log_earn",   pp = FALSE)
+inc_logw <- fs(A_inc, "Log real earnings (winsorized top 1\\%)", y = "log_earn_w", pp = FALSE)
 
 # =============================================================================
 # Table A (first stage) + income (two-line journal format: estimate; (se) below)
@@ -100,9 +102,9 @@ tab <- c(
   "\\multicolumn{3}{l}{\\textit{Home office (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(rows)), function(i) row_tex(rows[i]))),
   "\\midrule",
-  "\\multicolumn{3}{l}{\\textit{Real income (R\\$), outlier sensitivity}} \\\\",
-  row_tex(inc_raw, 1),
-  row_tex(inc_wins, 1),
+  "\\multicolumn{3}{l}{\\textit{Log real earnings (workers with positive earnings)}} \\\\",
+  row_tex(inc_log, 3),
+  row_tex(inc_logw, 3),
   "\\bottomrule\\end{tabular}",
   "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression on the preferred sample (treated vs.\\ Control A, child 5--7), including the treated main effect, individual and year-quarter fixed effects, and survey weights; standard errors clustered at the household in parentheses (except the two-way row, clustered at the household and primary sampling unit). $^{*}$/$^{**}$/$^{***}$ denote significance at 10/5/1\\%. The placebo on men is reported in Table \\ref{tab:triple_diff}.",
   "\\end{table}"
@@ -132,6 +134,6 @@ ggsave(file.path(GRAPH_DIR, "fig08_control_window_sweep.png"), figw, width = 7.5
 
 cat("\n=== First-stage robustness (home office, pp) ===\n")
 print(rows[, .(label = gsub("\\\\", "", label), est = round(est, 2), se = round(se, 2), star, n = fmt0(n))])
-cat("\n=== Income (R$) ===\n")
-print(rbind(inc_raw, inc_wins)[, .(label = gsub("\\\\", "", label), est = round(est, 1), se = round(se, 1), star)])
+cat("\n=== Log real earnings ===\n")
+print(rbind(inc_log, inc_logw)[, .(label = gsub("\\\\", "", label), est = round(est, 3), se = round(se, 3), star)])
 message("\n=== 06_robustness.R complete ===")

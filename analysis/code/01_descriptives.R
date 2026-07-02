@@ -36,7 +36,7 @@ load(file.path(OUTPUT_PATH, "main_data.RData"))
 
 # ---- Group assignment -------------------------------------------------------
 # Keep only head/spouse women (main_data now holds both sexes; filter female==1)
-dt_hs <- dt[female == 1 & is_head_or_spouse == 1]
+dt_hs <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 
 dt_hs[, group := fcase(
   has_child_u4 == 1,                              "Treated (child <= 4 years)",

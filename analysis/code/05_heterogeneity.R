@@ -24,7 +24,7 @@ GRAPH_DIR    <- here("analysis", "output", "graphs")
 
 load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
-dt <- dt[female == 1 & is_head_or_spouse == 1]
+dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
 dt[, clt_base    := as.integer(clt_private[1] == 1), by = id_panel]
 dt[, formal_base := as.integer(formal[1] == 1),      by = id_panel]

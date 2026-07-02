@@ -31,7 +31,7 @@ TABLE_DIR    <- here("analysis", "output", "tables")
 
 load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
-dt <- dt[is_head_or_spouse == 1]
+dt <- dt[is_head_or_spouse == 1 & panel_matched == 1]
 setnames(dt, "VD4031", "hours_usual")
 
 S <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]

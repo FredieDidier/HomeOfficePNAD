@@ -31,7 +31,7 @@ dir.create(TABLE_DIR, showWarnings = FALSE, recursive = TRUE)
 
 load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
-dt <- dt[female == 1 & is_head_or_spouse == 1]
+dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setnames(dt, "VD4031", "hours_usual")
 
 # Human-readable labels for etable. Nuisance controls are left unlabeled so they

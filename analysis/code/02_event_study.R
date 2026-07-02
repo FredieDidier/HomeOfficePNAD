@@ -31,7 +31,7 @@ NAVY <- "#2C3E50"; REFC <- "#C0392B"
 
 load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
-dt <- dt[female == 1 & is_head_or_spouse == 1]
+dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 
 # Event-study coefficients (in pp) for outcome `yvar`, one control group.
 run_es <- function(data, control_flag, label, yvar) {

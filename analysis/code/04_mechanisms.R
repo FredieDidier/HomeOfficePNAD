@@ -26,7 +26,7 @@ TABLE_DIR    <- here("analysis", "output", "tables")
 
 load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
-dt <- dt[female == 1 & is_head_or_spouse == 1]
+dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
 dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
 
