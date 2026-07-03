@@ -76,7 +76,7 @@ pv <- setNames(rows[match(het_subs, label), p], het_subs)
 K_tests <- length(pv)
 holm_p <- p.adjust(pv, method = "holm")   # Holm (1979) step-down FWER control
 holm_min <- min(holm_p)
-mt_note <- sprintf("The Holm $p$ is the Holm step-down adjustment for testing %d subgroups; it controls the family-wise error rate, is uniformly more powerful than a plain Bonferroni correction, and makes no assumption about the dependence across the tests. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $%.2f$, for women aged 40--49.", K_tests, holm_min)
+mt_note <- sprintf("The Holm $p$ is the Holm step-down adjustment for testing the %d subgroups, which controls the family-wise error rate under arbitrary dependence across the tests; a value of $1.00$ marks a subgroup far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $%.2f$, for women aged 40--49.", K_tests, holm_min)
 
 # ---- Table 6 (two-line journal format: estimate; (se) below) ----------------
 fmt <- function(x) formatC(x, format = "f", digits = 2)
