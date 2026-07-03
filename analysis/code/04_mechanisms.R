@@ -50,7 +50,7 @@ etable(fe(A), fe(A[pt_base == 1]), fe(A[pt_base == 0]),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect by Baseline Telework Eligibility",
        label = "tab:mech_moderation",
-       notes = paste("\\footnotesize\\textit{Notes:} Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Baseline telework eligibility is the woman's occupation eligibility, following \\citet{costa2024}, measured in her first observed quarter and held fixed. All columns include individual and year-quarter fixed effects, are weighted by the survey weights, and cluster standard errors at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column estimates ", EQ_REF, " (first stage, outcome home office) on the preferred sample (treated, child $\\leq$4, vs.\\ Control~A, youngest child 5--7), split by whether the woman was in a telework-eligible occupation at baseline---her occupation eligibility in her first observed quarter, held fixed, following \\citet{costa2024}. All columns include individual and year-quarter fixed effects."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab04_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5: occupational sorting (potential_telework as outcome) ----------
@@ -61,7 +61,7 @@ etable(fe(A, "potential_telework"), fe(B, "potential_telework"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Occupational Sorting: Telework-Eligible Occupation as Outcome",
        label = "tab:mech_allocation",
-       notes = paste("\\footnotesize\\textit{Notes:} The outcome is an indicator for being in a telework-eligible occupation. A positive Treated $\\times$ Post coefficient would mean treated mothers move into eligible occupations after the reform. The specification is the same preferred difference-in-differences used for the first stage: the treated main effect with individual and year-quarter fixed effects, weighted by the survey weights. Standard errors are clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} The outcome is an indicator for being in a telework-eligible occupation; each column estimates ", EQ_REF, " with this outcome. A positive Treated $\\times$ Post coefficient would mean treated mothers move into eligible occupations after the reform. Column~(1) uses Control~A (youngest child 5--7) and column~(2) Control~B (no child aged 0--7)."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab05_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5b: occupation transition matrix (descriptive) ------------------
@@ -89,7 +89,7 @@ tb <- c("\\begin{table}[H]\\centering",
   "\\begin{tabular}{lcc}", "\\toprule",
   trans_tab(1, "Treated (child $\\leq$4)"), "\\midrule",
   trans_tab(0, "Control A (child 5--7)"), "\\bottomrule\\end{tabular}",
-  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each cell is the share of women in a given pre-to-post telework-eligibility transition, among matched women observed both before and after the second quarter of 2022 (the number of women in each group is shown in the panel headers). Off-diagonal cells are occupation switches. The treated and control distributions are similar, consistent with the null in Table~\\ref{tab:mech_allocation}.",
+  "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each cell is the share of women in a given pre-to-post telework-eligibility transition, among matched women observed both before and after the second quarter of 2022. Off-diagonal cells are occupation switches. The treated and control distributions are similar, consistent with the null in Table~\\ref{tab:mech_allocation}.",
   "\\end{table}")
 writeLines(tb, file.path(TABLE_DIR, "tab05b_occupation_transition.tex"))
 

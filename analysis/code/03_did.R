@@ -35,12 +35,17 @@ setDT(dt)
 dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setnames(dt, "VD4031", "hours_usual")
 
+# Real income enters the outcome tables in logs (as in the robustness table), so
+# the coefficient is a proportional effect. Defined only for workers with
+# positive earnings; feols drops the remaining (NA) rows for that column only.
+dt[, log_income := fifelse(rendimento_habitual_real > 0, log(rendimento_habitual_real), NA_real_)]
+
 # Human-readable labels for etable. Nuisance controls are left unlabeled so they
 # can be dropped from the display by their raw names.
 dict <- c(
   treat_x_post = "Treated $\\times$ Post",
   treated      = "Treated (child $\\leq$4)",
-  home_office  = "Home office", rendimento_habitual_real = "Real income",
+  home_office  = "Home office", log_income = "Log income",
   hours_usual  = "Usual hours", employed = "Employed",
   in_labor_force = "In labor force", on_maternity_leave = "Maternity leave",
   id_panel = "Individual", id_dom = "Household", year_quarter = "Year-quarter"
@@ -75,7 +80,7 @@ etable(m1, m2, m3, m4,
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect: Specification Ladder (Control A)",
        label = "tab:did_firststage",
-       notes = paste("\\footnotesize\\textit{Notes:} Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Outcome: an indicator for working from home. Demographic controls are age, age$^2$, completed higher education, race, and region. All columns are weighted by the survey sampling weights. Columns (3) and (4) add individual fixed effects. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} The outcome is an indicator for working from home. Column~(3) is the preferred specification, ", EQ_REF, ", with individual and year-quarter fixed effects; columns~(1)--(2) omit the fixed effects and column~(4) adds a quadratic in age. Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control~A (youngest child 5--7). Demographic controls are age, age$^2$, completed higher education, race, and region."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab02_file, fontsize = "\\small", tabcolsep = 5)
 # Show an explicit "No" where a fixed effect is absent (etable leaves it blank).
 # Ladder: year-quarter FE enters from col 2, individual FE from col 3.
@@ -87,7 +92,7 @@ writeLines(.tx, tab02_file)
 # =============================================================================
 # Table 3 — all outcomes, preferred spec, Control A and Control B
 # =============================================================================
-outcomes <- c("home_office", "rendimento_habitual_real", "hours_usual",
+outcomes <- c("home_office", "log_income", "hours_usual",
               "employed", "in_labor_force", "on_maternity_leave")
 run_all <- function(sample) {
   setNames(lapply(outcomes, function(y)
@@ -103,7 +108,7 @@ etable(mods_A,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control A",
        label = "tab:did_outcomes_A",
-       notes = paste("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control A (youngest child 5--7). Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; real income is in reais per month and usual hours in hours per week, both observed for workers only. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, ". Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control~A (youngest child 5--7). ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab03a_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 tab03b_file <- file.path(TABLE_DIR, "tab03b_did_outcomes_B.tex")
@@ -112,7 +117,7 @@ etable(mods_B,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control B",
        label = "tab:did_outcomes_B",
-       notes = paste("\\footnotesize\\textit{Notes:} As in the Control~A outcome table, using the broad comparison group (women with no child aged 0--7). Each column is a separate difference-in-differences regression under the preferred specification (treated main effect with individual and year-quarter fixed effects, weighted by the survey weights). Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; real income is in reais per month and usual hours in hours per week, both observed for workers only. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, " on the broad comparison group (women with no child aged 0--7). Sample: women 18--49, household head or spouse. ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab03b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 # ---- A-vs-B placebo (home office) ------------------------------------------
@@ -130,7 +135,7 @@ for (nm in c("m1", "m2", "m3", "m4")) {
 cat("\n=== Table 3: Control A outcomes (treat_x_post) ===\n")
 for (y in outcomes) {
   ct <- coeftable(mods_A[[y]])["treat_x_post", ]
-  sc <- if (y %in% c("rendimento_habitual_real", "hours_usual")) 1 else 100
+  sc <- if (y %in% c("log_income", "hours_usual")) 1 else 100
   cat(sprintf("  %-26s %.3f (%.3f) p=%.2f\n", y, ct[1] * sc, ct[2] * sc, ct[4]))
 }
 ctP <- coeftable(mP)["fake_x_post", ]

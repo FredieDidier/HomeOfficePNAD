@@ -1,11 +1,11 @@
 \begin{table}[H]\centering
-\caption{Heterogeneity of the First-Stage Home-Office Effect (pp)}
+\caption{Heterogeneity of the First-Stage Home-Office Effect}
 \label{tab:heterogeneity}\small
 \begin{tabular}{lcccc}
 \toprule
  & Treated $\times$ Post & $p$-value & Holm $p$ & Obs. \\
 \midrule
-\multicolumn{5}{l}{\textit{By formality (placebo: effect only where the law binds)}} \\
+\multicolumn{5}{l}{\textit{By formality}} \\
 $\quad$ Formal & -0.03$^{}$ & 0.950 & 1.00 & 261,866 \\
  & (0.50) & & & \\
 $\quad$ Informal & -0.13$^{}$ & 0.727 & 1.00 & 728,032 \\
@@ -15,7 +15,7 @@ $\quad$ Private, signed card (CLT) & 0.27$^{}$ & 0.681 & 1.00 & 152,995 \\
 $\quad$ Non-CLT & -0.19$^{}$ & 0.572 & 1.00 & 836,903 \\
  & (0.34) & & & \\
 \midrule
-\multicolumn{5}{l}{\textit{By sector (placebo: private only)}} \\
+\multicolumn{5}{l}{\textit{By sector}} \\
 $\quad$ Private employee & 0.18$^{}$ & 0.752 & 1.00 & 197,959 \\
  & (0.58) & & & \\
 $\quad$ Public employee & -0.20$^{}$ & 0.515 & 1.00 & 91,735 \\
@@ -41,5 +41,5 @@ $\quad$ Age 30--39 & -0.49$^{}$ & 0.272 & 1.00 & 450,783 \\
 $\quad$ Age 40--49 & 1.39$^{**}$ & 0.042 & 0.55 & 190,322 \\
  & (0.69) & & & \\
 \bottomrule\end{tabular}
-\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\ Control A), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights, with standard errors clustered at the household in parentheses. Subgroups are defined at baseline (first observed quarter). The Holm $p$ is the Holm step-down adjustment for testing the 13 subgroups, which controls the family-wise error rate under arbitrary dependence across the tests; a value of $1.00$ marks a subgroup far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $0.55$, for women aged 40--49. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression estimating Eq.~\eqref{eq:did} (outcome: home office, in percentage points) on the preferred sample (treated vs.\ Control~A), for the subgroup indicated. Subgroups are defined at baseline (first observed quarter). All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. The Holm $p$ is the Holm step-down adjustment for testing the 13 subgroups, which controls the family-wise error rate under arbitrary dependence across the tests; a value of $1.00$ marks a subgroup far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $0.55$, for women aged 40--49. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}

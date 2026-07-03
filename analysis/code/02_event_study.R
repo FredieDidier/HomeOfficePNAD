@@ -118,6 +118,11 @@ pretrend_test <- function(control_flag, label, yvar = "home_office") {
 cat("\n=== Pre-trend joint tests (H0: all pre-reform leads = 0) ===\n")
 pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "home_office")
 pretrend_test(dt$has_child_u4 == 0 & dt$has_child_5_7 == 0, "Control B", "home_office")
+# Downstream outcomes with significant pooled DiD coefficients: home office is
+# the ONLY one with flat pre-trends; employment, participation, and maternity
+# leave all reject parallel pre-trends, so their post coefficients are not causal.
+pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "employed")
+pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "in_labor_force")
 pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "on_maternity_leave")
 
 message("\n=== 02_event_study.R complete ===")

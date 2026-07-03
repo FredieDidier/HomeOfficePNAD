@@ -93,18 +93,18 @@ grp <- function(title, labs) {
     })))
 }
 tab <- c("\\begin{table}[H]\\centering",
-  "\\caption{Heterogeneity of the First-Stage Home-Office Effect (pp)}",
+  "\\caption{Heterogeneity of the First-Stage Home-Office Effect}",
   "\\label{tab:heterogeneity}\\small",
   "\\begin{tabular}{lcccc}", "\\toprule",
   " & Treated $\\times$ Post & $p$-value & Holm $p$ & Obs. \\\\", "\\midrule",
-  grp("By formality (placebo: effect only where the law binds)",
+  grp("By formality",
       c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT")), "\\midrule",
-  grp("By sector (placebo: private only)", c("Private employee", "Public employee")), "\\midrule",
+  grp("By sector", c("Private employee", "Public employee")), "\\midrule",
   grp("By education", c("With higher education", "Without higher education")), "\\midrule",
   grp("By race", c("White", "Non-white")), "\\midrule",
   grp("By age band", c("Age 18--29", "Age 30--39", "Age 40--49")),
   "\\bottomrule\\end{tabular}",
-  paste("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control A), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights, with standard errors clustered at the household in parentheses. Subgroups are defined at baseline (first observed quarter).", mt_note, SIGNIF_NOTE),
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression estimating ", EQ_REF, " (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control~A), for the subgroup indicated. Subgroups are defined at baseline (first observed quarter)."), WEIGHT_NOTE, CLUSTER_NOTE, mt_note, SIGNIF_NOTE),
   "\\end{table}")
 writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
 
@@ -113,11 +113,12 @@ writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
 # were a real telework effect, some downstream outcome should move; none does.
 A4049 <- copy(A[age_band == "Age 40--49"])
 setnames(A4049, "VD4031", "hours_usual")
+A4049[, log_income := fifelse(rendimento_habitual_real > 0, log(rendimento_habitual_real), NA_real_)]
 dict6 <- c(treat_x_post = "Treated $\\times$ Post", treated = "Treated (child $\\leq$4)",
-           home_office = "Home office", rendimento_habitual_real = "Real income",
+           home_office = "Home office", log_income = "Log income",
            hours_usual = "Usual hours", employed = "Employed", in_labor_force = "In labor force",
            on_maternity_leave = "Maternity leave", id_panel = "Individual", year_quarter = "Year-quarter")
-outs6 <- c("home_office", "rendimento_habitual_real", "hours_usual", "employed", "in_labor_force", "on_maternity_leave")
+outs6 <- c("home_office", "log_income", "hours_usual", "employed", "in_labor_force", "on_maternity_leave")
 mods6 <- setNames(lapply(outs6, function(y)
   feols(as.formula(sprintf("%s ~ treated + treat_x_post | id_panel + year_quarter", y)),
         A4049, weights = ~V1028, cluster = ~id_dom, notes = FALSE)), outs6)
@@ -126,16 +127,20 @@ etable(mods6, tex = TRUE, file = tab06b_file, replace = TRUE,
        signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict6, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "All Outcomes for the Age 40--49 Subgroup", label = "tab:age4049",
-       notes = paste("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression on women whose baseline age is 40--49, the only individually significant subgroup in Table~\\ref{tab:heterogeneity}, under the preferred specification (treated main effect, individual and year-quarter fixed effects, survey weights); standard errors clustered at the household in parentheses. Home office, employed, in labor force, and maternity leave are 0/1 indicators (a coefficient of $0.01$ is one percentage point); real income is in reais per month and usual hours in hours per week, both observed for workers only. Only home office is significant; every downstream outcome is indistinguishable from zero.", SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, " on women whose baseline age is 40--49, the only individually significant subgroup in Table~\\ref{tab:heterogeneity}. ", UNITS_NOTE, " Only home office is significant; every downstream outcome is indistinguishable from zero."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab06b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 # ---- Figure 3 (fig07) — coefficient plot -----------------------------------
-rows[, label := factor(label, levels = rev(rows$label))]
-fig <- ggplot(rows[!is.na(est)], aes(x = est, y = label)) +
+# ggplot renders labels verbatim, so convert the LaTeX en-dash "--" in the age
+# bands to a plain ASCII hyphen for the axis (CLAUDE.md: ASCII-only in ggplot).
+rows_fig <- rows[!is.na(est)]
+rows_fig[, label := gsub("--", "-", label)]
+rows_fig[, label := factor(label, levels = rev(label))]
+fig <- ggplot(rows_fig, aes(x = est, y = label)) +
   geom_vline(xintercept = 0, linetype = "dashed", colour = "grey45") +
   geom_errorbarh(aes(xmin = ci_lo, xmax = ci_hi), height = 0.25, colour = "#2C3E50") +
   geom_point(colour = "#2C3E50", size = 2) +
-  labs(x = "First-stage home-office effect (pp), Treated x Post", y = NULL) +
+  labs(x = "First-stage home-office effect (pp)", y = NULL) +
   theme_bw(base_size = 13) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
         axis.text = element_text(size = 11))

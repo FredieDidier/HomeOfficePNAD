@@ -25,11 +25,17 @@ Two-way cluster (household, PSU) & -0.08$^{}$ & 989,898 \\
 Telework-eligible only & -0.95$^{}$ & 136,079 \\
  & (1.01) & \\
 \midrule
-\multicolumn{3}{l}{\textit{Log real earnings (workers with positive earnings)}} \\
+\multicolumn{3}{l}{\textit{Home office, by post-reform timing (pp)}} \\
+Early post (2022--2023) & -0.21$^{}$ & 989,898 \\
+ & (0.33) & \\
+Late post (2024--2026) & 0.18$^{}$ & 989,898 \\
+ & (0.35) & \\
+\midrule
+\multicolumn{3}{l}{\textit{Log real earnings}} \\
 Log real earnings & -0.001$^{}$ & 481,352 \\
  & (0.009) & \\
 Log real earnings (winsorized top 1\%) & -0.002$^{}$ & 481,352 \\
  & (0.009) & \\
 \bottomrule\end{tabular}
-\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate difference-in-differences regression on the preferred sample (treated vs.\ Control A, youngest child 5--7), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights. Standard errors are clustered at the household in parentheses, except the two-way row, which clusters at the household and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum). Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$. The placebo on men is reported in Table~\ref{tab:triple_diff}.
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate difference-in-differences regression estimating Eq.~\eqref{eq:did} on the preferred sample (treated vs.\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The two post-reform-timing rows come from a single regression that splits Treated $\times$ Post into a 2022--2023 and a 2024--2026 window. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum). Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}

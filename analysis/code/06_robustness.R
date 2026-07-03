@@ -90,6 +90,23 @@ A_inc[, log_earn_w := log(pmin(rendimento_habitual_real, cap))]
 inc_log  <- fs(A_inc, "Log real earnings",                       y = "log_earn",   pp = FALSE)
 inc_logw <- fs(A_inc, "Log real earnings (winsorized top 1\\%)", y = "log_earn_w", pp = FALSE)
 
+# ---- Post-reform timing: early (2022-2023) vs late (2024-2026) --------------
+# The event study drifts up only in 2024-2025, so splitting Treated x Post into
+# an early and a late window tests directly whether a delayed effect is hiding
+# behind the pooled null. Both come from ONE regression (two interaction terms).
+A_tim <- copy(A_main)
+A_tim[, post_early := as.integer(year_quarter >= 20222 & year_quarter <= 20234)]
+A_tim[, post_late  := as.integer(year_quarter >= 20241)]
+A_tim[, trxp_early := tr * post_early][, trxp_late := tr * post_late]
+m_tim <- feols(home_office ~ tr + trxp_early + trxp_late | id_panel + year_quarter,
+               A_tim, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
+ct_tim <- coeftable(m_tim)
+timing <- rbindlist(Map(function(v, lbl)
+  data.table(label = lbl, est = ct_tim[v, 1] * 100, se = ct_tim[v, 2] * 100,
+             star = star(ct_tim[v, 4]), n = nobs(m_tim)),
+  c("trxp_early", "trxp_late"),
+  c("Early post (2022--2023)", "Late post (2024--2026)")))
+
 # =============================================================================
 # Table A (first stage) + income (two-line journal format: estimate; (se) below)
 # =============================================================================
@@ -107,11 +124,14 @@ tab <- c(
   "\\multicolumn{3}{l}{\\textit{Home office (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(rows)), function(i) row_tex(rows[i]))),
   "\\midrule",
-  "\\multicolumn{3}{l}{\\textit{Log real earnings (workers with positive earnings)}} \\\\",
+  "\\multicolumn{3}{l}{\\textit{Home office, by post-reform timing (pp)}} \\\\",
+  unlist(lapply(seq_len(nrow(timing)), function(i) row_tex(timing[i]))),
+  "\\midrule",
+  "\\multicolumn{3}{l}{\\textit{Log real earnings}} \\\\",
   row_tex(inc_log, 3),
   row_tex(inc_logw, 3),
   "\\bottomrule\\end{tabular}",
-  paste("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression on the preferred sample (treated vs.\\ Control A, youngest child 5--7), including the treated main effect and individual and year-quarter fixed effects, weighted by the survey weights. Standard errors are clustered at the household in parentheses, except the two-way row, which clusters at the household and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum).", SIGNIF_NOTE, "The placebo on men is reported in Table~\\ref{tab:triple_diff}."),
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression estimating ", EQ_REF, " on the preferred sample (treated vs.\\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The two post-reform-timing rows come from a single regression that splits Treated $\\times$ Post into a 2022--2023 and a 2024--2026 window. ", WEIGHT_NOTE), "Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum).", SIGNIF_NOTE),
   "\\end{table}"
 )
 writeLines(tab, file.path(TABLE_DIR, "tab07_robustness.tex"))
@@ -139,6 +159,9 @@ ggsave(file.path(GRAPH_DIR, "fig08_control_window_sweep.png"), figw, width = 7.5
 
 cat("\n=== First-stage robustness (home office, pp) ===\n")
 print(rows[, .(label = gsub("\\\\", "", label), est = round(est, 2), se = round(se, 2), star, n = fmt0(n))])
+cat("\n=== Post-reform timing (home office, pp; 95% CI) ===\n")
+print(timing[, .(label = gsub("--", "-", label), est = round(est, 2), se = round(se, 2), star,
+                 ci_lo = round(est - 1.96 * se, 2), ci_hi = round(est + 1.96 * se, 2))])
 cat("\n=== Log real earnings ===\n")
 print(rbind(inc_log, inc_logw)[, .(label = gsub("\\\\", "", label), est = round(est, 3), se = round(se, 3), star)])
 message("\n=== 06_robustness.R complete ===")

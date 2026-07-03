@@ -10,7 +10,7 @@
 
 \paragraph{Panel quality.} Table~\ref{tab:panel_retention} documents that the reconstructed panel captures genuine repeated observations rather than spurious matches. It reports, for the estimation sample, the share of households and of matched individuals observed for at least a given number of quarters, together with the quarter-to-quarter continuation probability. The figures are computed on the analysis sample, prime-age women who head a household or are the head's spouse, and so reflect both survey attrition and the sample definition: a woman who ages out of the 18--49 window, or a household that no longer contains a qualifying woman, leaves the sample even though the survey continues to interview her. This is why retention is lower than an unrestricted population figure would be; it is a feature of the sample definition, not a failure of the matching. The key point for the identification is that a substantial share of women are observed repeatedly, so that individual fixed effects are meaningful.
 
-\input{../analysis/output/tables/tabA0_panel_retention.tex}
+\input{../analysis/output/tables/tabA1_panel_retention.tex}
 
 \clearpage
 \section{Variable definitions}\label{app:variables}
@@ -61,9 +61,18 @@ COD major group & Four-digit COD codes included & Representative occupations \\
 \clearpage
 \section{Additional tables and figures}\label{app:additional}
 
-Table~\ref{tab:robustness} collects the robustness checks on the first stage discussed in Section~\ref{sec:robustness}, and Figure~\ref{fig:hetero} summarizes the subgroup estimates of Table~\ref{tab:heterogeneity} as a coefficient plot; Table~\ref{tab:age4049} reports all outcomes for the age 40--49 subgroup. Table~\ref{tab:did_outcomes_B} repeats the difference-in-differences estimates using the broad comparison group (women with no child aged 0--7), which delivers more precision at the cost of a less tightly matched counterfactual; the conclusions are unchanged. Figure~\ref{fig:event_maternity} shows the event study for maternity leave, which exhibits the pronounced pre-reform trend discussed in the text and motivates treating that outcome as non-causal. Table~\ref{tab:occ_transition} reports the occupation-transition matrix underlying the mechanism discussion. Table~\ref{tab:triple_diff_outcomes} extends the triple difference to all outcomes. Figure~\ref{fig:window} reports the control-window robustness. Figure~\ref{fig:trends_eligible} plots home-office trends for women in telework-eligible occupations at baseline, and Figure~\ref{fig:lfp} plots labor-force participation and employment trends by group.
+This appendix collects the supplementary tables and figures, ordered as they are cited in the text. Table~\ref{tab:robustness} collects the robustness checks on the first stage discussed in Section~\ref{sec:robustness}, and Figure~\ref{fig:event_maternity} shows the event study for maternity leave, which exhibits the pronounced pre-reform trend discussed in the text and motivates treating that outcome as non-causal. Table~\ref{tab:occ_transition} reports the occupation-transition matrix underlying the mechanism discussion, and Figure~\ref{fig:hetero} summarizes the subgroup estimates of Table~\ref{tab:heterogeneity} as a coefficient plot. Table~\ref{tab:age4049} reports all outcomes for the age 40--49 subgroup, and Figure~\ref{fig:window} reports the control-window robustness. Table~\ref{tab:triple_diff_outcomes} extends the triple difference to all outcomes, and Figure~\ref{fig:trends_eligible} plots home-office trends for women in telework-eligible occupations at baseline. Table~\ref{tab:did_outcomes_B} repeats the difference-in-differences estimates using the broad comparison group (women with no child aged 0--7), which delivers more precision at the cost of a less tightly matched counterfactual; the conclusions are unchanged. Finally, Figure~\ref{fig:lfp} plots labor-force participation and employment trends by group.
 
 \input{../analysis/output/tables/tab07_robustness.tex}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{fig09_event_study_maternity.pdf}
+\caption{Event study: maternity leave around the reform. Constructed exactly as Figure~\ref{fig:event_home}. The pronounced pre-reform trend in the treated-versus-control gap indicates that the parallel-trends assumption fails for this outcome, which is therefore not interpreted causally: a joint Wald test rejects that the pre-reform coefficients are jointly zero ($\chi^2(16)=282$, $p<0.001$), in contrast to the home-office event study in Figure~\ref{fig:event_home}.}
+\label{fig:event_maternity}
+\end{figure}
+
+\input{../analysis/output/tables/tab05b_occupation_transition.tex}
 
 \begin{figure}[H]
 \centering
@@ -74,18 +83,6 @@ Table~\ref{tab:robustness} collects the robustness checks on the first stage dis
 
 \input{../analysis/output/tables/tab06b_age4049_outcomes.tex}
 
-\input{../analysis/output/tables/tab03b_did_outcomes_B.tex}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.82\textwidth]{fig09_event_study_maternity.pdf}
-\caption{Event study: maternity leave around the reform. Constructed exactly as Figure~\ref{fig:event_home}. The pronounced pre-reform trend in the treated-versus-control gap indicates that the parallel-trends assumption fails for this outcome, which is therefore not interpreted causally: a joint Wald test rejects that the pre-reform coefficients are jointly zero ($\chi^2(16)=282$, $p<0.001$), in contrast to the home-office event study in Figure~\ref{fig:event_home}.}
-\label{fig:event_maternity}
-\end{figure}
-
-\input{../analysis/output/tables/tab05b_occupation_transition.tex}
-\input{../analysis/output/tables/tab08b_triple_diff_outcomes.tex}
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{fig08_control_window_sweep.pdf}
@@ -93,12 +90,16 @@ Table~\ref{tab:robustness} collects the robustness checks on the first stage dis
 \label{fig:window}
 \end{figure}
 
+\input{../analysis/output/tables/tab08b_triple_diff_outcomes.tex}
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{fig04_home_office_telework_eligible.pdf}
 \caption{Home office rate by group and quarter, women in telework-eligible occupations at baseline. Constructed as Figure~\ref{fig:trends} but restricted to women whose occupation is telework-eligible, the only group for whom the priority is not vacuous. The rate is higher than in the full sample but still rises in parallel across groups, with no break for treated women at the reform.}
 \label{fig:trends_eligible}
 \end{figure}
+
+\input{../analysis/output/tables/tab03b_did_outcomes_B.tex}
 
 \begin{figure}[H]
 \centering

@@ -37,15 +37,17 @@ Art. 75-F is a **priority claim, not an automatic right**: the employer must pri
 ### COVID contamination
 Pre-period overlaps the pandemic home-office spike (2020–2021), a potential confounder. **Main spec:** TWFE on full 2018Q1–2026Q1 panel with individual + quarter FE (quarter FE absorb COVID in levels). Diagnostic: the **event study** — check whether treated/control pre-trends diverge in 2020–2021. Empirically pre-trends are flat through COVID. **Robustness:** drop 2020–2021 (clean 2018–2019 pre-period) and `post_mp_alt`; estimates unchanged.
 
+The event study drifts up to ~1pp in a few 2024–25 quarters. To pre-empt "the null just hides a delayed effect", `06_robustness.R` splits `treat_x_post` into an **early (2022–2023) vs late (2024–2026)** window in one regression (rows in `tab07`): early −0.21pp, late **+0.18pp**, both n.s., late CI rules out >~0.9pp. The late drift does not survive aggregation.
+
 ### Telework eligibility (`potential_telework`)
 `telework_cod` in `build/01_pnadc.R` is the **126-code list from Table 2 of Costa et al. (2024)** (adapting Dingel–Neiman 2020 / Góes et al. 2020 to the COD/V4010). Flags ~29.8% of employed women. Used as a **moderator** and as an **outcome** (job switching is a mechanism), **never as a sample restriction** — conditioning on it post-policy is a bad control (occupation is endogenous to the MP). Documented in appendix §"Classifying telework-eligible occupations".
 
 ### Key outcomes
 1. `home_office` — telework (V4022 ∈ {4,5}); the first stage.
-2. `income_habitual_real` — real habitual monthly income.
+2. `income_habitual_real` — real habitual monthly income. **In every OUTCOME regression table it enters in LOGS** (`log_income = log` of positive real earnings; NA for non-workers, feols drops them per-column), so the coefficient is an approximate proportional effect — matching the robustness log-earnings rows. Kept in **levels only** in the Table 1 descriptives (a summary stat, not a regression).
 3. `hours_usual` / `hours_effective` — weekly hours.
-4. `employed`, `unemployed`, `in_labor_force` — project-derived 0/1 over the FULL sample. **Never use datazoom's raw `ocupado` as the outcome** (NA out of labor force → silently conditions on LFP).
-5. `on_maternity_leave` — recent-birth proxy. DiD is significant (−0.87pp***) but `fig09` shows **strong pre-trends** → parallel trends fails → **not interpreted causally**. Only `home_office` has clean flat pre-trends.
+4. `employed`, `unemployed`, `in_labor_force` — project-derived 0/1 over the FULL sample. **Never use datazoom's raw `ocupado` as the outcome** (NA out of labor force → silently conditions on LFP). The +1pp DiD on `employed`/`in_labor_force` is **not causal**: joint pre-trend tests reject flat pre-trends (employed χ²(16)=39.6, LFP =38.0, both p<0.01), so they are differential trends, not a reform break.
+5. `on_maternity_leave` — recent-birth proxy. DiD is significant (−0.87pp***) but `fig09` shows **strong pre-trends** (χ²(16)=282, p<0.001) → parallel trends fails → **not interpreted causally**. **Only `home_office` has clean flat pre-trends** (χ²(16)=12.6, p=0.70) and is read causally.
 
 ### Sample
 Women 18–49, head/spouse (`is_head_or_spouse == 1`), from Q1 2018 (V4022 availability), matched panel (`panel_matched == 1`). Unit: individual × quarter (`id_panel` + `year_quarter`); each appears 1–5 quarters (rotating panel). Every women-only script filters `female == 1 & is_head_or_spouse == 1 & panel_matched == 1`.
@@ -100,7 +102,7 @@ Dropbox/HomeOfficePNAD/build/{input/Panel_6..13.RData, output/main_data.RData}
 | `forca_trab` / `in_labor_force` | In labor force (never NA); `in_labor_force` = clean 0/1 over all sample women. | datazoom / Project |
 | `employed` | = 1 if in labor force AND occupied, else 0 (out-of-LF → 0). Use this, not `ocupado`. | Project |
 | `unemployed` | = 1 if in labor force AND not occupied, else 0. | Project |
-| `rendimento_habitual_real` / `income_habitual_real` | Real habitual monthly income (all jobs, deflated). | datazoom / Derived |
+| `rendimento_habitual_real` / `income_habitual_real` | Real habitual monthly income (all jobs, deflated). **Enters outcome regressions as `log_income`** (log of positive earnings). | datazoom / Derived |
 | `formal` / `informal` | datazoom flags. `formal`=1 includes signed-card employees (private/domestic/public), military/statutory, AND INSS-contributing self-employed — broader than CLT. Employers (VD4009=8) are neither. | datazoom |
 | `clt_private` | = 1 if VD4009 == 1 (private-sector carteira-assinada = CLT). The **sharp "law binds here" group**; heterogeneity/placebo split only, never a restriction. | Derived |
 | `has_child_u4` | = 1 if head/spouse with child ≤4 (V2005 ∈ {4,5,6,10,11}: biological of head+spouse (4), of head (5), stepchild (6), grandchild (10), great-grandchild (11)). **Treatment.** | HH merge |
@@ -125,7 +127,8 @@ Dropbox/HomeOfficePNAD/build/{input/Panel_6..13.RData, output/main_data.RData}
 - `treated` is always `has_child_u4` (V2005 ∈ {4,5,6,10,11}); robustness `_no_gc` / `_no_sc`. **V2005 codes 10 (grandchild) and 11 (great-grandchild) are separate** — `_no_gc` excludes both.
 - SEs: cluster at `id_dom` (household) in main specs; `UPA` in robustness.
 - **Survey weights (`V1028`) in EVERY spec** — PNADC is not self-weighting; there is no unweighted version of any table.
-- **ggplot label text (titles/legends/strips) = plain ASCII only** (`<=`, `-`), never `≤`/`–` (rendering truncates to "..."). Unicode is fine in `.tex` (real LaTeX `$\leq$`) and in this file.
+- **ggplot label text (titles/legends/strips) = plain ASCII only** (`<=`, `-`), never `≤`/`–` (rendering truncates to "..."). Applies to axis text too: age bands are `"Age 18--29"` (LaTeX `--`) in the *table*, converted to `"Age 18-29"` for the *figure* (`gsub("--","-")` in `05_heterogeneity.R`). Unicode is fine in `.tex` (real LaTeX `$\leq$`) and in this file.
+- **Regression-table notes follow ONE house style** — shared fragments in `00_utils.R` (`EQ_REF`, `WEIGHT_NOTE`, `CLUSTER_NOTE`, `UNITS_NOTE`, `SIGNIF_NOTE`); build each note as `paste(<lead sentence + EQ_REF inline>, WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE)`. Structure: what each column estimates (with a green `\eqref{eq:did}` = "Eq. (1)" link) → sample → units → weighting → clustering → significance. SEs are always "clustered at the **household level** in parentheses". Descriptive tables (tab01, tab05b, tabA1) are exempt.
 
 ---
 
@@ -165,14 +168,14 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 | Table — Triple diff, first stage | `tab08_triple_diff.tex` | 07 |
 | Fig — Event study, `home_office` (both controls) | `fig06_event_study_home_office` | 02 |
 
-**Appendix**
+**Appendix.** Tables/figures are numbered **per appendix section** (`\numberwithin{table}{section}` in `paper.tex`): panel retention is **A.1**, telework codes **C.1**, and the "Additional tables and figures" section holds **D.1–D.5** (tables) and **D.1–D.5** (figures). Order the floats in `appendix.tex` to match first-citation order (JPopE requires consecutive numbering).
 | Role | File | Script |
 |---|---|---|
-| Table A0 — Panel retention | `tabA0_panel_retention.tex` | 01 |
+| Table A.1 — Panel retention | `tabA1_panel_retention.tex` | 01 |
 | Table — Reduced-form outcomes, Control B | `tab03b_did_outcomes_B.tex` | 03 |
 | Table — Occupation transition matrix | `tab05b_occupation_transition.tex` | 04 |
 | Table — All outcomes for the age 40–49 cell (multiple-testing companion) | `tab06b_age4049_outcomes.tex` | 05 |
-| Table — Robustness (first stage + log earnings) | `tab07_robustness.tex` | 06 |
+| Table — Robustness (first stage, early/late timing split, log earnings) | `tab07_robustness.tex` | 06 |
 | Table — Triple diff, all outcomes | `tab08b_triple_diff_outcomes.tex` | 07 |
 | Fig — Heterogeneity coefplot | `fig07_heterogeneity_coefplot` | 05 |
 | Fig — Control-window sweep | `fig08_control_window_sweep` | 06 |

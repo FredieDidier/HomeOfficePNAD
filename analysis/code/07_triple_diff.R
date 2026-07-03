@@ -38,10 +38,12 @@ setnames(dt, "VD4031", "hours_usual")
 S <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
 S[, tr_fem   := treated * female]
 S[, trxp_fem := treat_x_post * female]
+# Real income enters the outcome table in logs (workers with positive earnings).
+S[, log_income := fifelse(rendimento_habitual_real > 0, log(rendimento_habitual_real), NA_real_)]
 
 dict <- c(treat_x_post = "Treated $\\times$ Post", trxp_fem = "Treated $\\times$ Post $\\times$ Female",
           treated = "Treated (child $\\leq$4)", tr_fem = "Treated $\\times$ Female",
-          home_office = "Home office", rendimento_habitual_real = "Real income",
+          home_office = "Home office", log_income = "Log income",
           hours_usual = "Usual hours", employed = "Employed", in_labor_force = "In labor force",
           on_maternity_leave = "Maternity leave", id_panel = "Individual", id_dom = "Household",
           year_quarter = "Year-quarter", female = "Female")
@@ -61,7 +63,7 @@ etable(did(S[female == 0]), did(S[female == 1]), ddd(),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Triple Difference: Home Office, Men vs.\\ Women",
        label = "tab:triple_diff",
-       notes = paste("\\footnotesize\\textit{Notes:} Columns 1 and 2 are separate difference-in-differences regressions for men and women (treated $=$ child $\\leq$4 vs.\\ Control A). Column 3 is the pooled triple difference; the coefficient on Treated $\\times$ Post $\\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock. All columns include individual fixed effects, are weighted by the survey weights, and cluster standard errors at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Columns~(1) and~(2) estimate ", EQ_REF, " (outcome home office) separately for men and women (treated $=$ child $\\leq$4 vs.\\ Control~A). Column~(3) is the pooled triple difference; the coefficient on Treated $\\times$ Post $\\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock. All columns include individual fixed effects."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab08_file, fontsize = "\\small", tabcolsep = 5)
 # Show explicit "No" where a fixed effect is absent (etable leaves it blank):
 # the men/women DiD (cols 1-2) use year-quarter FE; the DDD (col 3) uses
@@ -72,7 +74,7 @@ postprocess_tex(tab08_file, fontsize = "\\small", tabcolsep = 5)
 writeLines(.tx, tab08_file)
 
 # ---- Table 8b: DDD across outcomes -----------------------------------------
-outcomes <- c("home_office", "rendimento_habitual_real", "hours_usual",
+outcomes <- c("home_office", "log_income", "hours_usual",
               "employed", "in_labor_force", "on_maternity_leave")
 ddd_mods <- setNames(lapply(outcomes, ddd), outcomes)
 tab08b_file <- file.path(TABLE_DIR, "tab08b_triple_diff_outcomes.tex")
@@ -81,7 +83,7 @@ etable(ddd_mods,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Triple Difference Across Outcomes",
        label = "tab:triple_diff_outcomes",
-       notes = paste("\\footnotesize\\textit{Notes:} Each column is a triple-difference regression with the same specification as the first-stage triple difference. The table reports the men effect (Treated $\\times$ Post) and the female differential (Treated $\\times$ Post $\\times$ Female). Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; real income is in reais per month and usual hours in hours per week, both observed for workers only. Standard errors clustered at the household in parentheses.", SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a triple-difference regression extending ", EQ_REF, " with a female interaction, with individual and female-by-year-quarter fixed effects throughout; it reports the men effect (Treated $\\times$ Post) and the female differential (Treated $\\times$ Post $\\times$ Female). ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab08b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 # ---- Console ---------------------------------------------------------------
@@ -96,7 +98,7 @@ cat(sprintf("  DDD   (treat x post x female): %.2f (%.2f) p=%.2f\n",
 cat("\n=== DDD (treat x post x female) across outcomes ===\n")
 for (y in outcomes) {
   ct <- coeftable(ddd_mods[[y]])["trxp_fem", ]
-  sc <- if (y %in% c("rendimento_habitual_real", "hours_usual")) 1 else 100
+  sc <- if (y %in% c("log_income", "hours_usual")) 1 else 100
   cat(sprintf("  %-26s %.3f (%.3f) p=%.2f\n", y, ct[1]*sc, ct[2]*sc, ct[4]))
 }
 message("\n=== 07_triple_diff.R complete ===")
