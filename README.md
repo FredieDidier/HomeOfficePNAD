@@ -25,11 +25,20 @@ The microdata are **not** in this repository. They live in a (Dropbox) folder:
 <DROPBOX_ROOT>/build/output/   main_data.RData                  (final dataset)
 ```
 
-`main_data.RData` covers 2018Q1–2026Q1 and holds both sexes; women are the analysis sample.
+`main_data.RData` covers 2018Q1–2026Q1.
 
 ## Reproducing the results
 
-1. **Set the data path.** Edit the single line in `config/config.R`:
+First, clone this repository and enter it:
+
+```
+git clone https://github.com/FredieDidier/HomeOfficePNAD.git
+cd HomeOfficePNAD
+```
+
+Then:
+
+1. **Open the project, then set the data path.** Open `HomeOfficePNAD.Rproj` in RStudio (or otherwise set the working directory to the repository root) **before running anything** — this is what lets `here::here()` and the `source()` calls below resolve paths correctly. Then edit the single line in `config/config.R`:
 
    ```r
    DROPBOX_ROOT <- "/path/to/your/HomeOfficePNAD"
@@ -59,13 +68,6 @@ The microdata are **not** in this repository. They live in a (Dropbox) folder:
 
    ```r
    source("config/00_master_analysis.R")
-   ```
-
-5. **Compile the paper** (run the full cycle, or use `latexmk`):
-
-   ```
-   cd latex && latexmk -pdf paper.tex
-   # or: pdflatex paper && bibtex paper && pdflatex paper && pdflatex paper
    ```
 
 ## Author
