@@ -3,18 +3,19 @@
 # Master script for the analysis pipeline.
 # Run this file after 00_master_build.R to reproduce all results.
 #
-# Analysis scripts will be added here as the project progresses.
-# Each script should be self-contained and load main_data.RData from Dropbox.
+# Each script is self-contained and loads main_data.RData from Dropbox/output.
 #
-# Expected pipeline (to be populated):
-#   01_descriptives.R   →  Summary statistics, sample description
-#   02_event_study.R    →  Event-study plot around MP 1108/2022 (March 2022)
-#   03_did.R            →  Difference-in-differences estimates
-#   04_mechanisms.R     →  Telework-priority channel: potential_telework moderation + occupation-allocation
-#   05_heterogeneity.R  →  Subgroup splits: formal/informal, public/private, education, age band
-#   06_robustness.R     →  Robustness checks and placebo tests
+# Pipeline:
+#   01_descriptives.R   →  Summary statistics (Table 1, A0), descriptive figures
+#   02_event_study.R    →  Event studies + pre-trend joint tests (fig06, fig09)
+#   03_did.R            →  First stage (Table 2) and reduced-form outcomes (Table 3)
+#   04_mechanisms.R     →  Telework moderation + occupation-allocation (Tables 4, 5, 5b)
+#   05_heterogeneity.R  →  Subgroup splits + Holm correction (Table 6, 6b, fig07)
+#   06_robustness.R     →  Robustness, placebo, control-window sweep (Table 7, fig08)
+#   07_triple_diff.R    →  Triple difference with men (Tables 8, 8b)
 #
-# PATHS: Only DROPBOX_ROOT in 01_pnadc.R needs to be updated on a new machine.
+# PATHS: set DROPBOX_ROOT once in config/config.R (the only path to change on a
+#   new machine); every script sources it. GitHub-repo paths use here::here().
 # =============================================================================
 
 library(here)

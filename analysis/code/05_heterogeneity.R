@@ -18,7 +18,7 @@ library(ggplot2)
 library(here)
 source(here("analysis", "code", "00_utils.R"))
 
-DROPBOX_ROOT <- "/Users/fredie/Library/CloudStorage/Dropbox/HomeOfficePNAD"
+source(here::here("config", "config.R"))
 OUTPUT_PATH  <- file.path(DROPBOX_ROOT, "build", "output")
 TABLE_DIR    <- here("analysis", "output", "tables")
 GRAPH_DIR    <- here("analysis", "output", "graphs")

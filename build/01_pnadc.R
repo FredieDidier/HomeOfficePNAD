@@ -79,7 +79,7 @@ library(data.table)
 library(here)
 
 # ---- User-defined Dropbox root (only line to change on a new machine) -------
-DROPBOX_ROOT <- "/Users/fredie/Library/CloudStorage/Dropbox/HomeOfficePNAD"
+source(here::here("config", "config.R"))
 
 # Derived Dropbox paths (do not edit)
 INPUT_PATH  <- file.path(DROPBOX_ROOT, "build", "input")

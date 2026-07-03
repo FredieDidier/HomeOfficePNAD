@@ -14,7 +14,8 @@
 #   download_pnadc_panels() there only if you need to (re-)download raw data —
 #   it skips any Panel_{v}.RData that already exists, so it is safe to re-run.
 #
-# PATHS: Only DROPBOX_ROOT in 01_pnadc.R needs to be updated on a new machine.
+# PATHS: set DROPBOX_ROOT once in config/config.R (the only path to change on a
+#   new machine); every script sources it. GitHub-repo paths use here::here().
 # =============================================================================
 
 library(here)

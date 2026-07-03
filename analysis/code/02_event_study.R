@@ -20,7 +20,7 @@ library(fixest)
 library(ggplot2)
 library(here)
 
-DROPBOX_ROOT <- "/Users/fredie/Library/CloudStorage/Dropbox/HomeOfficePNAD"
+source(here::here("config", "config.R"))
 OUTPUT_PATH  <- file.path(DROPBOX_ROOT, "build", "output")
 GRAPH_DIR    <- here("analysis", "output", "graphs")
 dir.create(GRAPH_DIR, showWarnings = FALSE, recursive = TRUE)

@@ -81,7 +81,7 @@ dictionary/  CLAUDE.md  README.md
 ```
 Dropbox/HomeOfficePNAD/build/{input/Panel_6..13.RData, output/main_data.RData}
 ```
-`main_data.RData` covers **2018Q1–2026Q1**, holds **BOTH sexes** (7,150,307 obs = 3,676,650 women + 3,473,657 men). Women are the analysis sample; men enter only `07_triple_diff.R`. Path set via `DROPBOX_ROOT` at the top of `build/01_pnadc.R` (only line to change per machine); GitHub paths via `here::here()`.
+`main_data.RData` covers **2018Q1–2026Q1**, holds **BOTH sexes** (7,150,307 obs = 3,676,650 women + 3,473,657 men). Women are the analysis sample; men enter only `07_triple_diff.R`. **`DROPBOX_ROOT` is set once in `config/config.R`** (the only path to change per machine); every build/analysis script does `source(here::here("config", "config.R"))`. GitHub paths via `here::here()`.
 
 > **`id_dom` is globally unique by construction.** datazoom's raw `id_dom` is unique only within a V1014 rotation group, so `build_main_data()` stores it as composite `"<V1014>_<id>"` and keys the child-flag merge on `(id_dom, V1014, year_quarter)` — required for correct clustering (`cluster = ~id_dom`). `id_rs3`/`id_panel` are already globally unique.
 
