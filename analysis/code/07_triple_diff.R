@@ -63,6 +63,13 @@ etable(did(S[female == 0]), did(S[female == 1]), ddd(),
        label = "tab:triple_diff",
        notes = paste("\\footnotesize\\textit{Notes:} Columns 1 and 2 are separate difference-in-differences regressions for men and women (treated $=$ child $\\leq$4 vs.\\ Control A). Column 3 is the pooled triple difference; the coefficient on Treated $\\times$ Post $\\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock. All columns include individual fixed effects, are weighted by the survey weights, and cluster standard errors at the household in parentheses.", SIGNIF_NOTE))
 postprocess_tex(tab08_file, fontsize = "\\small", tabcolsep = 5)
+# Show explicit "No" where a fixed effect is absent (etable leaves it blank):
+# the men/women DiD (cols 1-2) use year-quarter FE; the DDD (col 3) uses
+# female-by-year-quarter FE instead.
+.tx <- readLines(tab08_file)
+.tx[grepl("^\\s*Year-quarter\\s*&", .tx)]        <- "      Year-quarter & Yes & Yes & No\\\\"
+.tx[grepl("^\\s*Female-Year-quarter\\s*&", .tx)] <- "      Female-Year-quarter & No & No & Yes\\\\"
+writeLines(.tx, tab08_file)
 
 # ---- Table 8b: DDD across outcomes -----------------------------------------
 outcomes <- c("home_office", "rendimento_habitual_real", "hours_usual",

@@ -49,7 +49,7 @@ Pre-period overlaps the pandemic home-office spike (2020–2021), a potential co
 
 ### Sample
 Women 18–49, head/spouse (`is_head_or_spouse == 1`), from Q1 2018 (V4022 availability), matched panel (`panel_matched == 1`). Unit: individual × quarter (`id_panel` + `year_quarter`); each appears 1–5 quarters (rotating panel). Every women-only script filters `female == 1 & is_head_or_spouse == 1 & panel_matched == 1`.
-- **Age:** examined only as heterogeneity bands (18–29/30–39/40–49, baseline age) in `05_heterogeneity.R`; the old robustness age-windows were **removed** (redundant with the bands). The lone significant band (40–49, +1.4pp**) does not survive the **Bonferroni** correction over the 13 heterogeneity subgroups (min p 0.042→0.55; raw + Bonferroni p are columns in Table 6, cite `romanoshaikhwolf2010`). Table 6 also carries a **By race** panel (White/Non-white, both null) and an appendix companion `tab06b` (all outcomes for the 40–49 cell: only home office moves).
+- **Age:** examined only as heterogeneity bands (18–29/30–39/40–49, baseline age) in `05_heterogeneity.R`; the old robustness age-windows were **removed** (redundant with the bands). The lone significant band (40–49, +1.4pp**) does not survive the **Holm (1979)** step-down correction over the 13 heterogeneity subgroups (min p 0.042→0.55; raw + Holm p are columns in Table 6, cite `holm1979`). Holm chosen over plain Bonferroni (uniformly more powerful, assumption-free) and over Romano-Wolf (which needs a same-sample bootstrap `wildrwolf` can't do for overlapping subsamples). Table 6 also carries a **By race** panel (White/Non-white, both null) and an appendix companion `tab06b` (all outcomes for the 40–49 cell: only home office moves).
 - **Do NOT restrict to formal/CLT** (selection on a post-treatment variable). Use `clt_private` (VD4009==1) only as the sharp heterogeneity/placebo split, never as a restriction.
 
 ---
@@ -177,6 +177,7 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 | Fig — Heterogeneity coefplot | `fig07_heterogeneity_coefplot` | 05 |
 | Fig — Control-window sweep | `fig08_control_window_sweep` | 06 |
 | Fig — Event study, maternity leave (pre-trends) | `fig09_event_study_maternity` | 02 |
+| §Variable definitions (home office, formal/informal, CLT, private/public employee, etc.) | appendix.tex | — |
 | §Classifying telework-eligible occupations (Costa et al. 2024 + COD dict) | appendix.tex | — |
 
 **Descriptive figures** `fig01`–`fig04` (home-office trends, LFP/employment, two-control panels, telework-eligible subgroup) — available for appendix/slides as needed.

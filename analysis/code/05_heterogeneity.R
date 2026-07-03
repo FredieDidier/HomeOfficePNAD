@@ -72,10 +72,11 @@ het_subs <- c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT",
               "Private employee", "Public employee", "With higher education",
               "Without higher education", "White", "Non-white",
               "Age 18--29", "Age 30--39", "Age 40--49")
-pv <- rows[label %in% het_subs & !is.na(p), p]
+pv <- setNames(rows[match(het_subs, label), p], het_subs)
 K_tests <- length(pv)
-bonf_min <- min(min(pv) * K_tests, 1)
-mt_note <- sprintf("The Bonferroni $p$ is the raw $p$-value multiplied by the %d subgroups and capped at one---the family-wise adjustment for testing this many subgroups---so a Bonferroni $p$ of $1.00$ marks a subgroup whose raw $p$-value was already far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $%.2f$, for women aged 40--49.", K_tests, bonf_min)
+holm_p <- p.adjust(pv, method = "holm")   # Holm (1979) step-down FWER control
+holm_min <- min(holm_p)
+mt_note <- sprintf("The Holm $p$ is the Holm step-down adjustment for testing %d subgroups; it controls the family-wise error rate, is uniformly more powerful than a plain Bonferroni correction, and makes no assumption about the dependence across the tests. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $%.2f$, for women aged 40--49.", K_tests, holm_min)
 
 # ---- Table 6 (two-line journal format: estimate; (se) below) ----------------
 fmt <- function(x) formatC(x, format = "f", digits = 2)
@@ -84,7 +85,7 @@ grp <- function(title, labs) {
   c(sprintf("\\multicolumn{5}{l}{\\textit{%s}} \\\\", title),
     unlist(lapply(seq_len(nrow(s)), function(i) {
       r <- s[i]
-      padj <- min(r$p * K_tests, 1)
+      padj <- holm_p[r$label]
       c(sprintf("$\\quad$ %s & %s$^{%s}$ & %s & %s & %s \\\\", r$label, fmt(r$est), r$star,
                 formatC(r$p, format = "f", digits = 3), formatC(padj, format = "f", digits = 2),
                 formatC(r$n, big.mark = ",", format = "d")),
@@ -95,7 +96,7 @@ tab <- c("\\begin{table}[H]\\centering",
   "\\caption{Heterogeneity of the First-Stage Home-Office Effect (pp)}",
   "\\label{tab:heterogeneity}\\small",
   "\\begin{tabular}{lcccc}", "\\toprule",
-  " & Treated $\\times$ Post & $p$-value & Bonferroni $p$ & Obs. \\\\", "\\midrule",
+  " & Treated $\\times$ Post & $p$-value & Holm $p$ & Obs. \\\\", "\\midrule",
   grp("By formality (placebo: effect only where the law binds)",
       c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT")), "\\midrule",
   grp("By sector (placebo: private only)", c("Private employee", "Public employee")), "\\midrule",
