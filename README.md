@@ -1,6 +1,8 @@
-# HomeOfficePNAD
+# A Priority That Does Not Bind: Telework Mandates and Mothers of Young Children in Brazil — Replication Package
 
-Replication code for **"A Priority That Does Not Bind: Telework Mandates and Mothers of Young Children in Brazil."** The paper evaluates whether Brazil's 2022 telework-priority reform (MP 1108/2022 → Law 14.442/2022, Art. 75-F) changed the labor-market outcomes of eligible women, using the rotating panel of the PNAD Contínua and a difference-in-differences design. The result is a precisely-estimated null.
+**Author:** Fredie Didier (fdidier@terra.com.br)
+
+Replication code for the paper. It evaluates whether Brazil's 2022 telework-priority reform (MP 1108/2022 → Law 14.442/2022, Art. 75-F) changed the labor-market outcomes of eligible women, using the rotating panel of the PNAD Contínua and a difference-in-differences design. The result is a precisely-estimated null.
 
 ## Repository layout
 
@@ -26,6 +28,11 @@ The microdata are **not** in this repository. They live in a (Dropbox) folder:
 ```
 
 `main_data.RData` covers 2018Q1–2026Q1.
+
+### Getting the data — two options
+
+- **Option A — download the pre-built dataset (fastest).** Upon publication, the pre-built `main_data.RData` will be deposited on Zenodo (with a DOI) and its download link added here. Once available, place the file in `<DROPBOX_ROOT>/build/output/` and **skip step 3** (the build) below.
+- **Option B — rebuild from the raw microdata.** Reconstruct `main_data.RData` from the public PNADC microdata with the R packages (step 3 below); no external download needed. This is the currently available path.
 
 ## Reproducing the results
 
@@ -69,7 +76,3 @@ Then:
    ```r
    source("config/00_master_analysis.R")
    ```
-
-## Author
-
-Fredie Didier — fdidier@terra.com.br

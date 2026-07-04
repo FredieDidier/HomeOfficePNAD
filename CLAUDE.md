@@ -154,6 +154,44 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 
 ---
 
+## Results guide — why each result is in the paper
+
+The argument, exhibit by exhibit in paper order. This is the "are we telling the story right?" checklist; the **Exhibit map** below says *where* each lives (file/script). One narrative: *the compliance channel (home office) does not move, so nothing downstream can, and the null is uniform, robust, and not gendered.*
+
+**Setup**
+- **Table 1 — descriptives.** Establishes the three groups and two load-bearing facts: (i) home office is rare (~5%) and rises *in parallel* across groups; (ii) treated women are younger, less formal, less teleworkable. *Why it's needed:* the level gaps justify **individual FE** (not cross-sectional matching), and the tiny teleworkable share foreshadows *why* the priority has almost nothing to bite on.
+
+**First stage (the crux)**
+- **Table 2 — first-stage ladder.** The central result. Raw / +demographics / +quarter-FE all give **+0.4pp\***; only **individual FE** collapse it to ≈0. *Why it's needed:* proves the naive positive is **selection into young motherhood on time-invariant unobservables**, not the law. This is the identification — and the null first stage **bounds every downstream outcome**.
+- **Fig. 2 (fig06) — event study, home office.** Flat pre-trends (incl. through COVID), no break at the reform; the late drift dies in the early/late split. *Why it's needed:* validates **parallel trends** and shows the null is dynamic, not an averaging artifact. Home office is the **only** outcome with clean pre-trends → the one read causally.
+
+**Reduced form**
+- **Table 3 — outcomes, Control A.** Log earnings and hours are **precise zeros**; employment/LFP/maternity are significant but **fail pre-trend tests** → not causal. *Why it's needed:* nothing downstream moves through the (null) telework channel; the ITT-bounds-everything logic in action, with honest handling of stray significant coefficients.
+
+**Mechanisms**
+- **Table 4 — moderation by baseline teleworkability.** Null **even among teleworkable women** — the only group a telework priority could bind. *Why it's needed:* rules out "it works where it can"; the null isn't just dilution by non-teleworkable jobs.
+- **Table 5 — allocation (telework-eligible occ. as outcome).** Treated women **don't sort into** teleworkable jobs. *Why it's needed:* rules out a "priority-seeking" occupational response; the null isn't hidden by endogenous occupation change.
+
+**Heterogeneity**
+- **Table 6 — heterogeneity + Holm.** Null across formality/sector/education/race/age; the formality & sector splits **double as channel placebos** (law binds only CLT-private → effect should show there, doesn't). The lone significant cell (40–49) dies under Holm. *Why it's needed:* the null is **uniform, including where the statute bites hardest**; pre-empts "you didn't look hard enough" and multiple-testing.
+
+**Triple difference**
+- **Table 7 (tab08) — triple diff, men vs. women.** Men are also null; the DDD is insignificant. *Why it's needed:* nets out any generic "parent of a young child, post-2022" shock and shows **the null is not gendered** — the reinforcement move (à la [[style-exemplar-jpope]]).
+
+**Appendix (support & falsification)**
+- **Table D.1 — robustness.** Null survives alt cutoff, treatment variants, COVID drop, state×quarter FE, two-way clustering, telework-eligible-only, and the **early/late timing split**; carries the **A-vs-B placebo** (licenses Control A as clean). *Why it's needed:* the null is not an artifact of any single design choice.
+- **Fig. D.3 (fig08) — control-window sweep.** Estimate stable 5–6 … 5–12. *Why:* the control's upper bound doesn't drive results.
+- **Table D.2 — occupation transitions.** Descriptive twin of Table 5 (identical treated/control flows). *Why:* backs "no sorting" without a regression.
+- **Table D.3 — age 40–49, all outcomes.** The one significant het cell leaves **no trace downstream**. *Why:* shows that cell isn't a real telework effect (multiple-testing companion).
+- **Table D.4 — triple diff, all outcomes.** The significant coefficients track **pre-existing gender trends**, not the reform. *Why:* same non-causal story as Table 3, gender version.
+- **Table D.5 — outcomes, Control B.** Broad control (more power), same conclusions. *Why:* precision robustness + shows the choice of control doesn't matter.
+- **Fig. D.1 (fig09) — maternity event study.** Pronounced pre-trend. *Why:* the visual reason maternity is not read causally.
+- **Figs. D.2/D.4/D.5, Tables A.1/C.1** — hetero coefplot; telework-eligible & LFP descriptive trends; panel-retention (individual FE are meaningful); telework-code list (classification transparency).
+
+**If a result doesn't serve this narrative, question whether it belongs.** New exhibits should either tighten identification, chase the effect where it "should" be and keep finding zero, or bound/falsify an alternative story.
+
+---
+
 ## Exhibit map (final — keyed to actual output files)
 
 **Main text**
@@ -195,9 +233,13 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 - Interpretation: a **supply-side, soft mandate** raising the chance eligible women are allocated to existing teleworkable roles. Expected first stage: `home_office` ↑ for treated. Reduced form: wages ambiguous, hours likely ↓, employment retention, fertility.
 - **Q1 2022 status:** MP published in the last week of Q1; PNADC reference weeks span the quarter. Main: Q1 2022 pre; robustness (`post_mp_alt`): Q1 2022 post. Similar estimates under both ⇒ cutoff doesn't drive results.
 
-## Target Journals (most → least likely)
-1. **Journal of Population Economics** — primary (family policy, female labor supply, fertility, quasi-experiments; receptive to clean nulls).
-2. **Labour Economics** — second (policy DiD).
-3. **Journal of Development Economics** — stretch (developing-country policy eval, sharp ID; higher bar for a null).
+## Target Journal
+**Journal of Population Economics** — the target (family policy, female labor supply, fertility, quasi-experiments; receptive to clean nulls). Write to its house style and submission mechanics; see memory `style-exemplar-jpope` for the JPopE writing model (Battaglia & Brown 2025) and submission mechanics.
 
-See memory `style-exemplar-jpope` for the JPopE writing model and submission mechanics.
+---
+
+## Status / open items before submission
+The paper is essentially submission-ready: it compiles clean (38 pp, no undefined refs/cites) and every analysis is final. Keep this list current — delete items as they close.
+- **Verify citation *content*** (in progress, Fredie): confirm each cited paper and each footnote actually supports the claim it is attached to — the *substance*, not just the bibliographic details. 
+- **Replication-data deposit (upon publication/acceptance):** deposit the pre-built `main_data.RData` on **Zenodo** (DOI), then paste the real link in **two** places — `README.md` Option A (which currently holds only a placeholder) and the paper's **data-availability statement** (which currently names only the GitHub *code* repo, not the dataset). Until then, users rebuild via Option B.
+- **Output-file renaming (deferred):** optionally rename table/figure files to match final exhibit numbers (e.g., `tab08b` → `tabD4`) — hold until the exhibit set is frozen (post first referee round), since position-encoded names are brittle to reordering.
