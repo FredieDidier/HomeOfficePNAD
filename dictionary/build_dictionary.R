@@ -4,8 +4,8 @@
 # Output: dictionary/variable_dictionary.xlsx
 # =============================================================================
 
-library(openxlsx)
-library(here)
+if (!requireNamespace("pacman", quietly = TRUE)) install.packages("pacman")
+pacman::p_load(openxlsx, here)
 
 # ---- Variable definitions ---------------------------------------------------
 

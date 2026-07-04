@@ -2,7 +2,6 @@
 
 **Author:** Fredie Didier (fdidier@terra.com.br)
 
-Replication code for the paper. It evaluates whether Brazil's 2022 telework-priority reform (MP 1108/2022 → Law 14.442/2022, Art. 75-F) changed the labor-market outcomes of eligible women, using the rotating panel of the PNAD Contínua and a difference-in-differences design. The result is a precisely-estimated null.
 
 ## Repository layout
 
@@ -59,7 +58,7 @@ Then:
    source("config/00_master_build.R")
    ```
 
-   The master scripts install any missing R packages automatically (via `pacman`), so there is no need to run `install.packages()` by hand. Downloading the raw PNADC from IBGE is commented out at the bottom of `build/01_pnadc.R`; uncomment `download_pnadc_panels()` there only to (re-)download.
+   The two master scripts (`config/00_master_build.R`, `config/00_master_analysis.R`) install any missing R packages automatically (via `pacman::p_load()`) before `source()`-ing the individual `build/`/`analysis/code/*.R` files, so there is no need to run `install.packages()` by hand. The individual scripts do not load packages themselves — always run them through a master script (or `pacman::p_load()` the same packages by hand first if you want to source one individually). Downloading the raw PNADC from IBGE is commented out at the bottom of `build/01_pnadc.R`; uncomment `download_pnadc_panels()` there only to (re-)download.
 
 3. **Run the analysis** (writes all tables and figures to `analysis/output/`):
 

@@ -12,10 +12,9 @@
 # `higher_educ` indicator (completed higher education, VD3004==7).
 # =============================================================================
 
-library(data.table)
-library(fixest)
-library(ggplot2)
-library(here)
+# Packages (data.table, fixest, ggplot2, here) are loaded by
+# config/00_master_analysis.R via pacman::p_load() before this script is
+# source()'d; not repeated here.
 source(here("analysis", "code", "00_utils.R"))
 
 source(here::here("config", "config.R"))

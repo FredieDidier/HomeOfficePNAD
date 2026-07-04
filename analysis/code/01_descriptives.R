@@ -19,9 +19,8 @@
 # All figures use survey weights (V1028).
 # =============================================================================
 
-library(data.table)
-library(ggplot2)
-library(here)
+# Packages (data.table, ggplot2, here) are loaded by config/00_master_analysis.R
+# via pacman::p_load() before this script is source()'d; not repeated here.
 
 # ---- Paths ------------------------------------------------------------------
 source(here::here("config", "config.R"))

@@ -75,8 +75,9 @@
 #   GitHub paths  → use here::here() [reproducible across machines]
 #   Dropbox paths → change only DROPBOX_ROOT below to match your machine
 # =============================================================================
-library(data.table)
-library(here)
+# Packages (data.table, here, PNADcIBGE, datazoom.social) are loaded by
+# config/00_master_build.R via pacman::p_load()/p_load_gh() before this script
+# is source()'d; not repeated here.
 
 # ---- User-defined Dropbox root (only line to change on a new machine) -------
 source(here::here("config", "config.R"))
@@ -111,10 +112,8 @@ OUTPUT_PATH <- file.path(DROPBOX_ROOT, "build", "output")
 #   download_pnadc_panels()
 # =============================================================================
 download_pnadc_panels <- function() {
-  # Install datazoom.social if needed:
-  # devtools::install_github("datazoompuc/datazoom.social")
-  library(datazoom.social)
-  library(PNADcIBGE)
+  # PNADcIBGE and datazoom.social are loaded by config/00_master_build.R
+  # (via pacman::p_load()/p_load_gh()) before this function is ever called.
 
   dir.create(INPUT_PATH, showWarnings = FALSE, recursive = TRUE)
 

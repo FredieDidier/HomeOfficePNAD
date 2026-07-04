@@ -148,7 +148,7 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 
 - **Include the `treated` main effect** — eligibility is time-varying (turns on at a birth, off at age 5), so individual FE do NOT absorb it; omitting it loads the level motherhood penalty onto `treat_x_post`. (The event study handles this via `i(year_quarter, treated, ref=20221)`, which subsumes the main effect — no separate term there.)
 - **Individual FE (`id_panel`): always.** The ladder in the first-stage table shows without them the first stage is +0.4pp (selection); adding them → ≈0. Never `id_rs3` alone (unmatched would pool into one spurious FE).
-- **Main sample = matched panel** (`panel_matched == 1`); the 3.72% unmatched are singletons (own FE → contribute nothing). FE estimates identical with/without them; only N changes.
+- **Main sample = matched panel** (`panel_matched == 1`); the 3.7% unmatched are singletons (own FE → contribute nothing). FE estimates identical with/without them; only N changes.
 - **Year-quarter FE (`year_quarter`): always** — absorbs COVID/business cycle/national trends. Single common post date ⇒ generalized 2×2 DiD, **not** exposed to staggered-DiD negative weighting (Goodman-Bacon 2021; de Chaisemartin & D'Haultfœuille 2020).
 - **Hours is an OUTCOME, not a covariate.** Same for employment status — never a RHS control.
 
