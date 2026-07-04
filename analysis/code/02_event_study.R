@@ -123,6 +123,8 @@ pretrend_test(dt$has_child_u4 == 0 & dt$has_child_5_7 == 0, "Control B", "home_o
 # leave all reject parallel pre-trends, so their post coefficients are not causal.
 pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "employed")
 pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "in_labor_force")
+# Maternity leave for BOTH controls (the fig09 caption reports both, matching fig06).
 pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "on_maternity_leave")
+pretrend_test(dt$has_child_u4 == 0 & dt$has_child_5_7 == 0, "Control B", "on_maternity_leave")
 
 message("\n=== 02_event_study.R complete ===")
