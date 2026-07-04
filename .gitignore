@@ -11,3 +11,4 @@ latex/*.blg
 latex/*.out
 latex/*.pdf
 latex/*.synctex.gz
+.DS_Store
