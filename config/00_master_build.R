@@ -18,6 +18,11 @@
 #   new machine); every script sources it. GitHub-repo paths use here::here().
 # =============================================================================
 
-library(here)
+# Package management: pacman installs any missing package automatically, so
+# there is no need to run install.packages() by hand. datazoom.social is on
+# GitHub, so it is installed with p_load_gh.
+if (!requireNamespace("pacman", quietly = TRUE)) install.packages("pacman")
+pacman::p_load(data.table, here, PNADcIBGE)
+pacman::p_load_gh("datazoompuc/datazoom.social")
 
 source(here("build", "01_pnadc.R"))

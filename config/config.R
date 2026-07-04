@@ -9,12 +9,9 @@
 # single line is the only path that changes per machine. Sourced by every build
 # and analysis script.
 #
-# Required R packages (install once):
-#   install.packages(c("data.table", "fixest", "ggplot2", "here", "readxl",
-#                      "PNADcIBGE", "remotes"))
-#   remotes::install_github("datazoompuc/datazoom.social")
-# Optional (only for the descriptive state map, not used in the paper):
-#   install.packages(c("geobr", "sf"))
+# Packages install themselves: the master scripts (config/00_master_*.R) call
+# pacman::p_load(), which installs any missing package automatically, so there
+# is no need to run install.packages() by hand.
 # =============================================================================
 
 DROPBOX_ROOT <- "/Users/fredie/Library/CloudStorage/Dropbox/HomeOfficePNAD"

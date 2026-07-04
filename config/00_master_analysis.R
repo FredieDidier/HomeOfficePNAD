@@ -18,7 +18,10 @@
 #   new machine); every script sources it. GitHub-repo paths use here::here().
 # =============================================================================
 
-library(here)
+# Package management: pacman installs any missing package automatically, so
+# there is no need to run install.packages() by hand.
+if (!requireNamespace("pacman", quietly = TRUE)) install.packages("pacman")
+pacman::p_load(data.table, fixest, ggplot2, here)
 
 source(here("analysis", "code", "01_descriptives.R"))
 source(here("analysis", "code", "02_event_study.R"))

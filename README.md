@@ -31,8 +31,8 @@ The microdata are **not** in this repository. They live in a (Dropbox) folder:
 
 ### Getting the data — two options
 
-- **Option A — download the pre-built dataset (fastest).** Upon publication, the pre-built `main_data.RData` will be deposited on Zenodo (with a DOI) and its download link added here. Once available, place the file in `<DROPBOX_ROOT>/build/output/` and **skip step 3** (the build) below.
-- **Option B — rebuild from the raw microdata.** Reconstruct `main_data.RData` from the public PNADC microdata with the R packages (step 3 below); no external download needed. This is the currently available path.
+- **Option A — download the pre-built dataset (fastest).** Upon publication, the pre-built `main_data.RData` will be deposited on Zenodo (with a DOI) and its download link added here. Once available, place the file in `<DROPBOX_ROOT>/build/output/` and **skip step 2** (the build) below.
+- **Option B — rebuild from the raw microdata.** Reconstruct `main_data.RData` from the public PNADC microdata with the R packages (step 2 below); no external download needed. This is the currently available path.
 
 ## Reproducing the results
 
@@ -53,25 +53,15 @@ Then:
 
    This is the only path that changes per machine; all repository paths are resolved automatically with `here::here()`.
 
-2. **Install R packages** (once):
-
-   ```r
-   install.packages(c("data.table", "fixest", "ggplot2", "here", "readxl",
-                      "PNADcIBGE", "remotes"))
-   remotes::install_github("datazoompuc/datazoom.social")
-   # optional, only for the descriptive state map (not used in the paper):
-   install.packages(c("geobr", "sf"))
-   ```
-
-3. **Build the dataset** (skip if `main_data.RData` already exists):
+2. **Build the dataset** (skip if `main_data.RData` already exists):
 
    ```r
    source("config/00_master_build.R")
    ```
 
-   Downloading the raw PNADC from IBGE is commented out at the bottom of `build/01_pnadc.R`; uncomment `download_pnadc_panels()` there only to (re-)download.
+   The master scripts install any missing R packages automatically (via `pacman`), so there is no need to run `install.packages()` by hand. Downloading the raw PNADC from IBGE is commented out at the bottom of `build/01_pnadc.R`; uncomment `download_pnadc_panels()` there only to (re-)download.
 
-4. **Run the analysis** (writes all tables and figures to `analysis/output/`):
+3. **Run the analysis** (writes all tables and figures to `analysis/output/`):
 
    ```r
    source("config/00_master_analysis.R")

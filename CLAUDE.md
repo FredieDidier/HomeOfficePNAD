@@ -35,7 +35,7 @@ Art. 75-F is a **priority claim, not an automatic right**: the employer must pri
 - **Post (robustness):** `post_mp_alt` = `year_quarter >= 20221` (Q1 2022 post).
 
 ### COVID contamination
-Pre-period overlaps the pandemic home-office spike (2020–2021), a potential confounder. **Main spec:** TWFE on full 2018Q1–2026Q1 panel with individual + quarter FE (quarter FE absorb COVID in levels). Diagnostic: the **event study** — check whether treated/control pre-trends diverge in 2020–2021. Empirically pre-trends are flat through COVID. **Robustness:** drop 2020–2021 (clean 2018–2019 pre-period) and `post_mp_alt`; estimates unchanged.
+Pre-period overlaps the pandemic home-office spike (2020–2021), a potential confounder. **Main spec:** TWFE on full 2018Q1–2026Q1 panel with individual + year-quarter FE (year-quarter FE absorb COVID in levels). Diagnostic: the **event study** — check whether treated/control pre-trends diverge in 2020–2021. Empirically pre-trends are flat through COVID. **Robustness:** drop 2020–2021 (clean 2018–2019 pre-period) and `post_mp_alt`; estimates unchanged.
 
 The event study drifts up to ~1pp in a few 2024–25 quarters. To pre-empt "the null just hides a delayed effect", `06_robustness.R` splits `treat_x_post` into an **early (2022–2023) vs late (2024–2026)** window in one regression (rows in `tab07`): early −0.21pp, late **+0.18pp**, both n.s., late CI rules out >~0.9pp. The late drift does not survive aggregation.
 
@@ -51,7 +51,7 @@ The event study drifts up to ~1pp in a few 2024–25 quarters. To pre-empt "the 
 
 ### Sample
 Women 18–49, head/spouse (`is_head_or_spouse == 1`), from Q1 2018 (V4022 availability), matched panel (`panel_matched == 1`). Unit: individual × quarter (`id_panel` + `year_quarter`); each appears 1–5 quarters (rotating panel). Every women-only script filters `female == 1 & is_head_or_spouse == 1 & panel_matched == 1`.
-- **Age:** examined only as heterogeneity bands (18–29/30–39/40–49, baseline age) in `05_heterogeneity.R`; the old robustness age-windows were **removed** (redundant with the bands). The lone significant band (40–49, +1.4pp**) does not survive the **Holm (1979)** step-down correction over the 13 heterogeneity subgroups (min p 0.042→0.55; raw + Holm p are columns in Table 6, cite `holm1979`). Holm chosen over plain Bonferroni (uniformly more powerful, assumption-free) and over Romano-Wolf (which needs a same-sample bootstrap `wildrwolf` can't do for overlapping subsamples). Table 6 also carries a **By race** panel (White/Non-white, both null) and an appendix companion `tab06b` (all outcomes for the 40–49 cell: only home office moves).
+- **Age:** examined only as heterogeneity bands (18–29/30–39/40–49, baseline age) in `05_heterogeneity.R`; the old robustness age-windows were **removed** (redundant with the bands). The lone significant band (40–49, +1.4pp**) does not survive the **Holm (1979)** step-down correction over the 13 heterogeneity subgroups (min p 0.042→0.55; raw + Holm p are columns in Table 6, cite `holm1979`). Holm chosen over plain Bonferroni (uniformly more powerful, assumption-free) and over Romano-Wolf (which needs a same-sample bootstrap `wildrwolf` can't do for overlapping subsamples). Table 6 also carries a **By race** panel (White/Non-white, both null). The Holm correction is the sole, sufficient answer to the 40–49 cell; the old `tab06b` "all outcomes for the 40–49 cell" companion was **deleted** (redundant with Holm, and once log earnings turned marginally significant in that cell it muddied the story rather than reinforcing it).
 - **Do NOT restrict to formal/CLT** (selection on a post-treatment variable). Use `clt_private` (VD4009==1) only as the sharp heterogeneity/placebo split, never as a restriction.
 
 ---
@@ -142,21 +142,21 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 
 **Why exactly this spec, and nothing more (the intuition).** The RHS is deliberately minimal — `treated + treat_x_post`, two sets of FE, no covariates. Each choice defends against one threat:
 
-- **Individual FE — because treated women aren't a random slice.** Women with a child ≤4 differ *permanently* from women whose youngest is 5–7: younger, less formal, different occupations, different tastes for working at home. A plain treated-vs-control comparison confounds "effect of the law" with "who these women are" (selection into young motherhood). Individual FE compare **each woman to herself over time**, differencing out everything fixed about her — observed *and* unobserved — so identification comes only from within-woman change around the reform. The ladder is the proof: demographics and quarter FE don't budge the +0.4pp; only individual FE collapse it to ≈0, i.e., the selection is on **time-invariant unobservables** no control could capture.
+- **Individual FE — because treated women aren't a random slice.** Women with a child ≤4 differ *permanently* from women whose youngest is 5–7: younger, less formal, different occupations, different tastes for working at home. A plain treated-vs-control comparison confounds "effect of the law" with "who these women are" (selection into young motherhood). Individual FE compare **each woman to herself over time**, differencing out everything fixed about her — observed *and* unobserved — so identification comes only from within-woman change around the reform. The ladder is the proof: demographics and year-quarter FE don't budge the +0.4pp; only individual FE collapse it to ≈0, i.e., the selection is on **time-invariant unobservables** no control could capture.
 - **No sample restriction to formal / telework-eligible — because those are outcomes, not fixed traits.** A woman can move *into* a teleworkable occupation (to claim the priority) or into/out of formal employment *because of* the reform. Filtering the sample on such a variable conditions on a **post-treatment outcome** — a bad control that selects on the treatment's own effect and biases the estimate. So keep the **full** eligible sample and use occupation/formality only as **baseline** moderators (frozen at first observation) or as outcomes, never as filters.
-- **No occupation/sector/employment/hours covariates, and no time-varying controls — same reason.** Anything the reform can move (occupation, sector, formal status, employment, hours) is a *channel* the effect could run through; "controlling" for it removes part of the very effect we want and can induce collider bias. The clean rule: let **individual FE** soak up everything time-invariant (education, race, permanent traits) and **quarter FE** soak up common time shocks (COVID, cycle), and add **nothing** the treatment could touch — hence the minimal RHS.
+- **No occupation/sector/employment/hours covariates, and no time-varying controls — same reason.** Anything the reform can move (occupation, sector, formal status, employment, hours) is a *channel* the effect could run through; "controlling" for it removes part of the very effect we want and can induce collider bias. The clean rule: let **individual FE** soak up everything time-invariant (education, race, permanent traits) and **year-quarter FE** soak up common time shocks (COVID, cycle), and add **nothing** the treatment could touch — hence the minimal RHS.
 
 - **Include the `treated` main effect** — eligibility is time-varying (turns on at a birth, off at age 5), so individual FE do NOT absorb it; omitting it loads the level motherhood penalty onto `treat_x_post`. (The event study handles this via `i(year_quarter, treated, ref=20221)`, which subsumes the main effect — no separate term there.)
 - **Individual FE (`id_panel`): always.** The ladder in the first-stage table shows without them the first stage is +0.4pp (selection); adding them → ≈0. Never `id_rs3` alone (unmatched would pool into one spurious FE).
 - **Main sample = matched panel** (`panel_matched == 1`); the 3.72% unmatched are singletons (own FE → contribute nothing). FE estimates identical with/without them; only N changes.
-- **Quarter FE (`year_quarter`): always** — absorbs COVID/business cycle/national trends. Single common post date ⇒ generalized 2×2 DiD, **not** exposed to staggered-DiD negative weighting (Goodman-Bacon 2021; de Chaisemartin & D'Haultfœuille 2020).
+- **Year-quarter FE (`year_quarter`): always** — absorbs COVID/business cycle/national trends. Single common post date ⇒ generalized 2×2 DiD, **not** exposed to staggered-DiD negative weighting (Goodman-Bacon 2021; de Chaisemartin & D'Haultfœuille 2020).
 - **Hours is an OUTCOME, not a covariate.** Same for employment status — never a RHS control.
 
 **Do NOT include (post-treatment / bad controls):** occupation FE (`cod_2dig`), sector FE (`cnae_2dig`), employment status, job tenure, `potential_telework`, formal status. Race (`V2010`) and mostly-stable education are absorbed by individual FE.
 
 **Specification ladder (first-stage table, 5 cols):** (1) raw OLS, no controls/FE; (2) + demographic controls; (3) + quarter FE; (4) + individual FE (**preferred**); (5) + age² only (`I(V2009^2)` — the linear age term is dropped because age = calendar time − birth cohort is collinear with individual+quarter FE, so only the quadratic carries any age adjustment; table label reads "Age² only"). Cols 1–3 all give +0.4pp\* (demographics and quarter FE barely move it); only individual FE collapses it to ≈0 — the selection is on time-invariant unobservables, not observed demographics. First stage unchanged with or without the age² term. FE rows list **Individual above Year-quarter** (post-processing in `03_did.R` reorders them to match the other tables).
 
-**Additional/robustness FE:** state × quarter (`sigla_uf^year_quarter`); `UPA` clustering. **Table reporting:** below coefficients report N obs, N individuals (`uniqueN(id_panel)`), N households (`uniqueN(id_dom)`), within-R²; note the clustering variable.
+**Additional/robustness FE:** state × year-quarter (`sigla_uf^year_quarter`); `UPA` clustering. **Table reporting:** below coefficients report N obs, N individuals (`uniqueN(id_panel)`), N households (`uniqueN(id_dom)`), within-R²; note the clustering variable.
 
 ---
 
@@ -185,10 +185,9 @@ The argument, exhibit by exhibit in paper order. This is the "are we telling the
 - **Table 7 (tab08) — triple diff, men vs. women.** Men are also null; the DDD is insignificant. *Why it's needed:* nets out any generic "parent of a young child, post-2022" shock and shows **the null is not gendered** — the reinforcement move (à la [[style-exemplar-jpope]]).
 
 **Appendix (support & falsification)**
-- **Table D.1 — robustness.** Null survives alt cutoff, treatment variants, COVID drop, state×quarter FE, two-way clustering, telework-eligible-only, and the **early/late timing split**; carries the **A-vs-B placebo** (licenses Control A as clean). *Why it's needed:* the null is not an artifact of any single design choice.
+- **Table D.1 — robustness.** Null survives alt cutoff, treatment variants, COVID drop, state×year-quarter FE, two-way clustering, telework-eligible-only, and the **early/late timing split**; carries the **A-vs-B placebo** (licenses Control A as clean). *Why it's needed:* the null is not an artifact of any single design choice.
 - **Fig. D.3 (fig08) — control-window sweep.** Estimate stable 5–6 … 5–12. *Why:* the control's upper bound doesn't drive results.
 - **Table D.2 — occupation transitions.** Descriptive twin of Table 5 (identical treated/control flows). *Why:* backs "no sorting" without a regression.
-- **Table D.3 — age 40–49, all outcomes.** The one significant het cell leaves **no trace downstream**. *Why:* shows that cell isn't a real telework effect (multiple-testing companion).
 - **Table D.4 — triple diff, all outcomes.** The significant coefficients track **pre-existing gender trends**, not the reform. *Why:* same non-causal story as Table 3, gender version.
 - **Table D.5 — outcomes, Control B.** Broad control (more power), same conclusions. *Why:* precision robustness + shows the choice of control doesn't matter.
 - **Fig. D.1 (fig09) — maternity event study.** Pronounced pre-trend. *Why:* the visual reason maternity is not read causally.
@@ -212,13 +211,12 @@ The argument, exhibit by exhibit in paper order. This is the "are we telling the
 | Table — Triple diff, first stage | `tab08_triple_diff.tex` | 07 |
 | Fig — Event study, `home_office` (both controls) | `fig06_event_study_home_office` | 02 |
 
-**Appendix.** Tables/figures are numbered **per appendix section** (`\numberwithin{table}{section}` in `paper.tex`): panel retention is **A.1**, telework codes **C.1**, and the "Additional tables and figures" section holds **D.1–D.5** (tables) and **D.1–D.5** (figures). Order the floats in `appendix.tex` to match first-citation order (JPopE requires consecutive numbering).
+**Appendix.** Tables/figures are numbered **per appendix section** (`\numberwithin{table}{section}` in `paper.tex`): panel retention is **A.1**, telework codes **C.1**, and the "Additional tables and figures" section holds **D.1–D.4** (tables) and **D.1–D.5** (figures). Order the floats in `appendix.tex` to match first-citation order (JPopE requires consecutive numbering).
 | Role | File | Script |
 |---|---|---|
 | Table A.1 — Panel retention | `tabA1_panel_retention.tex` | 01 |
 | Table — Reduced-form outcomes, Control B | `tab03b_did_outcomes_B.tex` | 03 |
 | Table — Occupation transition matrix | `tab05b_occupation_transition.tex` | 04 |
-| Table — All outcomes for the age 40–49 cell (multiple-testing companion) | `tab06b_age4049_outcomes.tex` | 05 |
 | Table — Robustness (first stage, early/late timing split, log earnings) | `tab07_robustness.tex` | 06 |
 | Table — Triple diff, all outcomes | `tab08b_triple_diff_outcomes.tex` | 07 |
 | Fig — Heterogeneity coefplot | `fig07_heterogeneity_coefplot` | 05 |
@@ -229,7 +227,7 @@ The argument, exhibit by exhibit in paper order. This is the "are we telling the
 
 **Descriptive figures** `fig01`–`fig04` (home-office trends, LFP/employment, two-control panels, telework-eligible subgroup) — available for appendix/slides as needed.
 
-**Decided NOT in the paper:** `fig05` state map (`analysis/output/maps/`) — treatment has no geographic dimension (single national date), so a map is decorative and would need pre+post panels; kept in repo only.
+**Decided NOT in the paper:** (i) `fig05` state map (`analysis/output/maps/`) — treatment has no geographic dimension (single national date), so a map is decorative and would need pre+post panels; kept in repo only. (ii) `tab06b_age4049_outcomes` (**deleted**) — the "all outcomes for the 40–49 cell" companion; the Holm correction in Table 6 already handles that cell, and log earnings turning marginally significant made the table muddy the story rather than reinforce it.
 
 ---
 

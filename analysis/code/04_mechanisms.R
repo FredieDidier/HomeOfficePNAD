@@ -50,7 +50,7 @@ etable(fe(A), fe(A[pt_base == 1]), fe(A[pt_base == 0]),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect by Baseline Telework Eligibility",
        label = "tab:mech_moderation",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column estimates ", EQ_REF, " (first stage, outcome home office) on the preferred sample (treated, child $\\leq$ 4, vs.\\ Control~A, youngest child 5--7), split by whether the woman was in a telework-eligible occupation at baseline---her occupation eligibility in her first observed quarter, held fixed, following \\citet{costa2024}. All columns include individual and year-quarter fixed effects."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column estimates ", EQ_REF, " (first stage, outcome home office) on the preferred sample (treated, child $\\leq$ 4, vs.\\ Control~A, youngest child 5--7), split by whether the woman was in a telework-eligible occupation at baseline---her occupation eligibility in her first observed quarter, held fixed, following \\citet{costa2024}."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab04_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5: occupational sorting (potential_telework as outcome) ----------

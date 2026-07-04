@@ -244,11 +244,11 @@ make_latex_table2 <- function(hh_res, ind_res, outfile, range_str) {
     "\\toprule",
     "\\multicolumn{4}{l}{Type} & \\multicolumn{2}{r}{Transition Probability (T $\\to$ T+1)} \\\\",
     "\\midrule",
-    paste0("\\multicolumn{4}{l}{Individuals} & \\multicolumn{2}{r}{", fmt_pct(ind_res$transition), "} \\\\"),
     paste0("\\multicolumn{4}{l}{Households} & \\multicolumn{2}{r}{", fmt_pct(hh_res$transition), "} \\\\"),
+    paste0("\\multicolumn{4}{l}{Individuals} & \\multicolumn{2}{r}{", fmt_pct(ind_res$transition), "} \\\\"),
     "\\bottomrule",
     "\\end{tabular}",
-    "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Sample: women aged 18--49 who are household head or spouse, the main estimation sample used throughout the paper. Individuals are tracked across quarters using an advanced panel identification algorithm that links respondents via birth date and household composition, including fuzzy matching for interviews with incomplete or fragmented information; the sample is restricted to individuals for whom this linkage succeeded. Households are tracked using a time-invariant household identifier. Panel A reports retention rates: the share of households and individuals observed for at least $X$ quarterly interviews. Panel B reports quarter-to-quarter transition probabilities: of all household-quarter or individual-quarter observations for which a subsequent quarter could in principle have been observed, the share that are. Statistics pool all quarters from ", range_str, ".",
+    "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Sample: women aged 18--49 who are household head or spouse, the main estimation sample used throughout the paper. Panel A reports retention rates: the share of households and individuals observed for at least $X$ quarterly interviews. Panel B reports quarter-to-quarter transition probabilities: of all household-quarter or individual-quarter observations for which a subsequent quarter could in principle have been observed, the share that are. Statistics pool all quarters from ", range_str, ".",
     "\\end{table}"
   )
   writeLines(lines, outfile)
