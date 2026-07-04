@@ -3,10 +3,13 @@
 # Summary statistics and pre-treatment trends for the HomeOfficePNAD project.
 #
 # Produces:
-#   1. Table 1 — Sample means by treatment group (treated / control A / control B)
-#   2. Figure 1 — Home office rate by quarter and group (2018Q1-2025Q4)
-#   3. Figure 2 — Home office rate: treated vs. each control group (separate panels)
-#   4. Figure 3 — Share in labor force and employment rate by group over time
+#   1. Table 1  — Sample means by treatment group (treated / control A / control B)
+#   2. Table A.1 — Panel retention diagnostics (households/individuals across quarters)
+#   3. Figure 1 — Home office rate by quarter and group (2018Q1-2026Q1)
+#   4. Figure 2 — Home office rate: treated vs. each control group (separate panels)
+#   5. Figure 3 — Share in labor force and employment rate by group over time
+#   6. Figure 4 — Home office rate among women in telework-eligible occupations
+#   7. Figure 5 (appendix, optional) — geographic map of home office, treated women
 #
 # Groups:
 #   Treated   : is_head_or_spouse == 1 & has_child_u4 == 1
@@ -168,7 +171,7 @@ make_latex_table1(
 
 
 # =============================================================================
-# TABLE A0 — Panel retention diagnostics
+# TABLE A.1 — Panel retention diagnostics
 #
 # Validates, for the reader, that the datazoom.social advanced (Stage 3)
 # individual panel identification is actually capturing the rotating panel's
@@ -310,7 +313,7 @@ theme_paper <- function(base = 14) {
 
 
 # =============================================================================
-# FIGURE 1 — Home office rate by quarter and group (full 2018-2025)
+# FIGURE 1 — Home office rate by quarter and group (full 2018-2026)
 # =============================================================================
 
 trends <- dt_hs[, .(

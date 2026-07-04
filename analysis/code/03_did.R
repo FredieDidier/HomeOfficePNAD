@@ -3,10 +3,11 @@
 # Main difference-in-differences results.
 #
 #   Table 2  — First stage (home office): specification ladder.
-#              (1) OLS + demographic controls, no FE
-#              (2) + year-quarter FE
-#              (3) + individual FE                (preferred)
-#              (4) + individual FE + age, age^2
+#              (1) raw OLS, no controls, no FE
+#              (2) + demographic controls
+#              (3) + year-quarter FE
+#              (4) + individual FE                (preferred)
+#              (5) + age^2 only (in place of demographic controls)
 #              Shows the null does not depend on the fixed-effects/covariate
 #              choice (addresses whether individual FE and age controls matter).
 #   Table 3  — All outcomes under the preferred spec, Control A and Control B,
@@ -72,7 +73,7 @@ m2 <- feols(home_office ~ treated + treat_x_post + V2009 + I(V2009^2) +
             samp_A, weights = ~V1028, cluster = ~id_dom)
 m3 <- feols(home_office ~ treated + treat_x_post | id_panel + year_quarter,
             samp_A, weights = ~V1028, cluster = ~id_dom)
-# Column 4: add age^2 only. The linear age term is collinear with individual +
+# Column 5: add age^2 only. The linear age term is collinear with individual +
 # year-quarter FE (age = calendar time - birth cohort, both absorbed), so it is
 # mechanically dropped; the quadratic carries any age adjustment.
 m4 <- feols(home_office ~ treated + treat_x_post + I(V2009^2) |
@@ -130,11 +131,9 @@ etable(mods_B,
        notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, " on the broad comparison group (women with no child aged 0--7). Sample: women 18--49, household head or spouse. ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab03b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
-# ---- A-vs-B placebo (home office) ------------------------------------------
-samp_P <- dt[(has_child_5_7 == 1 & has_child_u4 == 0) | (has_child_u4 == 0 & has_child_5_7 == 0)]
-samp_P[, fake_x_post := as.integer(has_child_5_7 == 1) * post_mp]
-mP <- feols(home_office ~ has_child_5_7 + fake_x_post | id_panel + year_quarter,
-            samp_P, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
+# Note: the A-vs-B placebo (home office, fake treatment = has_child_5_7) is
+# computed in 06_robustness.R, which writes it into tab07_robustness.tex; it is
+# not repeated here to avoid duplicating that regression.
 
 # ---- Console summary --------------------------------------------------------
 cat("\n=== Table 2: first-stage ladder (home office, treat_x_post) ===\n")
@@ -148,6 +147,4 @@ for (y in outcomes) {
   sc <- if (y %in% c("log_income", "hours_usual")) 1 else 100
   cat(sprintf("  %-26s %.3f (%.3f) p=%.2f\n", y, ct[1] * sc, ct[2] * sc, ct[4]))
 }
-ctP <- coeftable(mP)["fake_x_post", ]
-cat(sprintf("\n  Placebo A-vs-B (home office): %.3f (%.3f) p=%.2f\n", ctP[1] * 100, ctP[2] * 100, ctP[4]))
 message("\n=== 03_did.R complete ===")
