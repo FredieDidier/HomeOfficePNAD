@@ -31,7 +31,7 @@ dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
 dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
 
-dict <- c(treat_x_post = "Treated $\\times$ Post", treated = "Treated (child $\\leq$4)",
+dict <- c(treat_x_post = "Treated $\\times$ Post", treated = "Treated (child $\\leq$ 4)",
           home_office = "Home office", potential_telework = "Telework-eligible occupation",
           id_panel = "Individual", id_dom = "Household", year_quarter = "Year-quarter")
 
@@ -50,7 +50,7 @@ etable(fe(A), fe(A[pt_base == 1]), fe(A[pt_base == 0]),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect by Baseline Telework Eligibility",
        label = "tab:mech_moderation",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column estimates ", EQ_REF, " (first stage, outcome home office) on the preferred sample (treated, child $\\leq$4, vs.\\ Control~A, youngest child 5--7), split by whether the woman was in a telework-eligible occupation at baseline---her occupation eligibility in her first observed quarter, held fixed, following \\citet{costa2024}. All columns include individual and year-quarter fixed effects."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column estimates ", EQ_REF, " (first stage, outcome home office) on the preferred sample (treated, child $\\leq$ 4, vs.\\ Control~A, youngest child 5--7), split by whether the woman was in a telework-eligible occupation at baseline---her occupation eligibility in her first observed quarter, held fixed, following \\citet{costa2024}. All columns include individual and year-quarter fixed effects."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab04_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5: occupational sorting (potential_telework as outcome) ----------
@@ -87,7 +87,7 @@ tb <- c("\\begin{table}[H]\\centering",
   "\\caption{Occupation Transitions Around the Reform}",
   "\\label{tab:occ_transition}\\small",
   "\\begin{tabular}{lcc}", "\\toprule",
-  trans_tab(1, "Treated (child $\\leq$4)"), "\\midrule",
+  trans_tab(1, "Treated (child $\\leq$ 4)"), "\\midrule",
   trans_tab(0, "Control A (child 5--7)"), "\\bottomrule\\end{tabular}",
   "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each cell is the share of women in a given pre-to-post telework-eligibility transition, among matched women observed both before and after the second quarter of 2022. Off-diagonal cells are occupation switches. The treated and control distributions are similar, consistent with the null in Table~\\ref{tab:mech_allocation}.",
   "\\end{table}")

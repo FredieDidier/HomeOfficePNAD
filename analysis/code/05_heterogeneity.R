@@ -114,7 +114,7 @@ writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
 A4049 <- copy(A[age_band == "Age 40--49"])
 setnames(A4049, "VD4031", "hours_usual")
 A4049[, log_income := fifelse(rendimento_habitual_real > 0, log(rendimento_habitual_real), NA_real_)]
-dict6 <- c(treat_x_post = "Treated $\\times$ Post", treated = "Treated (child $\\leq$4)",
+dict6 <- c(treat_x_post = "Treated $\\times$ Post", treated = "Treated (child $\\leq$ 4)",
            home_office = "Home office", log_income = "Log income",
            hours_usual = "Usual hours", employed = "Employed", in_labor_force = "In labor force",
            on_maternity_leave = "Maternity leave", id_panel = "Individual", year_quarter = "Year-quarter")

@@ -42,7 +42,7 @@ S[, trxp_fem := treat_x_post * female]
 S[, log_income := fifelse(rendimento_habitual_real > 0, log(rendimento_habitual_real), NA_real_)]
 
 dict <- c(treat_x_post = "Treated $\\times$ Post", trxp_fem = "Treated $\\times$ Post $\\times$ Female",
-          treated = "Treated (child $\\leq$4)", tr_fem = "Treated $\\times$ Female",
+          treated = "Treated (child $\\leq$ 4)", tr_fem = "Treated $\\times$ Female",
           home_office = "Home office", log_income = "Log income",
           hours_usual = "Usual hours", employed = "Employed", in_labor_force = "In labor force",
           on_maternity_leave = "Maternity leave", id_panel = "Individual", id_dom = "Household",
@@ -63,7 +63,7 @@ etable(did(S[female == 0]), did(S[female == 1]), ddd(),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Triple Difference: Home Office, Men vs.\\ Women",
        label = "tab:triple_diff",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Columns~(1) and~(2) estimate ", EQ_REF, " (outcome home office) separately for men and women (treated $=$ child $\\leq$4 vs.\\ Control~A). Column~(3) is the pooled triple difference; the coefficient on Treated $\\times$ Post $\\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock. All columns include individual fixed effects."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Columns~(1) and~(2) estimate ", EQ_REF, " (outcome home office) separately for men and women (treated $=$ child $\\leq$ 4 vs.\\ Control~A). Column~(3) is the pooled triple difference; the coefficient on Treated $\\times$ Post $\\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock. All columns include individual fixed effects."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab08_file, fontsize = "\\small", tabcolsep = 5)
 # Show explicit "No" where a fixed effect is absent (etable leaves it blank):
 # the men/women DiD (cols 1-2) use year-quarter FE; the DDD (col 3) uses

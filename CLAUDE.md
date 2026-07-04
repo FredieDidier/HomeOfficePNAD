@@ -148,7 +148,7 @@ feols(outcome ~ treated + treat_x_post | id_panel + year_quarter,
 
 **Do NOT include (post-treatment / bad controls):** occupation FE (`cod_2dig`), sector FE (`cnae_2dig`), employment status, job tenure, `potential_telework`, formal status. Race (`V2010`) and mostly-stable education are absorbed by individual FE.
 
-**Specification ladder (first-stage table):** (1) OLS + demographic controls, no FE; (2) + quarter FE; (3) + individual FE; (4) + age & age² (`V2009 + I(V2009^2)`). Age's linear term is near-collinear under FE; quadratic carries the adjustment; first stage unchanged either way.
+**Specification ladder (first-stage table, 5 cols):** (1) raw OLS, no controls/FE; (2) + demographic controls; (3) + quarter FE; (4) + individual FE (**preferred**); (5) + age² only (`I(V2009^2)` — the linear age term is dropped because age = calendar time − birth cohort is collinear with individual+quarter FE, so only the quadratic carries any age adjustment; table label reads "Age² only"). Cols 1–3 all give +0.4pp\* (demographics and quarter FE barely move it); only individual FE collapses it to ≈0 — the selection is on time-invariant unobservables, not observed demographics. First stage unchanged with or without the age² term. FE rows list **Individual above Year-quarter** (post-processing in `03_did.R` reorders them to match the other tables).
 
 **Additional/robustness FE:** state × quarter (`sigla_uf^year_quarter`); `UPA` clustering. **Table reporting:** below coefficients report N obs, N individuals (`uniqueN(id_panel)`), N households (`uniqueN(id_dom)`), within-R²; note the clustering variable.
 

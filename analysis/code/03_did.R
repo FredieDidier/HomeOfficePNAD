@@ -44,7 +44,7 @@ dt[, log_income := fifelse(rendimento_habitual_real > 0, log(rendimento_habitual
 # can be dropped from the display by their raw names.
 dict <- c(
   treat_x_post = "Treated $\\times$ Post",
-  treated      = "Treated (child $\\leq$4)",
+  treated      = "Treated (child $\\leq$ 4)",
   home_office  = "Home office", log_income = "Log income",
   hours_usual  = "Usual hours", employed = "Employed",
   in_labor_force = "In labor force", on_maternity_leave = "Maternity leave",
@@ -57,6 +57,13 @@ samp_B <- dt[has_child_u4 == 1 | (has_child_u4 == 0 & has_child_5_7 == 0)]
 # =============================================================================
 # Table 2 — first-stage specification ladder (Control A)
 # =============================================================================
+# Column 1: raw OLS, no controls and no fixed effects (the fully unconditional
+# treated-vs-control difference around the reform). Columns 2-5 add, in turn,
+# demographic controls, quarter FE, individual FE (preferred), and age^2 --- so
+# the ladder separates what observed demographics do (little) from what the
+# individual fixed effects do (collapse the estimate to zero).
+m0 <- feols(home_office ~ treated + post_mp + treat_x_post,
+            samp_A, weights = ~V1028, cluster = ~id_dom)
 m1 <- feols(home_office ~ treated + post_mp + treat_x_post + V2009 + I(V2009^2) +
               higher_educ + i(V2010) + i(regiao),
             samp_A, weights = ~V1028, cluster = ~id_dom)
@@ -73,20 +80,23 @@ m4 <- feols(home_office ~ treated + treat_x_post + I(V2009^2) |
             samp_A, weights = ~V1028, cluster = ~id_dom)
 
 tab02_file <- file.path(TABLE_DIR, "tab02_did_firststage.tex")
-etable(m1, m2, m3, m4,
+etable(m0, m1, m2, m3, m4,
        tex = TRUE, file = tab02_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, drop = c("post_mp", "V2009", "V2010", "regiao", "higher_educ", "Constant"),
-       extralines = list("Demographic controls" = c("Yes", "Yes", "No", "Age$^2$ only")),
+       extralines = list("Demographic controls" = c("No", "Yes", "Yes", "No", "Age$^2$ only")),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "First-Stage Home-Office Effect: Specification Ladder (Control A)",
        label = "tab:did_firststage",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} The outcome is an indicator for working from home. Column~(3) is the preferred specification, ", EQ_REF, ", with individual and year-quarter fixed effects; columns~(1)--(2) omit the fixed effects and column~(4) adds a quadratic in age. Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control~A (youngest child 5--7). Demographic controls are age, age$^2$, completed higher education, race, and region."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
-postprocess_tex(tab02_file, fontsize = "\\small", tabcolsep = 5)
-# Show an explicit "No" where a fixed effect is absent (etable leaves it blank).
-# Ladder: year-quarter FE enters from col 2, individual FE from col 3.
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} The outcome is an indicator for working from home. Column~(4) is the preferred specification, ", EQ_REF, ", with individual and year-quarter fixed effects; column~(1) is a raw regression with no controls, column~(2) adds demographic controls, column~(3) adds year-quarter fixed effects, and column~(5) adds a quadratic in age. Sample: women 18--49, household head or spouse, treated (child $\\leq$ 4) vs.\\ Control~A (youngest child 5--7). Demographic controls are age, age$^2$, completed higher education, race, and region."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+postprocess_tex(tab02_file, fontsize = "\\small", tabcolsep = 4)
+# Show an explicit "No" where a fixed effect is absent (etable leaves it blank),
+# and list Individual above Year-quarter to match the other tables. Ladder:
+# year-quarter FE enters from col 3, individual FE from col 4.
 .tx <- readLines(tab02_file)
-.tx[grepl("^\\s*Year-quarter\\s*&", .tx)] <- "      Year-quarter & No & Yes & Yes & Yes\\\\"
-.tx[grepl("^\\s*Individual\\s*&",  .tx)]  <- "      Individual & No & No & Yes & Yes\\\\"
+iy <- grep("^\\s*Year-quarter\\s*&", .tx); ii <- grep("^\\s*Individual\\s*&", .tx)
+lo <- min(iy, ii); hi <- max(iy, ii)
+.tx[lo] <- "      Individual & No & No & No & Yes & Yes\\\\"
+.tx[hi] <- "      Year-quarter & No & No & Yes & Yes & Yes\\\\"
 writeLines(.tx, tab02_file)
 
 # =============================================================================
@@ -108,7 +118,7 @@ etable(mods_A,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control A",
        label = "tab:did_outcomes_A",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, ". Sample: women 18--49, household head or spouse, treated (child $\\leq$4) vs.\\ Control~A (youngest child 5--7). ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, ". Sample: women 18--49, household head or spouse, treated (child $\\leq$ 4) vs.\\ Control~A (youngest child 5--7). ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab03a_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 tab03b_file <- file.path(TABLE_DIR, "tab03b_did_outcomes_B.tex")
@@ -128,7 +138,7 @@ mP <- feols(home_office ~ has_child_5_7 + fake_x_post | id_panel + year_quarter,
 
 # ---- Console summary --------------------------------------------------------
 cat("\n=== Table 2: first-stage ladder (home office, treat_x_post) ===\n")
-for (nm in c("m1", "m2", "m3", "m4")) {
+for (nm in c("m0", "m1", "m2", "m3", "m4")) {
   ct <- coeftable(get(nm))["treat_x_post", ]
   cat(sprintf("  %s: %.3f (%.3f) p=%.2f\n", nm, ct[1] * 100, ct[2] * 100, ct[4]))
 }
