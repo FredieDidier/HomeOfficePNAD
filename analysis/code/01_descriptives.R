@@ -69,14 +69,14 @@ dt_hs[, post := factor(post, levels = c("Pre-MP", "Post-MP (Q2 2022+)"))]
 # share of all women who are employed (see build/01_pnadc.R).
 vars_desc <- c(
   "home_office", "in_labor_force", "employed",
-  "rendimento_habitual_real", "VD4031", "VD4035",
+  "rendimento_habitual_real", "VD4031",
   "on_maternity_leave", "formal", "potential_telework",
   "V2009"
 )
 
 labels_desc <- c(
   "Home office (\\%)", "In labor force (\\%)", "Employed (\\%)",
-  "Real monthly earnings (R\\$)", "Usual weekly hours", "Effective weekly hours",
+  "Real monthly earnings (R\\$)", "Usual weekly hours",
   "On maternity leave (\\%)", "Formal employment (\\%)", "Telework-eligible occupation (\\%)",
   "Age (years)"
 )
