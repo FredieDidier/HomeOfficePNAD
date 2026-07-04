@@ -51,7 +51,7 @@ The event study drifts up to ~1pp in a few 2024–25 quarters. To pre-empt "the 
 
 ### Sample
 Women 18–49, head/spouse (`is_head_or_spouse == 1`), from Q1 2018 (V4022 availability), matched panel (`panel_matched == 1`). Unit: individual × quarter (`id_panel` + `year_quarter`); each appears 1–5 quarters (rotating panel). Every women-only script filters `female == 1 & is_head_or_spouse == 1 & panel_matched == 1`.
-- **Age:** examined only as heterogeneity bands (18–29/30–39/40–49, baseline age) in `05_heterogeneity.R`; the old robustness age-windows were **removed** (redundant with the bands). The lone significant band (40–49, +1.4pp**) does not survive the **Holm (1979)** step-down correction over the 13 heterogeneity subgroups (min p 0.042→0.55; raw + Holm p are columns in Table 6, cite `holm1979`). Holm chosen over plain Bonferroni (uniformly more powerful, assumption-free) and over Romano-Wolf (which needs a same-sample bootstrap `wildrwolf` can't do for overlapping subsamples). Table 6 also carries a **By race** panel (White/Non-white, both null). The Holm correction is the sole, sufficient answer to the 40–49 cell; the old `tab06b` "all outcomes for the 40–49 cell" companion was **deleted** (redundant with Holm, and once log earnings turned marginally significant in that cell it muddied the story rather than reinforcing it).
+- **Age:** examined only as heterogeneity bands (18–29/30–39/40–49, baseline age) in `05_heterogeneity.R`. The lone significant band (40–49, +1.4pp**) does not survive the **Holm (1979)** step-down correction over the 13 heterogeneity subgroups (min p 0.042→0.55; raw + Holm p are columns in Table 6, cite `holm1979`). Holm chosen over plain Bonferroni (uniformly more powerful, assumption-free) and over Romano-Wolf (which needs a same-sample bootstrap `wildrwolf` can't do for overlapping subsamples). Table 6 also carries a **By race** panel (White/Non-white, both null). The Holm correction is the sole, sufficient answer to the 40–49 cell;
 - **Do NOT restrict to formal/CLT** (selection on a post-treatment variable). Use `clt_private` (VD4009==1) only as the sharp heterogeneity/placebo split, never as a restriction.
 
 ---
@@ -227,9 +227,7 @@ The argument, exhibit by exhibit in paper order. This is the "are we telling the
 
 **Descriptive figures** `fig01`–`fig04` (home-office trends, LFP/employment, two-control panels, telework-eligible subgroup) — available for appendix/slides as needed.
 
-**Decided NOT in the paper:** (i) `fig05` state map (`analysis/output/maps/`) — treatment has no geographic dimension (single national date), so a map is decorative and would need pre+post panels; kept in repo only. (ii) `tab06b_age4049_outcomes` (**deleted**) — the "all outcomes for the 40–49 cell" companion; the Holm correction in Table 6 already handles that cell, and log earnings turning marginally significant made the table muddy the story rather than reinforce it.
-
----
+**Decided NOT in the paper:** fig05` state map (`analysis/output/maps/`) — treatment has no geographic dimension (single national date), so a map is decorative and would need pre+post panels; kept in repo only.
 
 ## Policy Context
 

@@ -65,8 +65,8 @@ rows <- rbindlist(list(
 ))
 rows[, ci_lo := est - 1.96 * se][, ci_hi := est + 1.96 * se]
 
-# Multiple-testing correction across the displayed subgroups (Bonferroni). Only
-# one of the 11 subgroups is individually significant; correcting for the number
+# Multiple-testing correction across the displayed subgroups (Holm). Only
+# one of the 13 subgroups is individually significant; correcting for the number
 # of tests leaves nothing significant.
 het_subs <- c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT",
               "Private employee", "Public employee", "With higher education",
