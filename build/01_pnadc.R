@@ -150,7 +150,7 @@ download_pnadc_panels <- function() {
   # above, kept in the final dataset (see keep_vars in build_main_data()).
   derived_cols_needed <- c(
     "regiao", "sigla_uf", "faixa_idade", "faixa_educ",
-    "rendimento_habitual_real",
+    "rendimento_habitual_real", 
     "ocupado", "forca_trab", "formal", "informal",
     "home_office", "cnae_2dig", "cod_2dig"
   )
@@ -447,6 +447,10 @@ build_main_data <- function() {
     tmp <- as.data.table(panel_data)
     rm(panel_data)
 
+    if ("rendimento_habitual_real" %in% names(tmp)) {
+      setnames(tmp, "rendimento_habitual_real", "earnings_habitual_real")
+    }
+
     # Filter to adults 18-49 from 2018 onwards (V4022/home_office only from Q1
     # 2018). BOTH sexes are kept: women are the analysis sample (filter
     # female == 1), men are the additional control dimension for the
@@ -623,8 +627,8 @@ build_main_data <- function() {
     "in_labor_force", "employed", "unemployed",
     # CLT private-sector employee (sharp "law binds" heterogeneity indicator)
     "clt_private",
-    # Income
-    "VD4019", "Habitual", "rendimento_habitual_real",
+    # Earnings
+    "VD4019", "Habitual", "earnings_habitual_real",
     # Hours
     "VD4031", "VD4035",
     # Home office (V4022 available from Q1 2018)

@@ -39,7 +39,7 @@ fmt  <- function(x, d = 2) formatC(x, format = "f", digits = d)
 fmt0 <- function(x) formatC(x, format = "d", big.mark = ",")
 
 # Generic first-stage DiD. `sample` must already contain `tr` (0/1 treated) and
-# `trxp` (tr x post). Returns the trxp row scaled to pp (or level for income).
+# `trxp` (tr x post). Returns the trxp row scaled to pp (or level for earnings).
 fs <- function(sample, label, clu = ~id_dom, y = "home_office", pp = TRUE,
                fes = "id_panel + year_quarter") {
   m <- feols(as.formula(sprintf("%s ~ tr + trxp | %s", y, fes)),
@@ -79,13 +79,13 @@ rows <- rbindlist(list(
 ))
 
 # ---- Earnings: log real earnings, with a winsorized version -----------------
-# Earnings are observed only for workers with positive income; the outcome is
+# Earnings are observed only for workers with positive earnings; the outcome is
 # the log of real monthly earnings, so the coefficient is a proportional effect.
 # The winsorized version caps earnings at the 99th percentile before taking logs.
-A_inc <- A_main[!is.na(rendimento_habitual_real) & rendimento_habitual_real > 0]
-cap <- A_inc[, quantile(rendimento_habitual_real, 0.99)]
-A_inc[, log_earn   := log(rendimento_habitual_real)]
-A_inc[, log_earn_w := log(pmin(rendimento_habitual_real, cap))]
+A_inc <- A_main[!is.na(earnings_habitual_real) & earnings_habitual_real > 0]
+cap <- A_inc[, quantile(earnings_habitual_real, 0.99)]
+A_inc[, log_earn   := log(earnings_habitual_real)]
+A_inc[, log_earn_w := log(pmin(earnings_habitual_real, cap))]
 inc_log  <- fs(A_inc, "Log real earnings",                       y = "log_earn",   pp = FALSE)
 inc_logw <- fs(A_inc, "Log real earnings (winsorized top 1\\%)", y = "log_earn_w", pp = FALSE)
 
@@ -107,7 +107,7 @@ timing <- rbindlist(Map(function(v, lbl)
   c("Early post (2022--2023)", "Late post (2024--2026)")))
 
 # =============================================================================
-# Table A (first stage) + income (two-line journal format: estimate; (se) below)
+# Table A (first stage) + earnings (two-line journal format: estimate; (se) below)
 # =============================================================================
 row_tex <- function(r, d = 2) c(
   sprintf("%s & %s$^{%s}$ & %s \\\\", r$label, fmt(r$est, d), r$star, fmt0(r$n)),

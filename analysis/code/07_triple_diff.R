@@ -37,12 +37,12 @@ setnames(dt, "VD4031", "hours_usual")
 S <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
 S[, tr_fem   := treated * female]
 S[, trxp_fem := treat_x_post * female]
-# Real income enters the outcome table in logs (workers with positive earnings).
-S[, log_income := fifelse(rendimento_habitual_real > 0, log(rendimento_habitual_real), NA_real_)]
+# Real earnings enter the outcome table in logs (workers with positive earnings).
+S[, log_earnings := fifelse(earnings_habitual_real > 0, log(earnings_habitual_real), NA_real_)]
 
 dict <- c(treat_x_post = "Treated $\\times$ Post", trxp_fem = "Treated $\\times$ Post $\\times$ Female",
           treated = "Treated (child $\\leq$ 4)", tr_fem = "Treated $\\times$ Female",
-          home_office = "Home office", log_income = "Log income",
+          home_office = "Home office", log_earnings = "Log earnings",
           hours_usual = "Usual hours", employed = "Employed", in_labor_force = "In labor force",
           on_maternity_leave = "Maternity leave", id_panel = "Individual", id_dom = "Household",
           year_quarter = "Year-quarter", female = "Female")
@@ -73,7 +73,7 @@ postprocess_tex(tab08_file, fontsize = "\\small", tabcolsep = 5)
 writeLines(.tx, tab08_file)
 
 # ---- Table 8b: DDD across outcomes -----------------------------------------
-outcomes <- c("home_office", "log_income", "hours_usual",
+outcomes <- c("home_office", "log_earnings", "hours_usual",
               "employed", "in_labor_force", "on_maternity_leave")
 ddd_mods <- setNames(lapply(outcomes, ddd), outcomes)
 tab08b_file <- file.path(TABLE_DIR, "tab08b_triple_diff_outcomes.tex")
@@ -97,7 +97,7 @@ cat(sprintf("  DDD   (treat x post x female): %.2f (%.2f) p=%.2f\n",
 cat("\n=== DDD (treat x post x female) across outcomes ===\n")
 for (y in outcomes) {
   ct <- coeftable(ddd_mods[[y]])["trxp_fem", ]
-  sc <- if (y %in% c("log_income", "hours_usual")) 1 else 100
+  sc <- if (y %in% c("log_earnings", "hours_usual")) 1 else 100
   cat(sprintf("  %-26s %.3f (%.3f) p=%.2f\n", y, ct[1]*sc, ct[2]*sc, ct[4]))
 }
 message("\n=== 07_triple_diff.R complete ===")

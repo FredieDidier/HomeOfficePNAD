@@ -71,7 +71,7 @@ dt_hs[, post := factor(post, levels = c("Pre-MP", "Post-MP (Q2 2022+)"))]
 # share of all women who are employed (see build/01_pnadc.R).
 vars_desc <- c(
   "home_office", "in_labor_force", "employed",
-  "rendimento_habitual_real", "VD4031",
+  "earnings_habitual_real", "VD4031",
   "on_maternity_leave", "formal", "potential_telework",
   "V2009"
 )
@@ -124,7 +124,7 @@ make_latex_table1 <- function(tab, labels, outfile) {
     if (vars_desc[i] %in% pp_vars) {
       row_vals[seq_along(row_vals)] <- row_vals * 100
       fmt <- "%.1f"
-    } else if (vars_desc[i] == "rendimento_habitual_real") {
+    } else if (vars_desc[i] == "earnings_habitual_real") {
       fmt <- "%.0f"
     } else {
       fmt <- "%.1f"

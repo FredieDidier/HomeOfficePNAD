@@ -43,7 +43,7 @@ postprocess_tex <- function(file, fontsize = "\\small", tabcolsep = 4, addspace 
 # Shared note fragments, so every regression-table note follows one house style:
 #   1. what each column/row estimates, with a green hyperlink to Eq. (1);
 #   2. the sample;
-#   3. units of the outcomes (0/1 indicators, log income, hours);
+#   3. units of the outcomes (0/1 indicators, log earnings, hours);
 #   4. weighting; 5. clustering; 6. significance legend.
 # Build a note as paste(<lead sentence(s), EQ_REF inline>, WEIGHT_NOTE,
 # CLUSTER_NOTE, SIGNIF_NOTE). Each constant is a full sentence ending in a
@@ -61,6 +61,6 @@ EQ_REF <- "Eq.~\\eqref{eq:did}"
 WEIGHT_NOTE  <- "All regressions are weighted by the survey weights."
 CLUSTER_NOTE <- "Standard errors are clustered at the household level in parentheses."
 
-# Units sentence for the multi-outcome tables. Real income enters in logs (as in
-# the robustness table), so its coefficient is an approximate proportional effect.
-UNITS_NOTE <- "Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; log income is the natural logarithm of real monthly labor earnings, so its coefficient is an approximate proportional effect, and usual hours are usual weekly hours---both defined only for workers."
+# Units sentence for the multi-outcome tables. Real earnings enter in logs (as in
+# the robustness table), so their coefficient is an approximate proportional effect.
+UNITS_NOTE <- "Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; log earnings is the natural logarithm of real monthly labor earnings, so its coefficient is an approximate proportional effect, and usual hours are usual weekly hours---both defined only for workers."

@@ -35,17 +35,17 @@ setDT(dt)
 dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setnames(dt, "VD4031", "hours_usual")
 
-# Real income enters the outcome tables in logs (as in the robustness table), so
+# Real earnings enter the outcome tables in logs (as in the robustness table), so
 # the coefficient is a proportional effect. Defined only for workers with
 # positive earnings; feols drops the remaining (NA) rows for that column only.
-dt[, log_income := fifelse(rendimento_habitual_real > 0, log(rendimento_habitual_real), NA_real_)]
+dt[, log_earnings := fifelse(earnings_habitual_real > 0, log(earnings_habitual_real), NA_real_)]
 
 # Human-readable labels for etable. Nuisance controls are left unlabeled so they
 # can be dropped from the display by their raw names.
 dict <- c(
   treat_x_post = "Treated $\\times$ Post",
   treated      = "Treated (child $\\leq$ 4)",
-  home_office  = "Home office", log_income = "Log income",
+  home_office  = "Home office", log_earnings = "Log earnings",
   hours_usual  = "Usual hours", employed = "Employed",
   in_labor_force = "In labor force", on_maternity_leave = "Maternity leave",
   id_panel = "Individual", id_dom = "Household", year_quarter = "Year-quarter"
@@ -102,7 +102,7 @@ writeLines(.tx, tab02_file)
 # =============================================================================
 # Table 3 — all outcomes, preferred spec, Control A and Control B
 # =============================================================================
-outcomes <- c("home_office", "log_income", "hours_usual",
+outcomes <- c("home_office", "log_earnings", "hours_usual",
               "employed", "in_labor_force", "on_maternity_leave")
 run_all <- function(sample) {
   setNames(lapply(outcomes, function(y)
@@ -143,7 +143,7 @@ for (nm in c("m0", "m1", "m2", "m3", "m4")) {
 cat("\n=== Table 3: Control A outcomes (treat_x_post) ===\n")
 for (y in outcomes) {
   ct <- coeftable(mods_A[[y]])["treat_x_post", ]
-  sc <- if (y %in% c("log_income", "hours_usual")) 1 else 100
+  sc <- if (y %in% c("log_earnings", "hours_usual")) 1 else 100
   cat(sprintf("  %-26s %.3f (%.3f) p=%.2f\n", y, ct[1] * sc, ct[2] * sc, ct[4]))
 }
 message("\n=== 03_did.R complete ===")
