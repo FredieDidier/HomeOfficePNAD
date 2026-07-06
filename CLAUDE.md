@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Empirical paper (working title *"A Priority That Does Not Bind"*) asking whether **MP 1108/2022 → Law 14.442/2022 (Art. 75-F)** — which orders employers to give priority telework access to employees with children/dependents under 4 — causally affected women's labor-market outcomes and fertility. MP enacted **25 Mar 2022** (published 28 Mar), converted to Law 14.442 on **2 Sep 2022**.
+Empirical paper (title *"The Labor Market Effects of a Telework Priority Mandate for Mothers of Young Children in Brazil"*) asking whether **MP 1108/2022 → Law 14.442/2022 (Art. 75-F)** — which orders employers to give priority telework access to employees with children/dependents under 4 — causally affected women's labor-market outcomes and fertility. MP enacted **25 Mar 2022** (published 28 Mar), converted to Law 14.442 on **2 Sep 2022**.
 
 > **Art. 75-F:** "Employers must give priority to employees with disabilities and to employees with children or minors under judicial guardianship up to 4 years of age in the allocation of positions for activities that can be performed through telework or remote work."
 
