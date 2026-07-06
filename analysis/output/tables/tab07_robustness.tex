@@ -1,41 +1,36 @@
 \begin{table}[H]\centering
 \caption{Robustness of the First-Stage Home-Office Effect}
 \label{tab:robustness}\small
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
 \begin{tabular}{lcc}
 \toprule
- & Treated $\times$ Post & Obs. \\
+ & Treated $\times$ Post (se) & Obs. \\
 \midrule
 \multicolumn{3}{l}{\textit{Home office (pp)}} \\
-Baseline & -0.08$^{}$ & 989,898 \\
- & (0.30) & \\
-Placebo: youngest child 5--7 vs.\ no child 0--7 & 0.04$^{}$ & 1,852,383 \\
- & (0.30) & \\
-Alternative cutoff (2022Q1 post) & 0.20$^{}$ & 989,898 \\
- & (0.30) & \\
-Treated, excluding grandchildren & -0.07$^{}$ & 929,101 \\
- & (0.31) & \\
-Treated, excluding stepchildren & -0.13$^{}$ & 974,966 \\
- & (0.30) & \\
-Excluding 2020--2021 (COVID) & -0.09$^{}$ & 798,776 \\
- & (0.37) & \\
-State $\times$ quarter fixed effects & -0.08$^{}$ & 989,898 \\
- & (0.30) & \\
-Two-way cluster (household, PSU) & -0.08$^{}$ & 989,898 \\
- & (0.29) & \\
-Telework-eligible only & -0.95$^{}$ & 136,079 \\
- & (1.01) & \\
+Baseline & -0.08$^{}$ (0.30) & 989,898 \\
+Placebo: youngest child 5--7 vs.\ no child 0--7 & 0.04$^{}$ (0.30) & 1,852,383 \\
+Alternative cutoff (2022Q1 post) & 0.20$^{}$ (0.30) & 989,898 \\
+Treated, excluding grandchildren & -0.07$^{}$ (0.31) & 929,101 \\
+Treated, excluding stepchildren & -0.13$^{}$ (0.30) & 974,966 \\
+Excluding 2020--2021 (COVID) & -0.09$^{}$ (0.37) & 798,776 \\
+State $\times$ quarter fixed effects & -0.08$^{}$ (0.30) & 989,898 \\
+Two-way cluster (household, PSU) & -0.08$^{}$ (0.29) & 989,898 \\
+Telework-eligible only & -0.95$^{}$ (1.01) & 136,079 \\
+\midrule
+\multicolumn{3}{l}{\textit{Home office, by exact-birthdate treatment ceiling (pp)}} \\
+Ceiling 48 months (until 4th birthday) & 0.18$^{}$ (0.48) & 825,209 \\
+Ceiling 49 months (4y1m) & 0.20$^{}$ (0.46) & 835,377 \\
+Ceiling 51 months (4y3m) & 0.12$^{}$ (0.44) & 855,783 \\
+Ceiling 53 months (4y5m) & -0.07$^{}$ (0.42) & 875,890 \\
+Ceiling 60 months (exact age $<5$; = main) & 0.00$^{}$ (0.31) & 944,322 \\
 \midrule
 \multicolumn{3}{l}{\textit{Home office, by post-reform timing (pp)}} \\
-Early post (2022--2023) & -0.21$^{}$ & 989,898 \\
- & (0.33) & \\
-Late post (2024--2026) & 0.18$^{}$ & 989,898 \\
- & (0.35) & \\
+Early post (2022--2023) & -0.21$^{}$ (0.33) & 989,898 \\
+Late post (2024--2026) & 0.18$^{}$ (0.35) & 989,898 \\
 \midrule
 \multicolumn{3}{l}{\textit{Log real earnings}} \\
-Log real earnings & -0.001$^{}$ & 481,352 \\
- & (0.009) & \\
-Log real earnings (winsorized top 1\%) & -0.002$^{}$ & 481,352 \\
- & (0.009) & \\
-\bottomrule\end{tabular}
-\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate difference-in-differences regression estimating Eq.~\eqref{eq:did} on the preferred sample (treated vs.\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The two post-reform-timing rows come from a single regression that splits Treated $\times$ Post into a 2022--2023 and a 2024--2026 window. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum). Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+Log real earnings & -0.001$^{}$ (0.009) & 481,352 \\
+Log real earnings (winsorized top 1\%) & -0.002$^{}$ (0.009) & 481,352 \\
+\bottomrule\end{tabular}}
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate difference-in-differences regression estimating Eq.~\eqref{eq:did} on the preferred sample (treated vs.\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The exact-birthdate rows redefine treatment from the youngest child's precise age in months (computed from the reported month and year of birth, anchored at the quarter midpoint since the exact interview date is unobserved), sliding the eligibility ceiling across the statutory four-year boundary while holding the comparison group fixed at Control~A; a ceiling of 60 months reproduces the main completed-year definition, and lower ceilings drop children between the ceiling and age five from both groups. The two post-reform-timing rows come from a single regression that splits Treated $\times$ Post into a 2022--2023 and a 2024--2026 window. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum). Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}

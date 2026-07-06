@@ -51,7 +51,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "treat_x_post", "treat_x_post_alt",
                      "clt_private",
                      "age_youngest_child_any",
-                     "female", "higher_educ"
+                     "female", "higher_educ",
+                     "age_youngest_child_months_any", "single_mother"
                    ),
                    
                    source = c(
@@ -79,6 +80,7 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "Project-derived", "Project-derived",
                      "Project-derived",
                      "Project-derived",
+                     "Project-derived", "Project-derived",
                      "Project-derived", "Project-derived"
                    ),
 
@@ -107,6 +109,7 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "integer", "integer",
                      "integer",
                      "numeric",
+                     "integer", "integer",
                      "integer", "integer"
                    ),
 
@@ -178,7 +181,9 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "=1 se VD4009==1 (empregado no setor privado com carteira = empregado CLT). Grupo em que o Art. 75-F de fato vincula. Usado como corte de placebo/heterogeneidade (não como restrição amostral). =0 para os demais, inclusive não ocupadas.",
                      "Idade do filho mais novo de QUALQUER idade no domicílio (todos os tipos de filho; NA se não há filhos). Subsume as definições de grupo: tratado = (≤4); janela de controle [5,K]; Controle B = (≥8 ou NA). Usada na robustez de janela de controle.",
                      "Indicador de sexo feminino (=1 se V2007==2). A base contém ambos os sexos; as análises principais filtram female==1. Homens entram apenas no triple-difference (DDD) e no placebo.",
-                     "Ensino superior completo (=1 se VD3004==7). Split de educação mais interpretável que faixa_educ, usado na heterogeneidade."
+                     "Ensino superior completo (=1 se VD3004==7). Split de educação mais interpretável que faixa_educ, usado na heterogeneidade.",
+                     "Idade em MESES da criança mais nova de qualquer idade no domicílio, reconstruída do mês/ano de nascimento (V20081/V20082) e avaliada no ponto médio do trimestre de referência (a data exata da entrevista não é divulgada; o dia de nascimento V2008 não é usado). Contínua; usada na robustez de corte etário por data de nascimento em 06_robustness.R (teto de 48/49/51/53/60 meses). NA (~7% das crianças <4) quando a data de nascimento da criança mais nova é inutilizável. Apenas robustez — a especificação principal usa idade em anos completos.",
+                     "=1 se mulher chefe do domicílio (V2005==1) sem cônjuge/companheiro(a) co-residente (nenhum membro com V2005 ∈ {2,3}; PNADC trimestral não traz estado civil). No sample de análise (que condiciona à presença de criança pequena) identifica a mãe solteira/sem parceiro co-residente. Usada apenas como moderadora de heterogeneidade (baseline), nunca como restrição."
                    ),
                    
                    description_en = c(
@@ -249,7 +254,9 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "=1 if VD4009==1 (private-sector employee with a signed card = CLT employee). The group Art. 75-F actually binds on. Used as a placebo/heterogeneity split (not a sample restriction). =0 otherwise, including the non-employed.",
                      "Age of the youngest child of ANY age in the household (all child types; NA if no children). Subsumes the group definitions: treated = (<=4); control window [5,K]; Control B = (>=8 or NA). Used for the control-window robustness.",
                      "Female indicator (=1 if V2007==2). The base holds both sexes; main analyses filter female==1. Men enter only the triple-difference (DDD) and the placebo.",
-                     "Completed higher education (=1 if VD3004==7). More interpretable education split than faixa_educ, used in the heterogeneity analysis."
+                     "Completed higher education (=1 if VD3004==7). More interpretable education split than faixa_educ, used in the heterogeneity analysis.",
+                     "Age IN MONTHS of the youngest child of any age in the household, reconstructed from birth month/year (V20081/V20082) and evaluated at the reference-quarter midpoint (the exact interview date is not released; the day of birth V2008 is not used). Continuous; used in the exact-birthdate age-cutoff robustness in 06_robustness.R (ceiling 48/49/51/53/60 months). NA (~7% of under-4 children) when the youngest child's birth date is unusable. Robustness only — the main specification uses completed-year age.",
+                     "=1 if a female household head (V2005==1) with no co-resident spouse or partner (no household member with V2005 in {2,3}; the quarterly PNADC carries no marital-status variable). In the analysis sample, which conditions on the presence of a young child, this identifies the single (lone) mother — a mother with no co-resident partner. Used only as a baseline heterogeneity moderator, never as a sample restriction."
                    ),
                    
                    values_notes = c(
@@ -320,7 +327,9 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "0 or 1 (integer). Sharp CLT (private carteira) indicator, VD4009==1. Heterogeneity/placebo moderator; ~19.5% of sample women, ~34% of employed.",
                      "Integer years (0-17+) or NA. Youngest child of any age. Treated == (value <= 4); control window [5,K] == (value in 5:K).",
                      "0 or 1 (integer). V2007: 1=male, 2=female.",
-                     "0 or 1 (integer). VD3004==7 (Superior completo). ~19.7% of women."
+                     "0 or 1 (integer). VD3004==7 (Superior completo). ~19.7% of women.",
+                     "Non-negative integer (months) or NA. Treated at ceiling C == (value < C); comparison held at Control A == (value in [60, 96)). NA when youngest child's DOB unusable (~7% of under-4 children).",
+                     "0 or 1 (integer). =1 for a female lone household head (no co-resident partner). Baseline heterogeneity moderator (single vs. partnered mother); ~1/4 of treated women in the sample."
                    )
 )
 

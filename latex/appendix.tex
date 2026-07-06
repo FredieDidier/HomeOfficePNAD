@@ -25,6 +25,7 @@ This section defines the derived variables used in the analysis that are not alr
 \item \textbf{Private / public employee} --- an employee of a private-sector firm / of the public sector (including statutory servants), by the survey's position-in-employment classification.
 \item \textbf{Telework-eligible occupation} --- the worker's occupation is on the teleworkable list of \citet{costa2024}; see Appendix~\ref{app:telework}.
 \item \textbf{Higher education} --- has completed a tertiary degree.
+\item \textbf{Youngest child's age in months} --- used only for the exact-birthdate robustness in Table~\ref{tab:robustness}. The age of the household's youngest child, reconstructed from the reported month and year of birth and evaluated at the midpoint of the reference quarter; because the survey does not release the exact interview date, within-quarter timing leaves at most about six weeks of measurement error, and the day of birth is deliberately not used, as sub-monthly precision would be spurious. About 7\% of children under four lack a usable birth date, and their households drop from the exact-birthdate rows but remain in every completed-year specification, which is why the analysis uses completed-year age throughout and reserves the birth-date measure for that single check.
 \end{itemize}
 
 \clearpage
@@ -84,7 +85,7 @@ This appendix collects the supplementary tables and figures, ordered as they are
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{fig08_control_window_sweep.pdf}
-\caption{Control-window robustness. Each point is the first-stage difference-in-differences estimate as the comparison group is widened from a youngest child aged 5--6 up to 5--12; bars are 95\% confidence intervals. The estimate is stable across windows.}
+\caption{Control-window robustness. Each point is the first-stage difference-in-differences estimate as the comparison group is widened from a youngest child aged exactly 5 (the tightest age-threshold match) up to 5--12; bars are 95\% confidence intervals. The estimate is stable across windows.}
 \label{fig:window}
 \end{figure}
 

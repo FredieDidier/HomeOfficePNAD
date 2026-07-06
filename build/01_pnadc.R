@@ -57,7 +57,7 @@
 #   ourselves, one quarter at a time, via PNADcIBGE::get_pnadc() directly. Right
 #   after each quarter is downloaded and cleaned with datazoom.social's own
 #   (internal) treat_pnadc(), we do two things load_pnadc() cannot do for us:
-#     1. Immediately drop every column except the ~35 raw + derived columns this
+#     1. Immediately drop every column except the ~38 raw + derived columns this
 #        project actually needs (see `raw_cols_needed` / `derived_cols_needed`
 #        below) — roughly a 6x reduction in memory per row.
 #     2. Immediately filter to V1014 == the target panel group for this
@@ -214,7 +214,7 @@ download_pnadc_panels <- function() {
           df <- df[!is.na(df$V1014) & df$V1014 == spec$v1014, , drop = FALSE]
         }
 
-        # Prune to only the columns this project needs (~35 instead of ~210) —
+        # Prune to only the columns this project needs (~38 instead of ~210) —
         # the actual fix for the RAM crash, since get_pnadc()'s `vars` argument
         # cannot restrict the download itself (see header comment).
         keep_cols <- intersect(names(df), c(raw_cols_needed, derived_cols_needed,
@@ -311,7 +311,10 @@ download_pnadc_panels <- function() {
 #   year_quarter          : numeric time ID, e.g. 20221 = Q1 2022
 #   has_child_u4[_no_gc|_no_sc] : child ≤4 flags (main + robustness variants)
 #   has_child_5_7[_no_gc|_no_sc]: child 5-7 flags (donut DiD control)
-#   age_youngest_child    : age of youngest qualifying child
+#   age_youngest_child    : age of youngest qualifying child (completed years)
+#   age_youngest_child_months_any : precise age (months) of the youngest child of
+#                           any age, from birth month/year at the quarter midpoint
+#                           — powers the exact-birthdate age-cutoff robustness
 #   potential_telework    : occupation eligible for telework (Góes et al. 2020)
 #   treated               : = has_child_u4 (DiD treatment indicator)
 #   post_mp               : = 1 if year_quarter >= 20222 (Q2 2022+, main spec)
@@ -320,6 +323,8 @@ download_pnadc_panels <- function() {
 #   treat_x_post_alt      : treated × post_mp_alt (robustness DiD interaction)
 #   on_maternity_leave    : = 1 if V4006A == 2 (proxy for recent birth)
 #   is_head_or_spouse     : = 1 if V2005 ∈ {1,2,3}
+#   single_mother         : = 1 if female household head (V2005 == 1) with no
+#                           co-resident spouse/partner — lone-mother moderator
 # =============================================================================
 build_main_data <- function() {
   dir.create(OUTPUT_PATH, showWarnings = FALSE, recursive = TRUE)
@@ -364,8 +369,25 @@ build_main_data <- function() {
     # to child flags from a DIFFERENT household in another panel that happened to
     # share the same id_dom in the same quarter, duplicating rows and assigning
     # false treatment flags.
-    tmp <- tmp[, .(id_dom, V1014, Ano, Trimestre, V2009, V2005)]
+    tmp <- tmp[, .(id_dom, V1014, Ano, Trimestre, V2009, V2005, V20081, V20082)]
     tmp[, year_quarter := Ano * 10L + Trimestre]
+
+    # Precise child age in MONTHS, evaluated at the quarter midpoint. The exact
+    # interview date is unobserved (only Year x Quarter is known), so we anchor
+    # age at the middle month of the reference quarter: Q1->Feb, Q2->May,
+    # Q3->Aug, Q4->Nov. Uses the child's month+year of birth (V20081/V20082); the
+    # day of birth (V2008) is deliberately NOT used, because within-quarter
+    # interview timing is unknown and day-level precision would be spurious.
+    # Children with a missing/implausible birth month or year (or a negative
+    # implied age) get NA and drop out of the youngest-child min below. This
+    # feeds the exact-birthdate age-cutoff robustness in
+    # analysis/code/06_robustness.R; the main treatment still uses completed-year
+    # age (V2009), which is available for every child (see build header).
+    mid_month <- c(2L, 5L, 8L, 11L)
+    tmp[, child_age_months := as.integer((Ano * 12L + mid_month[Trimestre]) -
+                                         (V20082 * 12L + V20081))]
+    tmp[is.na(V20081) | is.na(V20082) | V20081 < 1L | V20081 > 12L |
+        child_age_months < 0L, child_age_months := NA_integer_]
 
     # Children ≤4 (all child types: biological + stepchildren + grandchildren+)
     ch_all <- tmp[V2009 <= 4L & V2005 %in% child_positions_all,
@@ -409,6 +431,23 @@ build_main_data <- function() {
                   .(age_youngest_child_any = min(V2009, na.rm = TRUE)),
                   by = .(id_dom, V1014, year_quarter)]
 
+    # Youngest child of ANY age, PRECISE (months from birth dates). Continuous,
+    # so a robustness check can slide the eligibility ceiling across the statutory
+    # 4-year boundary (e.g. 48, 49, 51, 53, 60 months) instead of being stuck at
+    # whole-year V2009 buckets. It tracks the SAME child as age_youngest_child_any
+    # (the youngest by completed years V2009) and returns that child's own precise
+    # age: within the youngest completed-year cohort it takes the smallest precise
+    # age, and is NA when none of those children has a usable birth date. This
+    # avoids borrowing an older sibling's birth date when the true youngest child's
+    # date is missing — such households simply drop out of the robustness.
+    ch_any_m <- tmp[V2005 %in% child_positions_all,
+                    {
+                      cand <- child_age_months[V2009 == min(V2009)]
+                      .(age_youngest_child_months_any =
+                          if (all(is.na(cand))) NA_integer_ else as.integer(min(cand, na.rm = TRUE)))
+                    },
+                    by = .(id_dom, V1014, year_quarter)]
+
     lu_key <- c("id_dom", "V1014", "year_quarter")
     hh_lu <- merge(ch_all,      ch_no_gc,    by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_no_sc,    by = lu_key, all = TRUE)
@@ -416,9 +455,10 @@ build_main_data <- function() {
     hh_lu <- merge(hh_lu,       ch_5_7_no_gc, by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_5_7_no_sc, by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_any,       by = lu_key, all = TRUE)
+    hh_lu <- merge(hh_lu,       ch_any_m,     by = lu_key, all = TRUE)
 
     hh_lookup_list[[i]] <- hh_lu
-    rm(tmp, ch_all, ch_no_gc, ch_no_sc, ch_5_7, ch_5_7_no_gc, ch_5_7_no_sc, ch_any, hh_lu); gc()
+    rm(tmp, ch_all, ch_no_gc, ch_no_sc, ch_5_7, ch_5_7_no_gc, ch_5_7_no_sc, ch_any, ch_any_m, hh_lu); gc()
   }
 
   hh_lookup <- rbindlist(hh_lookup_list, fill = TRUE)
@@ -450,17 +490,26 @@ build_main_data <- function() {
     if ("rendimento_habitual_real" %in% names(tmp)) {
       setnames(tmp, "rendimento_habitual_real", "earnings_habitual_real")
     }
+    tmp[, year_quarter := Ano * 10L + Trimestre]
+
+    # Household spouse/partner presence over the FULL roster (all ages), for the
+    # single-mother (lone female head) moderator. Must be computed BEFORE the
+    # 18-49 age filter below, because a co-resident partner may fall outside that
+    # range. Keyed on the composite (id_dom, V1014, year_quarter), like hh_lookup.
+    sp_lookup <- tmp[, .(spouse_present_hh = as.integer(any(V2005 %in% c(2L, 3L)))),
+                     by = .(id_dom, V1014, year_quarter)]
 
     # Filter to adults 18-49 from 2018 onwards (V4022/home_office only from Q1
     # 2018). BOTH sexes are kept: women are the analysis sample (filter
     # female == 1), men are the additional control dimension for the
     # triple-difference (DDD) and the men placebo. `female` is added below.
     tmp <- tmp[V2007 %in% c(1L, 2L) & V2009 >= 18L & V2009 <= 49L & Ano >= 2018L]
-    tmp[, year_quarter := Ano * 10L + Trimestre]
 
     # Merge on the composite key (id_dom, V1014, year_quarter) — see the Pass-1
     # comment for why V1014 is required to avoid cross-panel contamination.
     tmp <- merge(tmp, hh_lookup, by = c("id_dom", "V1014", "year_quarter"), all.x = TRUE)
+    tmp <- merge(tmp, sp_lookup, by = c("id_dom", "V1014", "year_quarter"), all.x = TRUE)
+    rm(sp_lookup)
 
     # Fill NA (household not in lookup = no qualifying child in household)
     flag_vars <- c("has_child_u4_hh", "has_child_u4_no_gc_hh", "has_child_u4_no_sc_hh",
@@ -566,6 +615,17 @@ build_main_data <- function() {
   # as the third difference in the DDD and as the placebo group.
   dt[, female := as.integer(V2007 == 2L)]
 
+  # --- Single (lone) mother moderator ---
+  # PNADC's quarterly module carries no marital-status variable, so a single
+  # mother is defined structurally: a female household head (V2005 == 1) with no
+  # co-resident spouse or partner (no household member with V2005 in {2,3},
+  # captured by spouse_present_hh over the full roster). Within the analysis
+  # sample, which conditions on the presence of a young child, this is exactly
+  # the lone-mother group (a mother with no co-resident partner). Used only as a
+  # baseline heterogeneity moderator (05_heterogeneity.R), never as a restriction.
+  dt[is.na(spouse_present_hh), spouse_present_hh := 0L]
+  dt[, single_mother := as.integer(female == 1L & V2005 == 1L & spouse_present_hh == 0L)]
+
   # --- Completed higher education (interpretable education split) ---
   # VD3004 == 7 = "Superior completo". Cleaner binary than faixa_educ for the
   # heterogeneity split (higher-education-complete vs. not).
@@ -613,6 +673,8 @@ build_main_data <- function() {
     "Ano", "Trimestre", "year_quarter", "V1016",
     # Survey design
     "UF", "UPA", "V1008", "V1014", "V1028", "posest",
+    # Day, month and year of birth
+    "V2008", "V20081", "V20082",
     # Demographics (raw)
     "V2007", "V2009", "V2010", "V2005", "V1022", "female",
     # Demographics (datazoom-derived)
@@ -638,11 +700,11 @@ build_main_data <- function() {
     # Maternity leave proxy
     "V4006A", "on_maternity_leave",
     # Household composition & treatment variables
-    "is_head_or_spouse",
+    "is_head_or_spouse", "single_mother",
     "has_child_u4", "has_child_u4_no_gc", "has_child_u4_no_sc",
     "has_child_5_7", "has_child_5_7_no_gc", "has_child_5_7_no_sc",
     "age_youngest_child", "age_youngest_child_no_gc", "age_youngest_child_no_sc",
-    "age_youngest_child_any",
+    "age_youngest_child_any", "age_youngest_child_months_any",
     "potential_telework",
     "treated", "post_mp", "post_mp_alt",
     "treat_x_post", "treat_x_post_alt"

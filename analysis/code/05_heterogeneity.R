@@ -33,6 +33,7 @@ dt[, he_base     := as.integer(higher_educ[1] == 1), by = id_panel]
 dt[, age_base    := V2009[1],                        by = id_panel]
 dt[, age_band := fcase(age_base <= 29, "Age 18--29", age_base <= 39, "Age 30--39", default = "Age 40--49")]
 dt[, race_base := as.integer(V2010[1] %in% c(1L, 3L)), by = id_panel]  # white = branca(1)+amarela(3); non-white = preta/parda/indigena
+dt[, sm_base   := as.integer(single_mother[1] == 1), by = id_panel]    # baseline single (lone) mother: female head, no co-resident partner
 
 A <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
 
@@ -58,6 +59,13 @@ rows <- rbindlist(list(
   did_row(A[he_base == 0],                "Without higher education"),
   did_row(A[race_base == 1],              "White"),
   did_row(A[race_base == 0],              "Non-white"),
+  did_row(A[sm_base == 1],                "Single mother"),
+  did_row(A[sm_base == 0],                "Partnered mother"),
+  # Decomposition of the single-mother cell by contract type (channel check: the
+  # statute binds only CLT). NOT added to het_subs, so NOT in the Holm family;
+  # placed next to the single-mother rows so they sit together in the coefplot.
+  did_row(A[sm_base == 1 & clt_base == 1], "Single mother, CLT"),
+  did_row(A[sm_base == 1 & clt_base == 0], "Single mother, non-CLT"),
   did_row(A[age_band == "Age 18--29"],    "Age 18--29"),
   did_row(A[age_band == "Age 30--39"],    "Age 30--39"),
   did_row(A[age_band == "Age 40--49"],    "Age 40--49")
@@ -70,47 +78,67 @@ rows[, ci_lo := est - 1.96 * se][, ci_hi := est + 1.96 * se]
 het_subs <- c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT",
               "Private employee", "Public employee", "With higher education",
               "Without higher education", "White", "Non-white",
+              "Single mother", "Partnered mother",
               "Age 18--29", "Age 30--39", "Age 40--49")
 pv <- setNames(rows[match(het_subs, label), p], het_subs)
 K_tests <- length(pv)
 holm_p <- p.adjust(pv, method = "holm")   # Holm (1979) step-down FWER control
 holm_min <- min(holm_p)
-mt_note <- sprintf("The Holm $p$ is the Holm step-down adjustment for testing the %d subgroups, which controls the family-wise error rate under arbitrary dependence across the tests; a value of $1.00$ marks a subgroup far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $%.2f$, for women aged 40--49.", K_tests, holm_min)
+holm_min_lab <- gsub("--", "--", names(holm_p)[which.min(holm_p)])  # subgroup with the smallest adjusted p
+mt_note <- sprintf("The Holm $p$ is the Holm step-down adjustment for testing the %d subgroups, which controls the family-wise error rate under arbitrary dependence across the tests; a value of $1.00$ marks a subgroup far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $%.2f$ (the ``%s'' subgroup).", K_tests, holm_min, holm_min_lab)
 
-# ---- Table 6 (two-line journal format: estimate; (se) below) ----------------
-fmt <- function(x) formatC(x, format = "f", digits = 2)
+# ---- Table 6 (compact one-line format: estimate followed by (se) inline, to
+# keep all subgroups on a single page) ----------------------------------------
+fmt <- function(x) sub("^-(0\\.?0*)$", "\\1", formatC(x, format = "f", digits = 2))  # strip signed zero
+# Standard subgroups: estimate (se), raw p, Holm p, obs.
 grp <- function(title, labs) {
   s <- rows[label %in% labs][match(labs, label)]
   c(sprintf("\\multicolumn{5}{l}{\\textit{%s}} \\\\", title),
-    unlist(lapply(seq_len(nrow(s)), function(i) {
+    sapply(seq_len(nrow(s)), function(i) {
       r <- s[i]
-      padj <- holm_p[r$label]
-      c(sprintf("$\\quad$ %s & %s$^{%s}$ & %s & %s & %s \\\\", r$label, fmt(r$est), r$star,
-                formatC(r$p, format = "f", digits = 3), formatC(padj, format = "f", digits = 2),
-                formatC(r$n, big.mark = ",", format = "d")),
-        sprintf(" & (%s) & & & \\\\", fmt(r$se)))
-    })))
+      sprintf("$\\quad$ %s & %s$^{%s}$ (%s) & %s & %s & %s \\\\",
+              r$label, fmt(r$est), r$star, fmt(r$se),
+              formatC(r$p, format = "f", digits = 3),
+              formatC(holm_p[r$label], format = "f", digits = 2),
+              formatC(r$n, big.mark = ",", format = "d"))
+    }))
+}
+# Decomposition rows (single-mother by contract type): a channel check, not part
+# of the Holm multiple-testing family, so the Holm-$p$ column shows a dash.
+grp_decomp <- function(title, labs) {
+  s <- rows[label %in% labs][match(labs, label)]
+  c(sprintf("\\multicolumn{5}{l}{\\textit{%s}} \\\\", title),
+    sapply(seq_len(nrow(s)), function(i) {
+      r <- s[i]
+      sprintf("$\\quad$ %s & %s$^{%s}$ (%s) & %s & --- & %s \\\\",
+              r$label, fmt(r$est), r$star, fmt(r$se),
+              formatC(r$p, format = "f", digits = 3),
+              formatC(r$n, big.mark = ",", format = "d"))
+    }))
 }
 tab <- c("\\begin{table}[H]\\centering",
   "\\caption{Heterogeneity of the First-Stage Home-Office Effect}",
   "\\label{tab:heterogeneity}\\small",
+  "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{%",
   "\\begin{tabular}{lcccc}", "\\toprule",
-  " & Treated $\\times$ Post & $p$-value & Holm $p$ & Obs. \\\\", "\\midrule",
+  " & Treated $\\times$ Post (se) & $p$-value & Holm $p$ & Obs. \\\\", "\\midrule",
   grp("By formality",
       c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT")), "\\midrule",
   grp("By sector", c("Private employee", "Public employee")), "\\midrule",
   grp("By education", c("With higher education", "Without higher education")), "\\midrule",
   grp("By race", c("White", "Non-white")), "\\midrule",
+  grp("By household structure", c("Single mother", "Partnered mother")), "\\midrule",
+  grp_decomp("Single mothers, by contract type", c("Single mother, CLT", "Single mother, non-CLT")), "\\midrule",
   grp("By age band", c("Age 18--29", "Age 30--39", "Age 40--49")),
-  "\\bottomrule\\end{tabular}",
-  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression estimating ", EQ_REF, " (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control~A), for the subgroup indicated. Subgroups are defined at baseline (first observed quarter)."), WEIGHT_NOTE, CLUSTER_NOTE, mt_note, SIGNIF_NOTE),
+  "\\bottomrule\\end{tabular}}",
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression estimating ", EQ_REF, " (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control~A), for the subgroup indicated; standard errors in parentheses next to the estimate. Subgroups are defined at baseline (first observed quarter); the ``Single mothers, by contract type'' rows decompose the single-mother cell and are not part of the Holm family (dash in the Holm-$p$ column)."), WEIGHT_NOTE, CLUSTER_NOTE, mt_note, SIGNIF_NOTE),
   "\\end{table}")
 writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
 
 # ---- Figure 3 (fig07) — coefficient plot -----------------------------------
 # ggplot renders labels verbatim, so convert the LaTeX en-dash "--" in the age
 # bands to a plain ASCII hyphen for the axis (CLAUDE.md: ASCII-only in ggplot).
-rows_fig <- rows[!is.na(est)]
+rows_fig <- rows[!is.na(est)]  # includes the single-mother CLT/non-CLT decomposition rows
 rows_fig[, label := gsub("--", "-", label)]
 rows_fig[, label := factor(label, levels = rev(label))]
 fig <- ggplot(rows_fig, aes(x = est, y = label)) +
@@ -126,4 +154,14 @@ ggsave(file.path(GRAPH_DIR, "fig07_heterogeneity_coefplot.png"), fig, width = 8,
 
 cat("\n=== First-stage home office by subgroup (pp) ===\n")
 print(rows[, .(label, est = round(est, 2), se = round(se, 2), star, n = formatC(n, big.mark = ",", format = "d"))])
+
+# Single-mother x CLT decomposition (now shown at the bottom of Table 6). The
+# raw-significant negative single-mother coefficient is concentrated among
+# single mothers OUTSIDE the CLT (the group the statute cannot reach) and is null
+# among the registered private-sector (CLT) single mothers it does bind, so it
+# cannot be a response to the law.
+cat("\n=== Single-mother x CLT decomposition (first stage, pp) ===\n")
+print(rows[grepl("^Single mother", label),
+           .(label, est = round(est, 2), se = round(se, 2), star, p = round(p, 3),
+             n = formatC(n, big.mark = ",", format = "d"))])
 message("\n=== 05_heterogeneity.R complete ===")

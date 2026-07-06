@@ -35,7 +35,7 @@ setorder(dt, id_panel, year_quarter)
 dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
 
 star <- function(p) ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.1, "*", "")))
-fmt  <- function(x, d = 2) formatC(x, format = "f", digits = d)
+fmt  <- function(x, d = 2) sub("^-(0\\.?0*)$", "\\1", formatC(x, format = "f", digits = d))  # strip signed zero
 fmt0 <- function(x) formatC(x, format = "d", big.mark = ",")
 
 # Generic first-stage DiD. `sample` must already contain `tr` (0/1 treated) and
@@ -106,22 +106,56 @@ timing <- rbindlist(Map(function(v, lbl)
   c("trxp_early", "trxp_late"),
   c("Early post (2022--2023)", "Late post (2024--2026)")))
 
+# ---- Exact-birthdate treatment ceiling --------------------------------------
+# Robustness to how sharply the statutory "up to 4 years of age" boundary is
+# drawn. The main treatment uses completed-year age (V2009 <= 4 = exact age <5),
+# which cannot resolve where a completed-age-4 child sits relative to the true
+# cutoff. Here treatment is defined from the youngest child's PRECISE age in
+# months (age_youngest_child_months_any, from birth month/year at the quarter
+# midpoint), so the eligibility ceiling can slide across the 4-year boundary.
+# Control is held fixed at Control A (youngest child 5-7 = [60, 96) months) so
+# that ONLY the treated ceiling moves. A ceiling of 60 months (exact age <5)
+# reproduces the completed-year main definition; ceilings below 60 impose a
+# "donut" dropping children between the ceiling and age 5 from both groups, which
+# directly addresses the concern that some completed-age-4 children just under 5
+# could sit above the intended statutory cutoff. A 48-month ceiling is the strict
+# "until the 4th birthday" reading. Coverage: ~7% of under-4 children lack a
+# usable birth date and drop out of these rows (they remain in the main spec).
+mk_prec <- function(C_months, post_col = "post_mp") {
+  s <- dt[(!is.na(age_youngest_child_months_any) & age_youngest_child_months_any < C_months) |
+          (age_youngest_child_months_any >= 60 & age_youngest_child_months_any < 96)]
+  s[, tr := as.integer(age_youngest_child_months_any < C_months)]
+  s[, trxp := tr * get(post_col)]
+  s[]
+}
+prec_cuts <- data.table(
+  C   = c(48L, 49L, 51L, 53L, 60L),
+  lab = c("Ceiling 48 months (until 4th birthday)", "Ceiling 49 months (4y1m)",
+          "Ceiling 51 months (4y3m)", "Ceiling 53 months (4y5m)",
+          "Ceiling 60 months (exact age $<5$; = main)"))
+prec_rows <- rbindlist(lapply(seq_len(nrow(prec_cuts)),
+  function(i) fs(mk_prec(prec_cuts$C[i]), prec_cuts$lab[i])))
+
 # =============================================================================
-# Table A (first stage) + earnings (two-line journal format: estimate; (se) below)
+# Table A (first stage) + earnings (compact one-line format: estimate followed by
+# (se) inline, so the many rows fit on a single page)
 # =============================================================================
-row_tex <- function(r, d = 2) c(
-  sprintf("%s & %s$^{%s}$ & %s \\\\", r$label, fmt(r$est, d), r$star, fmt0(r$n)),
-  sprintf(" & (%s) & \\\\", fmt(r$se, d)))
+row_tex <- function(r, d = 2)
+  sprintf("%s & %s$^{%s}$ (%s) & %s \\\\", r$label, fmt(r$est, d), r$star, fmt(r$se, d), fmt0(r$n))
 tab <- c(
   "\\begin{table}[H]\\centering",
   "\\caption{Robustness of the First-Stage Home-Office Effect}",
   "\\label{tab:robustness}\\small",
+  "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{%",
   "\\begin{tabular}{lcc}",
   "\\toprule",
-  " & Treated $\\times$ Post & Obs. \\\\",
+  " & Treated $\\times$ Post (se) & Obs. \\\\",
   "\\midrule",
   "\\multicolumn{3}{l}{\\textit{Home office (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(rows)), function(i) row_tex(rows[i]))),
+  "\\midrule",
+  "\\multicolumn{3}{l}{\\textit{Home office, by exact-birthdate treatment ceiling (pp)}} \\\\",
+  unlist(lapply(seq_len(nrow(prec_rows)), function(i) row_tex(prec_rows[i]))),
   "\\midrule",
   "\\multicolumn{3}{l}{\\textit{Home office, by post-reform timing (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(timing)), function(i) row_tex(timing[i]))),
@@ -129,8 +163,8 @@ tab <- c(
   "\\multicolumn{3}{l}{\\textit{Log real earnings}} \\\\",
   row_tex(inc_log, 3),
   row_tex(inc_logw, 3),
-  "\\bottomrule\\end{tabular}",
-  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression estimating ", EQ_REF, " on the preferred sample (treated vs.\\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The two post-reform-timing rows come from a single regression that splits Treated $\\times$ Post into a 2022--2023 and a 2024--2026 window. ", WEIGHT_NOTE), "Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum).", SIGNIF_NOTE),
+  "\\bottomrule\\end{tabular}}",
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression estimating ", EQ_REF, " on the preferred sample (treated vs.\\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The exact-birthdate rows redefine treatment from the youngest child's precise age in months (computed from the reported month and year of birth, anchored at the quarter midpoint since the exact interview date is unobserved), sliding the eligibility ceiling across the statutory four-year boundary while holding the comparison group fixed at Control~A; a ceiling of 60 months reproduces the main completed-year definition, and lower ceilings drop children between the ceiling and age five from both groups. The two post-reform-timing rows come from a single regression that splits Treated $\\times$ Post into a 2022--2023 and a 2024--2026 window. ", WEIGHT_NOTE), "Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum).", SIGNIF_NOTE),
   "\\end{table}"
 )
 writeLines(tab, file.path(TABLE_DIR, "tab07_robustness.tex"))
@@ -138,7 +172,9 @@ writeLines(tab, file.path(TABLE_DIR, "tab07_robustness.tex"))
 # =============================================================================
 # Figure A5 (fig08) — control-window sweep, first stage
 # =============================================================================
-win <- rbindlist(lapply(6:12, function(K) {
+# K starts at 5 (control = youngest child aged 5 only, the tightest age-threshold
+# match) and widens to 5-12.
+win <- rbindlist(lapply(5:12, function(K) {
   s <- dt[has_child_u4 == 1 | (age_youngest_child_any >= 5 & age_youngest_child_any <= K)]
   s[, tr := as.integer(has_child_u4 == 1)][, trxp := tr * post_mp]
   fs(s, sprintf("5-%d", K))
@@ -158,6 +194,8 @@ ggsave(file.path(GRAPH_DIR, "fig08_control_window_sweep.png"), figw, width = 7.5
 
 cat("\n=== First-stage robustness (home office, pp) ===\n")
 print(rows[, .(label = gsub("\\\\", "", label), est = round(est, 2), se = round(se, 2), star, n = fmt0(n))])
+cat("\n=== Exact-birthdate treatment ceiling (home office, pp) ===\n")
+print(prec_rows[, .(label = gsub("\\$|\\\\", "", label), est = round(est, 2), se = round(se, 2), star, n = fmt0(n))])
 cat("\n=== Post-reform timing (home office, pp; 95% CI) ===\n")
 print(timing[, .(label = gsub("--", "-", label), est = round(est, 2), se = round(se, 2), star,
                  ci_lo = round(est - 1.96 * se, 2), ci_hi = round(est + 1.96 * se, 2))])

@@ -126,4 +126,29 @@ pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "in_lab
 pretrend_test(dt$has_child_5_7 == 1 & dt$has_child_u4 == 0, "Control A", "on_maternity_leave")
 pretrend_test(dt$has_child_u4 == 0 & dt$has_child_5_7 == 0, "Control B", "on_maternity_leave")
 
+# Single-mother subgroup: the pooled first-stage DiD for single mothers is
+# raw-significant and negative. Check whether that reflects a differential
+# pre-trend. It does not -- pre-trends are flat -- so the negative is not a trend
+# artifact (it is instead concentrated among non-CLT single mothers the law
+# cannot reach; see 05_heterogeneity.R -- and it dies under the Holm correction).
+setorder(dt, id_panel, year_quarter)
+dt[, sm_base := as.integer(single_mother[1] == 1), by = id_panel]
+pretrend_sub <- function(flag, label, yvar = "home_office") {
+  d <- dt[flag & (has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0))]
+  d[, treated := as.integer(has_child_u4 == 1)]
+  m <- feols(as.formula(sprintf("%s ~ i(year_quarter, treated, ref = %d) | id_panel + year_quarter",
+                                yvar, REF_QUARTER)),
+             data = d, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
+  b <- coef(m); V <- vcov(m)
+  pre <- grep("year_quarter::20(18|19|20|21)[1-4]:treated", names(b), value = TRUE)
+  bb <- b[pre]; VV <- V[pre, pre]
+  chi2 <- as.numeric(t(bb) %*% solve(VV) %*% bb)
+  k <- length(pre); p <- pchisq(chi2, df = k, lower.tail = FALSE)
+  cat(sprintf("Pre-trend joint test [%s, %s]: chi2(%d) = %.2f, p = %.3f\n",
+              label, yvar, k, chi2, p))
+}
+cat("\n=== Pre-trend joint tests, single-mother subgroups (Control A, home office) ===\n")
+pretrend_sub(dt$sm_base == 1, "Single mothers")
+pretrend_sub(dt$sm_base == 0, "Partnered mothers")
+
 message("\n=== 02_event_study.R complete ===")
