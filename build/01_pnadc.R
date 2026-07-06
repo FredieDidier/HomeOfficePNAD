@@ -300,17 +300,18 @@ download_pnadc_panels <- function() {
 #   18 = domestic worker
 #   19 = domestic worker's relative
 #
-# Child-presence variables (three combinations):
+# Child-presence variables (four combinations):
 #   has_child_u4          : V2005 ∈ {4,5,6,10,11} — main treatment (children, stepchildren, grandchildren+)
 #   has_child_u4_no_gc    : V2005 ∈ {4,5,6}        — robustness: excludes grandchildren/great-grandchildren
 #   has_child_u4_no_sc    : V2005 ∈ {4,5,10,11}    — robustness: excludes stepchildren
+#   has_child_u4_no_gc_sc : V2005 ∈ {4,5}          — robustness: excludes both grandchildren/great-grandchildren AND stepchildren (biological children only)
 #   has_child_5_7         : same V2005 sets, age 5-7 — donut DiD control A
-#   has_child_5_7_no_gc / has_child_5_7_no_sc : robustness variants of control A
+#   has_child_5_7_no_gc / has_child_5_7_no_sc / has_child_5_7_no_gc_sc : robustness variants of control A
 #
 # Key variables added here:
 #   year_quarter          : numeric time ID, e.g. 20221 = Q1 2022
-#   has_child_u4[_no_gc|_no_sc] : child ≤4 flags (main + robustness variants)
-#   has_child_5_7[_no_gc|_no_sc]: child 5-7 flags (donut DiD control)
+#   has_child_u4[_no_gc|_no_sc|_no_gc_sc] : child ≤4 flags (main + robustness variants)
+#   has_child_5_7[_no_gc|_no_sc|_no_gc_sc]: child 5-7 flags (donut DiD control)
 #   age_youngest_child    : age of youngest qualifying child (completed years)
 #   age_youngest_child_months_any : precise age (months) of the youngest child of
 #                           any age, from birth month/year at the quarter midpoint
@@ -339,9 +340,10 @@ build_main_data <- function() {
                   length(panel_files)))
 
   # V2005 position-in-household codes for children (see header comment above)
-  child_positions_all   <- c(4L, 5L, 6L, 10L, 11L)  # children + stepchildren + grandchildren/great-grandchildren
-  child_positions_no_gc <- c(4L, 5L, 6L)             # excludes grandchildren/great-grandchildren (no V2005 ∈ {10,11})
-  child_positions_no_sc <- c(4L, 5L, 10L, 11L)       # excludes stepchildren (no V2005 = 6)
+  child_positions_all      <- c(4L, 5L, 6L, 10L, 11L)  # children + stepchildren + grandchildren/great-grandchildren
+  child_positions_no_gc    <- c(4L, 5L, 6L)             # excludes grandchildren/great-grandchildren (no V2005 ∈ {10,11})
+  child_positions_no_sc    <- c(4L, 5L, 10L, 11L)       # excludes stepchildren (no V2005 = 6)
+  child_positions_no_gc_sc <- c(4L, 5L)                 # excludes both grandchildren/great-grandchildren and stepchildren (biological children only)
 
   # Two-pass approach (avoids loading all panels simultaneously):
   # Pass 1 — extract household-level child flags from FULL data (all ages).
@@ -407,6 +409,12 @@ build_main_data <- function() {
                       age_youngest_child_no_sc     = min(V2009, na.rm = TRUE)),
                     by = .(id_dom, V1014, year_quarter)]
 
+    # Children ≤4 (excluding both grandchildren/great-grandchildren and stepchildren)
+    ch_no_gc_sc <- tmp[V2009 <= 4L & V2005 %in% child_positions_no_gc_sc,
+                       .(has_child_u4_no_gc_sc_hh     = 1L,
+                         age_youngest_child_no_gc_sc  = min(V2009, na.rm = TRUE)),
+                       by = .(id_dom, V1014, year_quarter)]
+
     # Children 5-7 (all child types — donut DiD Control A)
     ch_5_7 <- tmp[V2009 >= 5L & V2009 <= 7L & V2005 %in% child_positions_all,
                   .(has_child_5_7_hh = 1L),
@@ -421,6 +429,11 @@ build_main_data <- function() {
     ch_5_7_no_sc <- tmp[V2009 >= 5L & V2009 <= 7L & V2005 %in% child_positions_no_sc,
                         .(has_child_5_7_no_sc_hh = 1L),
                         by = .(id_dom, V1014, year_quarter)]
+
+    # Children 5-7 (excluding both grandchildren/great-grandchildren and stepchildren)
+    ch_5_7_no_gc_sc <- tmp[V2009 >= 5L & V2009 <= 7L & V2005 %in% child_positions_no_gc_sc,
+                           .(has_child_5_7_no_gc_sc_hh = 1L),
+                           by = .(id_dom, V1014, year_quarter)]
 
     # Youngest child of ANY age (all child types). Flexible variable that
     # subsumes all group definitions: treated == (age_youngest_child_any <= 4);
@@ -451,14 +464,16 @@ build_main_data <- function() {
     lu_key <- c("id_dom", "V1014", "year_quarter")
     hh_lu <- merge(ch_all,      ch_no_gc,    by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_no_sc,    by = lu_key, all = TRUE)
+    hh_lu <- merge(hh_lu,       ch_no_gc_sc, by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_5_7,      by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_5_7_no_gc, by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_5_7_no_sc, by = lu_key, all = TRUE)
+    hh_lu <- merge(hh_lu,       ch_5_7_no_gc_sc, by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_any,       by = lu_key, all = TRUE)
     hh_lu <- merge(hh_lu,       ch_any_m,     by = lu_key, all = TRUE)
 
     hh_lookup_list[[i]] <- hh_lu
-    rm(tmp, ch_all, ch_no_gc, ch_no_sc, ch_5_7, ch_5_7_no_gc, ch_5_7_no_sc, ch_any, ch_any_m, hh_lu); gc()
+    rm(tmp, ch_all, ch_no_gc, ch_no_sc, ch_no_gc_sc, ch_5_7, ch_5_7_no_gc, ch_5_7_no_sc, ch_5_7_no_gc_sc, ch_any, ch_any_m, hh_lu); gc()
   }
 
   hh_lookup <- rbindlist(hh_lookup_list, fill = TRUE)
@@ -466,7 +481,7 @@ build_main_data <- function() {
 
   # Replace Inf (from min() on empty sets) with NA
   for (v in c("age_youngest_child", "age_youngest_child_no_gc", "age_youngest_child_no_sc",
-              "age_youngest_child_any")) {
+              "age_youngest_child_no_gc_sc", "age_youngest_child_any")) {
     if (v %in% names(hh_lookup))
       hh_lookup[is.infinite(get(v)), (v) := NA_real_]
   }
@@ -512,8 +527,8 @@ build_main_data <- function() {
     rm(sp_lookup)
 
     # Fill NA (household not in lookup = no qualifying child in household)
-    flag_vars <- c("has_child_u4_hh", "has_child_u4_no_gc_hh", "has_child_u4_no_sc_hh",
-                   "has_child_5_7_hh", "has_child_5_7_no_gc_hh", "has_child_5_7_no_sc_hh")
+    flag_vars <- c("has_child_u4_hh", "has_child_u4_no_gc_hh", "has_child_u4_no_sc_hh", "has_child_u4_no_gc_sc_hh",
+                   "has_child_5_7_hh", "has_child_5_7_no_gc_hh", "has_child_5_7_no_sc_hh", "has_child_5_7_no_gc_sc_hh")
     for (v in flag_vars) {
       if (v %in% names(tmp)) tmp[is.na(get(v)), (v) := 0L]
     }
@@ -534,18 +549,21 @@ build_main_data <- function() {
   dt[, has_child_u4       := is_head_or_spouse * has_child_u4_hh]
   dt[, has_child_u4_no_gc := is_head_or_spouse * has_child_u4_no_gc_hh]
   dt[, has_child_u4_no_sc := is_head_or_spouse * has_child_u4_no_sc_hh]
+  dt[, has_child_u4_no_gc_sc := is_head_or_spouse * has_child_u4_no_gc_sc_hh]
   dt[, has_child_5_7       := is_head_or_spouse * has_child_5_7_hh]
   dt[, has_child_5_7_no_gc := is_head_or_spouse * has_child_5_7_no_gc_hh]
   dt[, has_child_5_7_no_sc := is_head_or_spouse * has_child_5_7_no_sc_hh]
+  dt[, has_child_5_7_no_gc_sc := is_head_or_spouse * has_child_5_7_no_gc_sc_hh]
 
   # Set youngest-child age to NA when the corresponding flag is 0
   dt[has_child_u4       == 0L, age_youngest_child       := NA_real_]
   dt[has_child_u4_no_gc == 0L, age_youngest_child_no_gc := NA_real_]
   dt[has_child_u4_no_sc == 0L, age_youngest_child_no_sc := NA_real_]
+  dt[has_child_u4_no_gc_sc == 0L, age_youngest_child_no_gc_sc := NA_real_]
 
   # Drop intermediary household-level flag columns
-  dt[, c("has_child_u4_hh", "has_child_u4_no_gc_hh", "has_child_u4_no_sc_hh",
-         "has_child_5_7_hh", "has_child_5_7_no_gc_hh", "has_child_5_7_no_sc_hh") := NULL]
+  dt[, c("has_child_u4_hh", "has_child_u4_no_gc_hh", "has_child_u4_no_sc_hh", "has_child_u4_no_gc_sc_hh",
+         "has_child_5_7_hh", "has_child_5_7_no_gc_hh", "has_child_5_7_no_sc_hh", "has_child_5_7_no_gc_sc_hh") := NULL]
 
   # --- Potential telework (occupation eligibility) ---
   # COD codes eligible for telework, following Góes et al. (2020) adapted for
@@ -701,9 +719,9 @@ build_main_data <- function() {
     "V4006A", "on_maternity_leave",
     # Household composition & treatment variables
     "is_head_or_spouse", "single_mother",
-    "has_child_u4", "has_child_u4_no_gc", "has_child_u4_no_sc",
-    "has_child_5_7", "has_child_5_7_no_gc", "has_child_5_7_no_sc",
-    "age_youngest_child", "age_youngest_child_no_gc", "age_youngest_child_no_sc",
+    "has_child_u4", "has_child_u4_no_gc", "has_child_u4_no_sc", "has_child_u4_no_gc_sc",
+    "has_child_5_7", "has_child_5_7_no_gc", "has_child_5_7_no_sc", "has_child_5_7_no_gc_sc",
+    "age_youngest_child", "age_youngest_child_no_gc", "age_youngest_child_no_sc", "age_youngest_child_no_gc_sc",
     "age_youngest_child_any", "age_youngest_child_months_any",
     "potential_telework",
     "treated", "post_mp", "post_mp_alt",

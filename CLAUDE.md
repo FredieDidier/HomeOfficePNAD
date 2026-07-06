@@ -109,8 +109,8 @@ Dropbox/HomeOfficePNAD/build/{input/Panel_6..13.RData, output/main_data.RData}
 | `formal` / `informal` | datazoom flags. `formal`=1 includes signed-card employees (private/domestic/public), military/statutory, AND INSS-contributing self-employed — broader than CLT. Employers (VD4009=8) are neither. | datazoom |
 | `clt_private` | = 1 if VD4009 == 1 (private-sector carteira-assinada = CLT). The **sharp "law binds here" group**; heterogeneity/placebo split only, never a restriction. | Derived |
 | `has_child_u4` | = 1 if head/spouse with child ≤4 (V2005 ∈ {4,5,6,10,11}: biological of head+spouse (4), of head (5), stepchild (6), grandchild (10), great-grandchild (11)). **Treatment.** | HH merge |
-| `has_child_u4_no_gc` / `_no_sc` | Excluding grandchildren/great-grandchildren (V2005 ∈ {4,5,6}) / excluding stepchildren (∈ {4,5,10,11}). Robustness. | HH merge |
-| `has_child_5_7` (+ `_no_gc`/`_no_sc`) | = 1 if head/spouse with youngest child 5–7. **Control A.** | HH merge |
+| `has_child_u4_no_gc` / `_no_sc` / `_no_gc_sc` | Excluding grandchildren/great-grandchildren (V2005 ∈ {4,5,6}) / excluding stepchildren (∈ {4,5,10,11}) / excluding both (∈ {4,5}, biological children only). Robustness. | HH merge |
+| `has_child_5_7` (+ `_no_gc`/`_no_sc`/`_no_gc_sc`) | = 1 if head/spouse with youngest child 5–7. **Control A.** | HH merge |
 | `age_youngest_child` / `_any` | Age (completed years) of youngest qualifying child ≤4 / of ANY age (subsumes all groups; powers control-window sweep). | HH merge |
 | `age_youngest_child_months_any` | Precise age **in months** of the youngest child of ANY age, from birth month/year (V20081/V20082) at the quarter midpoint. Continuous; powers the exact-birthdate treatment-ceiling sweep in `06_robustness.R`. NA (~7% of under-4 kids) when youngest child's DOB unusable. Robustness only — main spec uses completed-year age. | HH merge |
 | `potential_telework` | = 1 if V4010 ∈ 126 COD telework codes (Costa et al. 2024). Moderator/outcome only. | Derived from V4010 |
@@ -246,7 +246,7 @@ The argument, exhibit by exhibit in paper order. This is the "are we telling the
 ---
 
 ## Status / open items before submission
-The paper is essentially submission-ready: it compiles clean (38 pp, no undefined refs/cites) and every analysis is final. Keep this list current — delete items as they close.
+The paper is essentially submission-ready: it compiles clean (40 pp, no undefined refs/cites) and every analysis is final. Keep this list current — delete items as they close.
 - **Verify citation *content*** (in progress, Fredie): confirm each cited paper and each footnote actually supports the claim it is attached to — the *substance*, not just the bibliographic details. 
 - **Replication-data deposit (upon publication/acceptance):** deposit the pre-built `main_data.RData` on **Zenodo** (DOI), then paste the real link in **two** places — `README.md` Option A (which currently holds only a placeholder) and the paper's **data-availability statement** (which currently names only the GitHub *code* repo, not the dataset). Until then, users rebuild via Option B.
 - **Output-file renaming (deferred):** optionally rename table/figure files to match final exhibit numbers (e.g., `tab08b` → `tabD4`) — hold until the exhibit set is frozen (post first referee round), since position-encoded names are brittle to reordering.

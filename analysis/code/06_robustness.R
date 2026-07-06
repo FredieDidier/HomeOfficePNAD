@@ -7,9 +7,9 @@
 # single specification choice.
 #
 #   - Alternative post-MP cutoff (Q1 2022)
-#   - Treatment variants (exclude grandchildren / stepchildren)
+#   - Treatment variants (exclude grandchildren / stepchildren / both)
 #   - COVID window (drop 2020-2021)
-#   - State x quarter fixed effects; two-way (household, PSU) clustering
+#   - State x year-quarter fixed effects; two-way (household, PSU) clustering
 #   - Telework-eligible-only sample (baseline)
 #   - Log real earnings, raw and winsorized at the top 1%
 #   - Control-window sweep (5-6 ... 5-12) coefplot
@@ -72,8 +72,9 @@ rows <- rbindlist(list(
   fs(mk("has_child_u4", "has_child_5_7", "post_mp_alt"),  "Alternative cutoff (2022Q1 post)"),
   fs(mk("has_child_u4_no_gc", "has_child_5_7_no_gc"),     "Treated, excluding grandchildren"),
   fs(mk("has_child_u4_no_sc", "has_child_5_7_no_sc"),     "Treated, excluding stepchildren"),
+  fs(mk("has_child_u4_no_gc_sc", "has_child_5_7_no_gc_sc"), "Treated, excluding grandchildren and stepchildren"),
   fs(A_main[!(year_quarter %/% 10L %in% c(2020L, 2021L))],"Excluding 2020--2021 (COVID)"),
-  fs(A_main, "State $\\times$ quarter fixed effects", fes = "id_panel + sigla_uf^year_quarter"),
+  fs(A_main, "State $\\times$ year-quarter fixed effects", fes = "id_panel + sigla_uf^year_quarter"),
   fs(A_main, "Two-way cluster (household, PSU)", clu = ~id_dom + UPA),
   fs(A_main[pt_base == 1],                                "Telework-eligible only")
 ))
