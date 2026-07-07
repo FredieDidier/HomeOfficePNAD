@@ -11,6 +11,8 @@
 #   - COVID window (drop 2020-2021)
 #   - State x year-quarter fixed effects; two-way (household, PSU) clustering
 #   - Telework-eligible-only sample (baseline)
+#   - Symmetric age donut around the five-year cutoff (Lucas Emanuel's suggestion)
+#   - First stage by the youngest child's age bin (Lucas Emanuel's suggestion)
 #   - Log real earnings, raw and winsorized at the top 1%
 #   - Control-window sweep (5-6 ... 5-12) coefplot
 #
@@ -137,26 +139,90 @@ prec_cuts <- data.table(
 prec_rows <- rbindlist(lapply(seq_len(nrow(prec_cuts)),
   function(i) fs(mk_prec(prec_cuts$C[i]), prec_cuts$lab[i])))
 
+# ---- Symmetric age donut around the five-year cutoff ------------------------
+# Threat to results: treated mothers (youngest child 0-4) differ from the 5-7
+# control not only in eligibility but in life-stage -- the treated pool includes
+# mothers of very young children who face the most acute care demands and are the
+# most likely to be on maternity leave, so the contrast could mix the policy
+# effect with an early-motherhood gap. A symmetric donut around the 60-month
+# (fifth-birthday) boundary addresses this by keeping ONLY the oldest eligible
+# band [60-w, 60) months as treated and the youngest ineligible band [60, 60+w)
+# as control: the very-young treated children are dropped and the two groups are
+# matched tightly in age around the cutoff. Precise age in months is used, so
+# ~7% of children with an unusable birth date drop out (as in the ceiling sweep).
+mk_donut <- function(w) {
+  s <- dt[(!is.na(age_youngest_child_months_any) &
+             age_youngest_child_months_any >= (60 - w) & age_youngest_child_months_any < 60) |
+          (age_youngest_child_months_any >= 60 & age_youngest_child_months_any < (60 + w))]
+  s[, tr := as.integer(age_youngest_child_months_any < 60)]
+  s[, trxp := tr * post_mp]
+  s[]
+}
+donut_rows <- rbindlist(lapply(c(12L, 18L, 24L), function(w)
+  fs(mk_donut(w), sprintf("Donut $\\pm$%dm (treated %d--59m vs.\\ 60--%dm)", w, 60 - w, 60 + w - 1))))
+
+# ---- First stage by the youngest child's completed-year age bin -------------
+# Threat to results: the pooled null could mask an effect concentrated among the
+# youngest children -- where the demand for telework is highest -- diluted by
+# older eligible children close to ageing out. A single regression splits
+# eligibility by the youngest child's age bin (0-1, 2-3, 4), each interacted with
+# post, all relative to Control A (youngest child 5-7). A null in every bin, and
+# in particular in the 0-1 bin, rules out a hidden effect at the highest-demand
+# life-stage. Age bins use completed-year age (full sample, no birth-date drop).
+S_strat <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
+S_strat[, bin01 := as.integer(has_child_u4 == 1 & age_youngest_child_any %in% 0:1)]
+S_strat[, bin23 := as.integer(has_child_u4 == 1 & age_youngest_child_any %in% 2:3)]
+S_strat[, bin4  := as.integer(has_child_u4 == 1 & age_youngest_child_any == 4L)]
+S_strat[, `:=`(t01 = bin01 * post_mp, t23 = bin23 * post_mp, t4 = bin4 * post_mp)]
+m_strat <- feols(home_office ~ bin01 + bin23 + bin4 + t01 + t23 + t4 | id_panel + year_quarter,
+                 S_strat, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
+ct_strat <- coeftable(m_strat)
+strat_rows <- rbindlist(Map(function(v, lbl)
+  data.table(label = lbl, est = ct_strat[v, 1] * 100, se = ct_strat[v, 2] * 100,
+             star = star(ct_strat[v, 4]), n = nobs(m_strat)),
+  c("t01", "t23", "t4"),
+  c("Youngest child aged 0--1 $\\times$ post", "Youngest child aged 2--3 $\\times$ post",
+    "Youngest child aged 4 $\\times$ post")))
+
 # =============================================================================
-# Table A (first stage) + earnings (compact one-line format: estimate followed by
-# (se) inline, so the many rows fit on a single page)
+# Table D.1 (first stage) + earnings. Compact one-line format (estimate followed
+# by (se) inline). Emitted as a longtable so the many rows break gracefully
+# across pages, repeating the column header, with the notes in the final footer.
 # =============================================================================
 row_tex <- function(r, d = 2)
   sprintf("%s & %s$^{%s}$ (%s) & %s \\\\", r$label, fmt(r$est, d), r$star, fmt(r$se, d), fmt0(r$n))
+note_txt <- paste(paste0("\\textit{Notes:} Each estimate is a separate difference-in-differences regression estimating ", EQ_REF, " on the preferred sample (treated vs.\\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The exact-birthdate rows redefine treatment from the youngest child's precise age in months (computed from the reported month and year of birth, anchored at the quarter midpoint since the exact interview date is unobserved), sliding the eligibility ceiling across the statutory four-year boundary while holding the comparison group fixed at Control~A; a ceiling of 60 months reproduces the main completed-year definition, and lower ceilings drop children between the ceiling and age five from both groups. The symmetric-donut rows keep only the oldest eligible band (from $60-w$ to 60 months) as treated and the youngest ineligible band (60 to $60+w$ months) as control, dropping the very-young treated children and matching the two groups' ages tightly around the five-year cutoff. The by-age rows come from a single regression that splits eligibility by the youngest child's completed-year age (0--1, 2--3, 4), each interacted with post, relative to Control~A. The two post-reform-timing rows come from a single regression that splits Treated $\\times$ Post into a 2022--2023 and a 2024--2026 window. ", WEIGHT_NOTE), "Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum).", SIGNIF_NOTE)
 tab <- c(
-  "\\begin{table}[H]\\centering",
-  "\\caption{Robustness of the First-Stage Home-Office Effect}",
-  "\\label{tab:robustness}\\small",
-  "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{%",
-  "\\begin{tabular}{lcc}",
+  "{\\small",
+  "\\setlength{\\LTcapwidth}{\\linewidth}",
+  "\\begin{longtable}{lcc}",
+  "\\caption{Robustness of the First-Stage Home-Office Effect}\\label{tab:robustness}\\\\",
   "\\toprule",
   " & Treated $\\times$ Post (se) & Obs. \\\\",
   "\\midrule",
+  "\\endfirsthead",
+  "\\multicolumn{3}{c}{\\footnotesize\\itshape Table \\ref{tab:robustness} (continued)} \\\\",
+  "\\toprule",
+  " & Treated $\\times$ Post (se) & Obs. \\\\",
+  "\\midrule",
+  "\\endhead",
+  "\\midrule",
+  "\\multicolumn{3}{r}{\\footnotesize\\itshape Continued on next page} \\\\",
+  "\\endfoot",
+  "\\bottomrule",
+  paste0("\\multicolumn{3}{@{}p{\\linewidth}@{}}{\\vspace{2pt}\\footnotesize\\raggedright ", note_txt, "} \\\\"),
+  "\\endlastfoot",
   "\\multicolumn{3}{l}{\\textit{Home office (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(rows)), function(i) row_tex(rows[i]))),
   "\\midrule",
   "\\multicolumn{3}{l}{\\textit{Home office, by exact-birthdate treatment ceiling (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(prec_rows)), function(i) row_tex(prec_rows[i]))),
+  "\\midrule",
+  "\\multicolumn{3}{l}{\\textit{Home office, symmetric age donut around the five-year cutoff (pp)}} \\\\",
+  unlist(lapply(seq_len(nrow(donut_rows)), function(i) row_tex(donut_rows[i]))),
+  "\\midrule",
+  "\\multicolumn{3}{l}{\\textit{Home office, by the youngest child's age (pp)}} \\\\",
+  unlist(lapply(seq_len(nrow(strat_rows)), function(i) row_tex(strat_rows[i]))),
   "\\midrule",
   "\\multicolumn{3}{l}{\\textit{Home office, by post-reform timing (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(timing)), function(i) row_tex(timing[i]))),
@@ -164,9 +230,8 @@ tab <- c(
   "\\multicolumn{3}{l}{\\textit{Log real earnings}} \\\\",
   row_tex(inc_log, 3),
   row_tex(inc_logw, 3),
-  "\\bottomrule\\end{tabular}}",
-  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression estimating ", EQ_REF, " on the preferred sample (treated vs.\\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The exact-birthdate rows redefine treatment from the youngest child's precise age in months (computed from the reported month and year of birth, anchored at the quarter midpoint since the exact interview date is unobserved), sliding the eligibility ceiling across the statutory four-year boundary while holding the comparison group fixed at Control~A; a ceiling of 60 months reproduces the main completed-year definition, and lower ceilings drop children between the ceiling and age five from both groups. The two post-reform-timing rows come from a single regression that splits Treated $\\times$ Post into a 2022--2023 and a 2024--2026 window. ", WEIGHT_NOTE), "Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum).", SIGNIF_NOTE),
-  "\\end{table}"
+  "\\end{longtable}",
+  "}"
 )
 writeLines(tab, file.path(TABLE_DIR, "tab07_robustness.tex"))
 
@@ -197,6 +262,11 @@ cat("\n=== First-stage robustness (home office, pp) ===\n")
 print(rows[, .(label = gsub("\\\\", "", label), est = round(est, 2), se = round(se, 2), star, n = fmt0(n))])
 cat("\n=== Exact-birthdate treatment ceiling (home office, pp) ===\n")
 print(prec_rows[, .(label = gsub("\\$|\\\\", "", label), est = round(est, 2), se = round(se, 2), star, n = fmt0(n))])
+cat("\n=== Symmetric age donut around the 5-year cutoff (home office, pp) ===\n")
+print(donut_rows[, .(label = gsub("\\$|\\\\pm|\\\\", "", label), est = round(est, 2), se = round(se, 2), star, n = fmt0(n))])
+cat("\n=== First stage by youngest child's age bin (home office, pp) ===\n")
+print(strat_rows[, .(label = gsub("\\$|\\\\times|\\\\", "", label), est = round(est, 2), se = round(se, 2), star,
+                     ci_lo = round(est - 1.96 * se, 2), ci_hi = round(est + 1.96 * se, 2))])
 cat("\n=== Post-reform timing (home office, pp; 95% CI) ===\n")
 print(timing[, .(label = gsub("--", "-", label), est = round(est, 2), se = round(se, 2), star,
                  ci_lo = round(est - 1.96 * se, 2), ci_hi = round(est + 1.96 * se, 2))])
