@@ -43,9 +43,9 @@ dt[, log_earnings := fifelse(earnings_habitual_real > 0, log(earnings_habitual_r
 # Human-readable labels for etable. Nuisance controls are left unlabeled so they
 # can be dropped from the display by their raw names.
 dict <- c(
-  treat_x_post = "Treated $\\times$ Post",
-  treated      = "Treated (child $\\leq$ 4)",
-  home_office  = "Home office", log_earnings = "Log earnings",
+  treat_x_post = "Young child $\\times$ Post",
+  treated      = "Young child ($\\leq$ 4)",
+  home_office  = "Home-based work", log_earnings = "Log earnings",
   hours_usual  = "Usual hours", employed = "Employed",
   in_labor_force = "In labor force", on_maternity_leave = "Maternity leave",
   id_panel = "Individual", id_dom = "Household", year_quarter = "Year-quarter"
@@ -85,9 +85,9 @@ etable(m0, m1, m2, m3, m4,
        dict = dict, drop = c("post_mp", "V2009", "V2010", "regiao", "higher_educ", "Constant"),
        extralines = list("Demographic controls" = c("No", "Yes", "Yes", "No", "Age$^2$ only")),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
-       title = "First-Stage Home-Office Effect: Specification Ladder (Control A)",
+       title = "Home-Based-Work Effect: Specification Ladder (Control A)",
        label = "tab:did_firststage",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} The outcome is an indicator for working from home. Column~(4) is the preferred specification, ", EQ_REF, ", with individual and year-quarter fixed effects; column~(1) is a raw regression with no controls, column~(2) adds demographic controls, column~(3) adds year-quarter fixed effects, and column~(5) adds a quadratic in age. Sample: women 18--49, household head or spouse, treated (child $\\leq$ 4) vs.\\ Control~A (youngest child 5--7). Demographic controls are age, age$^2$, completed higher education, race, and region."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} The outcome is an indicator for performing the main job at the worker's own residence (home-based work; non-employed women are coded zero). Column~(4) is the preferred specification, ", EQ_REF, ", with individual and year-quarter fixed effects; column~(1) is a raw regression with no controls, column~(2) adds demographic controls, column~(3) adds year-quarter fixed effects, and column~(5) adds a quadratic in age. The estimate is positive and significant until individual fixed effects (column~4) absorb selection into young motherhood and collapse it to zero. Sample: women 18--49, household head or spouse, young child (aged 4 or younger) vs.\\ Control~A (youngest child 5--7). Demographic controls are age, age$^2$, completed higher education, race, and region."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab02_file, fontsize = "\\small", tabcolsep = 4)
 # Show an explicit "No" where a fixed effect is absent (etable leaves it blank),
 # and list Individual above Year-quarter to match the other tables. Ladder:
@@ -118,7 +118,7 @@ etable(mods_A,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control A",
        label = "tab:did_outcomes_A",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, ". Sample: women 18--49, household head or spouse, treated (child $\\leq$ 4) vs.\\ Control~A (youngest child 5--7). ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, ". The home-based-work, employment, participation, and maternity-leave columns are defined over all sample women (non-employed coded zero); the log-earnings and hours columns are defined only for workers. Sample: women 18--49, household head or spouse, young child (aged 4 or younger) vs.\\ Control~A (youngest child 5--7). The employment, participation, and maternity-leave coefficients fail the parallel-trends pre-test (Section~\\ref{sec:results}) and are descriptive, not causal. ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab03a_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 tab03b_file <- file.path(TABLE_DIR, "tab03b_did_outcomes_B.tex")
@@ -127,12 +127,67 @@ etable(mods_B,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Difference-in-Differences Estimates by Outcome, Control B",
        label = "tab:did_outcomes_B",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, " on the broad comparison group (women with no child aged 0--7). Sample: women 18--49, household head or spouse. ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a separate difference-in-differences regression estimating ", EQ_REF, " on the broad comparison group (women with no child aged 0--7). Sample: women 18--49, household head or spouse. As in the Control~A table, the employment, participation, and maternity-leave coefficients fail the parallel-trends pre-test and are descriptive, not causal. ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab03b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 # Note: the A-vs-B placebo (home office, fake treatment = has_child_5_7) is
 # computed in 06_robustness.R, which writes it into tab07_robustness.tex; it is
 # not repeated here to avoid duplicating that regression.
+
+# =============================================================================
+# Table 3b — earnings and hours: intensive margin (workers) vs the extensive-
+# margin-inclusive unconditional versions defined over ALL women (referee round
+# 2, Comment 3). Earnings and usual hours among workers condition on employment,
+# a post-treatment variable; to show that this conditioning is not what produces
+# the null, the unconditional columns re-define each outcome over all women with
+# the non-employed coded zero (asinh for earnings, to admit the zeros). For each,
+# the pre-reform-leads joint test decides whether it can be read causally: the
+# worker-conditional outcomes pass parallel trends and are precise nulls, while
+# the unconditional versions fail (they inherit the employment extensive margin's
+# differential trend), so the causal-clean set is defined by the diagnostic, not
+# by assumption.
+# =============================================================================
+samp_A[, earn_uncond  := asinh(fifelse(is.na(earnings_habitual_real) | earnings_habitual_real < 0,
+                                        0, earnings_habitual_real))]
+samp_A[, hours_uncond := fifelse(is.na(hours_usual) | employed == 0, 0, hours_usual)]
+eh_specs <- list(c("log_earnings",  "Log earnings (workers only)"),
+                 c("hours_usual",   "Usual weekly hours (workers only)"),
+                 c("earn_uncond",   "asinh earnings (all women, non-employed $=0$)"),
+                 c("hours_uncond",  "Weekly hours (all women, non-employed $=0$)"))
+eh <- rbindlist(lapply(eh_specs, function(s) {
+  y <- s[1]
+  m  <- feols(as.formula(sprintf("%s ~ treated + treat_x_post | id_panel + year_quarter", y)),
+              samp_A, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
+  ct <- coeftable(m)["treat_x_post", ]
+  me <- feols(as.formula(sprintf("%s ~ i(year_quarter, treated, ref = 20221) | id_panel + year_quarter", y)),
+              samp_A, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
+  b <- coef(me); V <- vcov(me)
+  pre <- grep("year_quarter::20(18|19|20|21)[1-4]:treated", names(b), value = TRUE)
+  bb <- b[pre]; VV <- V[pre, pre]
+  chi <- as.numeric(t(bb) %*% solve(VV) %*% bb); k <- length(pre)
+  ptp <- pchisq(chi, k, lower.tail = FALSE)
+  data.table(label = s[2], est = ct[1], se = ct[2], lo = ct[1] - 1.96 * ct[2],
+             hi = ct[1] + 1.96 * ct[2], chi = chi, ptp = ptp,
+             pass = ifelse(ptp > 0.05, "Yes", "No"), n = nobs(m))
+}))
+f3 <- function(x) formatC(x, format = "f", digits = 3)
+eh_row <- function(r) sprintf("%s & %s (%s) & [%s, %s] & %.1f\\ ($p=%s$) & %s & %s \\\\",
+  r$label, f3(r$est), f3(r$se), f3(r$lo), f3(r$hi), r$chi,
+  formatC(r$ptp, format = "f", digits = 3), r$pass, formatC(r$n, big.mark = ",", format = "d"))
+tab3b <- c("\\begin{table}[H]\\centering",
+  "\\caption{Earnings and Hours: Worker-Conditional and Unconditional Estimates}",
+  "\\label{tab:earnings_margins}\\small",
+  "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{%",
+  "\\begin{tabular}{lccccc}", "\\toprule",
+  "Outcome & Young child $\\times$ Post (se) & 95\\% CI & Pre-trend $\\chi^2(16)$ & Parallel trends? & Obs. \\\\", "\\midrule",
+  unlist(lapply(seq_len(nrow(eh)), function(i) eh_row(eh[i]))),
+  "\\bottomrule\\end{tabular}}",
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each row is a separate difference-in-differences regression estimating ", EQ_REF, " on the preferred sample (young child vs.\\ Control~A). The first two rows are the intensive-margin outcomes observed only for workers (log real earnings and usual weekly hours). The last two re-define the outcomes over \\emph{all} sample women, coding the non-employed as zero (inverse hyperbolic sine for earnings, to admit the zeros), so they combine the intensive and the extensive margins. ``Pre-trend $\\chi^2(16)$'' is the joint Wald test that the pre-reform event-study leads are zero (the parallel-trends diagnostic): the worker-conditional earnings and hours pass it and are precise nulls, whereas the unconditional versions reject it, because they inherit the differential pre-trend of the employment extensive margin (Table~\\ref{tab:did_outcomes_A}). Only outcomes that pass this diagnostic are read causally."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE),
+  "\\end{table}")
+writeLines(tab3b, file.path(TABLE_DIR, "tab15_earnings_margins.tex"))
+cat("\n=== Table 3b: earnings/hours conditional vs unconditional ===\n")
+print(eh[, .(label = substr(gsub("\\$|\\\\", "", label), 1, 34), est = round(est, 3),
+             ptp = round(ptp, 3), pass, n = formatC(n, big.mark = ",", format = "d"))])
 
 # ---- Console summary --------------------------------------------------------
 cat("\n=== Table 2: first-stage ladder (home office, treat_x_post) ===\n")

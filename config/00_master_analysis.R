@@ -21,7 +21,7 @@
 # Package management: pacman installs any missing package automatically, so
 # there is no need to run install.packages() by hand.
 if (!requireNamespace("pacman", quietly = TRUE)) install.packages("pacman")
-pacman::p_load(data.table, fixest, ggplot2, here)
+pacman::p_load(data.table, fixest, ggplot2, here, fwildclusterboot, readxl)
 
 source(here("analysis", "code", "01_descriptives.R"))
 source(here("analysis", "code", "02_event_study.R"))
@@ -30,3 +30,5 @@ source(here("analysis", "code", "04_mechanisms.R"))
 source(here("analysis", "code", "05_heterogeneity.R"))
 source(here("analysis", "code", "06_robustness.R"))
 source(here("analysis", "code", "07_triple_diff.R"))
+source(here("analysis", "code", "08_referee_revision.R"))  # referee-response exhibits (Tables 9-13)
+source(here("analysis", "code", "09_supplement_validation.R"))  # proxy validation vs 2022 telework supplement (Table 14, fig10)

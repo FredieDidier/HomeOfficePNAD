@@ -1,14 +1,14 @@
 {\small
 \setlength{\LTcapwidth}{\linewidth}
 \begin{longtable}{lcc}
-\caption{Robustness of the First-Stage Home-Office Effect}\label{tab:robustness}\\
+\caption{Robustness of the Home-Based-Work Effect}\label{tab:robustness}\\
 \toprule
- & Treated $\times$ Post (se) & Obs. \\
+ & Young child $\times$ Post (se) & Obs. \\
 \midrule
 \endfirsthead
 \multicolumn{3}{c}{\footnotesize\itshape Table \ref{tab:robustness} (continued)} \\
 \toprule
- & Treated $\times$ Post (se) & Obs. \\
+ & Young child $\times$ Post (se) & Obs. \\
 \midrule
 \endhead
 \midrule
@@ -17,7 +17,7 @@
 \bottomrule
 \multicolumn{3}{@{}p{\linewidth}@{}}{\vspace{2pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate difference-in-differences regression estimating Eq.~\eqref{eq:did} on the preferred sample (treated vs.\ Control~A, youngest child 5--7), varying one design choice at a time; the log-earnings rows use the log of real monthly earnings among workers with positive earnings. The exact-birthdate rows redefine treatment from the youngest child's precise age in months (computed from the reported month and year of birth, anchored at the quarter midpoint since the exact interview date is unobserved), sliding the eligibility ceiling across the statutory four-year boundary while holding the comparison group fixed at Control~A; a ceiling of 60 months reproduces the main completed-year definition, and lower ceilings drop children between the ceiling and age five from both groups. The symmetric-donut rows keep only the oldest eligible band (from $60-w$ to 60 months) as treated and the youngest ineligible band (60 to $60+w$ months) as control, dropping the very-young treated children and matching the two groups' ages tightly around the five-year cutoff. The by-age rows come from a single regression that splits eligibility by the youngest child's completed-year age (0--1, 2--3, 4), each interacted with post, relative to Control~A. The two post-reform-timing rows come from a single regression that splits Treated $\times$ Post into a 2022--2023 and a 2024--2026 window. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses, except the two-way row, which clusters at the household level and at the primary sampling unit (the census enumeration area PNADC samples within each geographic stratum). Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.} \\
 \endlastfoot
-\multicolumn{3}{l}{\textit{Home office (pp)}} \\
+\multicolumn{3}{l}{\textit{Home-based work (pp)}} \\
 Baseline & -0.08$^{}$ (0.30) & 989,898 \\
 Placebo: youngest child 5--7 vs.\ no child 0--7 & 0.04$^{}$ (0.30) & 1,852,383 \\
 Alternative cutoff (2022Q1 post) & 0.20$^{}$ (0.30) & 989,898 \\
@@ -27,26 +27,26 @@ Treated, excluding grandchildren and stepchildren & -0.13$^{}$ (0.31) & 914,060 
 Excluding 2020--2021 (COVID) & -0.09$^{}$ (0.37) & 798,776 \\
 State $\times$ year-quarter fixed effects & -0.08$^{}$ (0.30) & 989,898 \\
 Two-way cluster (household, PSU) & -0.08$^{}$ (0.29) & 989,898 \\
-Telework-eligible only & -0.95$^{}$ (1.01) & 136,079 \\
+Telework-eligible only & -0.59$^{}$ (1.73) & 71,769 \\
 \midrule
-\multicolumn{3}{l}{\textit{Home office, by exact-birthdate treatment ceiling (pp)}} \\
+\multicolumn{3}{l}{\textit{Home-based work, by exact-birthdate treatment ceiling (pp)}} \\
 Ceiling 48 months (until 4th birthday) & 0.18$^{}$ (0.48) & 825,209 \\
 Ceiling 49 months (4y1m) & 0.20$^{}$ (0.46) & 835,377 \\
 Ceiling 51 months (4y3m) & 0.12$^{}$ (0.44) & 855,783 \\
 Ceiling 53 months (4y5m) & -0.07$^{}$ (0.42) & 875,890 \\
 Ceiling 60 months (exact age $<5$; = main) & 0.00$^{}$ (0.31) & 944,322 \\
 \midrule
-\multicolumn{3}{l}{\textit{Home office, symmetric age donut around the five-year cutoff (pp)}} \\
+\multicolumn{3}{l}{\textit{Home-based work, symmetric age donut around the five-year cutoff (pp)}} \\
 Donut $\pm$12m (treated 48--59m vs.\ 60--71m) & -0.21$^{}$ (0.44) & 230,084 \\
 Donut $\pm$18m (treated 42--59m vs.\ 60--77m) & 0.13$^{}$ (0.40) & 344,855 \\
 Donut $\pm$24m (treated 36--59m vs.\ 60--83m) & 0.02$^{}$ (0.37) & 458,983 \\
 \midrule
-\multicolumn{3}{l}{\textit{Home office, by the youngest child's age (pp)}} \\
+\multicolumn{3}{l}{\textit{Home-based work, by the youngest child's age (pp)}} \\
 Youngest child aged 0--1 $\times$ post & 0.05$^{}$ (0.39) & 989,898 \\
 Youngest child aged 2--3 $\times$ post & 0.10$^{}$ (0.37) & 989,898 \\
 Youngest child aged 4 $\times$ post & -0.21$^{}$ (0.32) & 989,898 \\
 \midrule
-\multicolumn{3}{l}{\textit{Home office, by post-reform timing (pp)}} \\
+\multicolumn{3}{l}{\textit{Home-based work, by post-reform timing (pp)}} \\
 Early post (2022--2023) & -0.21$^{}$ (0.33) & 989,898 \\
 Late post (2024--2026) & 0.18$^{}$ (0.35) & 989,898 \\
 \midrule

@@ -35,6 +35,31 @@ dir.create(MAP_DIR,   showWarnings = FALSE, recursive = TRUE)
 
 # ---- Load data --------------------------------------------------------------
 load(file.path(OUTPUT_PATH, "main_data.RData"))
+setDT(dt)
+
+# ---- Sample-construction counts (referee round 2, global suggestion) --------
+# A plain step-by-step count from the analytical dataset to the treatment groups,
+# in lieu of a flowchart. The steps upstream of main_data.RData (raw PNADC
+# download -> restriction to ages 18-49) are performed in build/01_pnadc.R.
+.step <- function(lbl, d) data.table(step = lbl, observations = nrow(d),
+                                     persons = uniqueN(d$id_panel))
+.funnel <- rbindlist(list(
+  .step("main_data.RData (both sexes, ages 18-49, 2018Q1-2026Q1)", dt),
+  .step("Women (female == 1)", dt[female == 1]),
+  .step("Women, household head or spouse", dt[female == 1 & is_head_or_spouse == 1]),
+  .step("+ linked panel (estimation universe)", dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]),
+  .step("Treated: youngest child aged 4 or younger", dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1 & has_child_u4 == 1]),
+  .step("Control A: youngest child aged 5-7", dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1 & has_child_5_7 == 1 & has_child_u4 == 0]),
+  .step("Control B: no child aged 0-7", dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1 & has_child_u4 == 0 & has_child_5_7 == 0])))
+.funnel[, `:=`(observations = formatC(observations, big.mark = ",", format = "d"),
+               persons = formatC(persons, big.mark = ",", format = "d"))]
+.cf <- file.path(here("analysis", "output"), "sample_construction_counts.txt")
+writeLines(c("Sample construction counts (person-quarter observations and distinct persons).",
+             "Upstream steps (raw PNADC download, restriction to ages 18-49) are in build/01_pnadc.R.",
+             "", sprintf("%-52s %14s %14s", "Step", "Observations", "Persons"),
+             paste(rep("-", 82), collapse = ""),
+             .funnel[, sprintf("%-52s %14s %14s", step, observations, persons)]), .cf)
+cat("\nSample-construction counts written to", .cf, "\n")
 
 # ---- Group assignment -------------------------------------------------------
 # Keep only head/spouse women (main_data now holds both sexes; filter female==1)

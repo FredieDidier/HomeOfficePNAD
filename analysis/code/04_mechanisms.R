@@ -28,14 +28,23 @@ load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
 dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
-dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
 
-dict <- c(treat_x_post = "Treated $\\times$ Post", treated = "Treated (child $\\leq$ 4)",
-          home_office = "Home office", potential_telework = "Telework-eligible occupation",
+# PREDETERMINED baseline telework eligibility (referee Comment 2): each woman's
+# occupation eligibility at her LAST observation on or before 2022Q1, not her
+# first observed quarter. Women with no pre-reform observation have pt_base = NA.
+pre <- dt[year_quarter <= 20221]
+b <- pre[, .(pt_base = as.integer(potential_telework[.N] == 1), has_pre = 1L), by = id_panel]
+dt <- merge(dt, b, by = "id_panel", all.x = TRUE)
+
+dict <- c(treat_x_post = "Young child $\\times$ Post", treated = "Young child ($\\leq$ 4)",
+          home_office = "Home-based work", potential_telework = "Telework-eligible occupation",
           id_panel = "Individual", id_dom = "Household", year_quarter = "Year-quarter")
 
 A <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
 B <- dt[has_child_u4 == 1 | (has_child_u4 == 0 & has_child_5_7 == 0)]
+# The moderation table (Table 4) conditions on a predetermined moderator, so it
+# is restricted to women observed before the reform.
+A_pt <- A[has_pre == 1L]
 
 fe <- function(sample, y = "home_office")
   feols(as.formula(sprintf("%s ~ treated + treat_x_post | id_panel + year_quarter", y)),
@@ -43,13 +52,13 @@ fe <- function(sample, y = "home_office")
 
 # ---- Table 4: moderation by baseline telework eligibility -------------------
 tab04_file <- file.path(TABLE_DIR, "tab04_mechanism_moderation.tex")
-etable(fe(A), fe(A[pt_base == 1]), fe(A[pt_base == 0]),
+etable(fe(A_pt), fe(A_pt[pt_base == 1]), fe(A_pt[pt_base == 0]),
        tex = TRUE, file = tab04_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, headers = c("All", "Telework-eligible", "Not eligible"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
-       title = "First-Stage Home-Office Effect by Baseline Telework Eligibility",
+       title = "Home-Based-Work Effect by Baseline Telework Eligibility",
        label = "tab:mech_moderation",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column estimates ", EQ_REF, " (first stage, outcome home office) on the preferred sample (treated, child $\\leq$ 4, vs.\\ Control~A, youngest child 5--7), split by whether the woman was in a telework-eligible occupation at baseline---her occupation eligibility in her first observed quarter, held fixed, following \\citet{costa2024}."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column estimates ", EQ_REF, " (outcome home-based work) on the preferred sample (young child, aged 4 or younger, vs.\\ Control~A, youngest child 5--7), split by whether the woman was in a telework-eligible occupation at her last observation on or before 2022Q1 (predetermined), following \\citet{costa2024}; the sample is restricted to women observed before the reform."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab04_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5: occupational sorting (potential_telework as outcome) ----------
@@ -93,9 +102,9 @@ tb <- c("\\begin{table}[H]\\centering",
 writeLines(tb, file.path(TABLE_DIR, "tab05b_occupation_transition.tex"))
 
 # ---- Console ----------------------------------------------------------------
-cat("\n=== Mechanism I: first stage by baseline eligibility (pp) ===\n")
+cat("\n=== Mechanism I: home-based work by baseline eligibility (pp) ===\n")
 for (lab in c("all", "elig", "nonelig")) {
-  s <- switch(lab, all = A, elig = A[pt_base == 1], nonelig = A[pt_base == 0])
+  s <- switch(lab, all = A_pt, elig = A_pt[pt_base == 1], nonelig = A_pt[pt_base == 0])
   ct <- coeftable(fe(s))["treat_x_post", ]
   cat(sprintf("  %-9s %.2f (%.2f) p=%.2f\n", lab, ct[1] * 100, ct[2] * 100, ct[4]))
 }

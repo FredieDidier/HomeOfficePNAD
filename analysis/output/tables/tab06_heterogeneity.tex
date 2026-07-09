@@ -1,41 +1,41 @@
 \begin{table}[H]\centering
-\caption{Heterogeneity of the First-Stage Home-Office Effect}
+\caption{Heterogeneity of the Home-Based-Work Effect}
 \label{tab:heterogeneity}\small
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
 \begin{tabular}{lcccc}
 \toprule
- & Treated $\times$ Post (se) & $p$-value & Holm $p$ & Obs. \\
+ & Young child $\times$ Post (se) & $p$-value & Holm $p$ & Obs. \\
 \midrule
 \multicolumn{5}{l}{\textit{By formality}} \\
-$\quad$ Formal & -0.03$^{}$ (0.50) & 0.950 & 1.00 & 261,866 \\
-$\quad$ Informal & -0.13$^{}$ (0.38) & 0.727 & 1.00 & 728,032 \\
-$\quad$ Private, signed card (CLT) & 0.27$^{}$ (0.65) & 0.681 & 1.00 & 152,995 \\
-$\quad$ Non-CLT & -0.19$^{}$ (0.34) & 0.572 & 1.00 & 836,903 \\
+$\quad$ Formal & -1.01$^{}$ (0.85) & 0.232 & 1.00 & 143,959 \\
+$\quad$ Informal & 0.26$^{}$ (0.55) & 0.633 & 1.00 & 412,112 \\
+$\quad$ Private, signed card (CLT) & -1.37$^{}$ (1.17) & 0.240 & 1.00 & 81,909 \\
+$\quad$ Non-CLT & 0.21$^{}$ (0.50) & 0.670 & 1.00 & 474,162 \\
 \midrule
 \multicolumn{5}{l}{\textit{By sector}} \\
-$\quad$ Private employee & 0.18$^{}$ (0.58) & 0.752 & 1.00 & 197,959 \\
-$\quad$ Public employee & -0.20$^{}$ (0.31) & 0.515 & 1.00 & 91,735 \\
+$\quad$ Private employee & -0.91$^{}$ (1.01) & 0.367 & 1.00 & 103,916 \\
+$\quad$ Public employee & -0.34$^{}$ (0.29) & 0.239 & 1.00 & 49,963 \\
 \midrule
 \multicolumn{5}{l}{\textit{By education}} \\
-$\quad$ With higher education & 0.39$^{}$ (0.83) & 0.641 & 1.00 & 177,666 \\
-$\quad$ Without higher education & -0.21$^{}$ (0.31) & 0.509 & 1.00 & 812,232 \\
+$\quad$ With higher education & 0.44$^{}$ (1.23) & 0.722 & 1.00 & 94,996 \\
+$\quad$ Without higher education & -0.22$^{}$ (0.48) & 0.650 & 1.00 & 461,075 \\
 \midrule
 \multicolumn{5}{l}{\textit{By race}} \\
-$\quad$ White & -0.20$^{}$ (0.50) & 0.693 & 1.00 & 341,737 \\
-$\quad$ Non-white & 0.00$^{}$ (0.37) & 0.997 & 1.00 & 648,161 \\
+$\quad$ White & -0.25$^{}$ (0.76) & 0.744 & 1.00 & 194,871 \\
+$\quad$ Non-white & 0.06$^{}$ (0.58) & 0.923 & 1.00 & 361,200 \\
 \midrule
 \multicolumn{5}{l}{\textit{By household structure}} \\
-$\quad$ Single mother & -1.64$^{**}$ (0.73) & 0.024 & 0.36 & 159,369 \\
-$\quad$ Partnered mother & 0.20$^{}$ (0.33) & 0.543 & 1.00 & 830,529 \\
+$\quad$ Single mother & -2.59$^{**}$ (1.19) & 0.029 & 0.44 & 82,525 \\
+$\quad$ Partnered mother & 0.41$^{}$ (0.50) & 0.410 & 1.00 & 473,546 \\
 \midrule
 \multicolumn{5}{l}{\textit{Single mothers, by contract type}} \\
-$\quad$ Single mother, CLT & 0.21$^{}$ (1.48) & 0.887 & --- & 24,588 \\
-$\quad$ Single mother, non-CLT & -2.12$^{**}$ (0.83) & 0.010 & --- & 134,781 \\
+$\quad$ Single mother, CLT & -0.31$^{}$ (1.92) & 0.873 & --- & 12,951 \\
+$\quad$ Single mother, non-CLT & -3.18$^{**}$ (1.40) & 0.023 & --- & 69,574 \\
 \midrule
 \multicolumn{5}{l}{\textit{By age band}} \\
-$\quad$ Age 18--29 & -0.31$^{}$ (0.49) & 0.534 & 1.00 & 348,793 \\
-$\quad$ Age 30--39 & -0.49$^{}$ (0.44) & 0.272 & 1.00 & 450,783 \\
-$\quad$ Age 40--49 & 1.39$^{**}$ (0.69) & 0.042 & 0.59 & 190,322 \\
+$\quad$ Age 18--29 & 0.01$^{}$ (0.87) & 0.991 & 1.00 & 179,506 \\
+$\quad$ Age 30--39 & -0.40$^{}$ (0.68) & 0.557 & 1.00 & 258,746 \\
+$\quad$ Age 40--49 & 1.02$^{}$ (0.91) & 0.261 & 1.00 & 117,819 \\
 \bottomrule\end{tabular}}
-\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression estimating Eq.~\eqref{eq:did} (outcome: home office, in percentage points) on the preferred sample (treated vs.\ Control~A), for the subgroup indicated; standard errors in parentheses next to the estimate. Subgroups are defined at baseline (first observed quarter); the ``Single mothers, by contract type'' rows decompose the single-mother cell and are not part of the Holm family (dash in the Holm-$p$ column). All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. The Holm $p$ is the Holm step-down adjustment for testing the 15 subgroups, which controls the family-wise error rate under arbitrary dependence across the tests; a value of $1.00$ marks a subgroup far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $0.36$ (the ``Single mother'' subgroup). Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each estimate is a separate difference-in-differences regression estimating Eq.~\eqref{eq:did} (outcome: home-based work, in percentage points) on the preferred sample (young child vs.\ Control~A), for the subgroup indicated; standard errors in parentheses next to the estimate. Subgroups are defined at each woman's last observation on or before 2022Q1 (predetermined), and the sample is restricted to women observed at least once before the reform; the ``Single mothers, by contract type'' rows decompose the single-mother cell and are not part of the Holm family (dash in the Holm-$p$ column). All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. The Holm $p$ is the Holm step-down adjustment for testing the 15 subgroups, which controls the family-wise error rate under arbitrary dependence across the tests; a value of $1.00$ marks a subgroup far from significance. No subgroup is significant after adjustment: the smallest adjusted $p$-value is $0.44$ (the ``Single mother'' subgroup). Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}

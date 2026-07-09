@@ -34,7 +34,10 @@ load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
 dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
-dt[, pt_base := as.integer(potential_telework[1] == 1), by = id_panel]
+# Predetermined baseline telework eligibility (referee Comment 2): eligibility at
+# the last observation on or before 2022Q1, not the first observed quarter.
+.preb <- dt[year_quarter <= 20221][, .(pt_base = as.integer(potential_telework[.N] == 1)), by = id_panel]
+dt <- merge(dt, .preb, by = "id_panel", all.x = TRUE)
 
 star <- function(p) ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.1, "*", "")))
 fmt  <- function(x, d = 2) sub("^-(0\\.?0*)$", "\\1", formatC(x, format = "f", digits = d))  # strip signed zero
@@ -196,14 +199,14 @@ tab <- c(
   "{\\small",
   "\\setlength{\\LTcapwidth}{\\linewidth}",
   "\\begin{longtable}{lcc}",
-  "\\caption{Robustness of the First-Stage Home-Office Effect}\\label{tab:robustness}\\\\",
+  "\\caption{Robustness of the Home-Based-Work Effect}\\label{tab:robustness}\\\\",
   "\\toprule",
-  " & Treated $\\times$ Post (se) & Obs. \\\\",
+  " & Young child $\\times$ Post (se) & Obs. \\\\",
   "\\midrule",
   "\\endfirsthead",
   "\\multicolumn{3}{c}{\\footnotesize\\itshape Table \\ref{tab:robustness} (continued)} \\\\",
   "\\toprule",
-  " & Treated $\\times$ Post (se) & Obs. \\\\",
+  " & Young child $\\times$ Post (se) & Obs. \\\\",
   "\\midrule",
   "\\endhead",
   "\\midrule",
@@ -212,19 +215,19 @@ tab <- c(
   "\\bottomrule",
   paste0("\\multicolumn{3}{@{}p{\\linewidth}@{}}{\\vspace{2pt}\\footnotesize\\raggedright ", note_txt, "} \\\\"),
   "\\endlastfoot",
-  "\\multicolumn{3}{l}{\\textit{Home office (pp)}} \\\\",
+  "\\multicolumn{3}{l}{\\textit{Home-based work (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(rows)), function(i) row_tex(rows[i]))),
   "\\midrule",
-  "\\multicolumn{3}{l}{\\textit{Home office, by exact-birthdate treatment ceiling (pp)}} \\\\",
+  "\\multicolumn{3}{l}{\\textit{Home-based work, by exact-birthdate treatment ceiling (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(prec_rows)), function(i) row_tex(prec_rows[i]))),
   "\\midrule",
-  "\\multicolumn{3}{l}{\\textit{Home office, symmetric age donut around the five-year cutoff (pp)}} \\\\",
+  "\\multicolumn{3}{l}{\\textit{Home-based work, symmetric age donut around the five-year cutoff (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(donut_rows)), function(i) row_tex(donut_rows[i]))),
   "\\midrule",
-  "\\multicolumn{3}{l}{\\textit{Home office, by the youngest child's age (pp)}} \\\\",
+  "\\multicolumn{3}{l}{\\textit{Home-based work, by the youngest child's age (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(strat_rows)), function(i) row_tex(strat_rows[i]))),
   "\\midrule",
-  "\\multicolumn{3}{l}{\\textit{Home office, by post-reform timing (pp)}} \\\\",
+  "\\multicolumn{3}{l}{\\textit{Home-based work, by post-reform timing (pp)}} \\\\",
   unlist(lapply(seq_len(nrow(timing)), function(i) row_tex(timing[i]))),
   "\\midrule",
   "\\multicolumn{3}{l}{\\textit{Log real earnings}} \\\\",

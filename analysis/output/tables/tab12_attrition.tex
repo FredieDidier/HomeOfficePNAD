@@ -1,0 +1,12 @@
+\begin{table}[H]\centering
+\caption{Panel Attrition and Inverse-Probability-Weighted Estimate}
+\label{tab:attrition}\small
+\begin{tabular}{lcc}
+\toprule
+Specification & Young child $\times$ Post (se) & $p$-value \\
+\midrule
+Differential attrition: P(reappear next quarter) & 0.14$^{}$ (0.20) & 0.478 \\
+Home-based work, inverse-retention-probability weighted & -0.22$^{}$ (0.40) & 0.582 \\
+\bottomrule\end{tabular}
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} The first row regresses an indicator for reappearing in the immediately following quarter on Young child $\times$ Post with year-quarter fixed effects, among women in interview rounds 1--4 (round 5 cannot reappear); a coefficient near zero means the reform did not change the retention of young-child women differentially, so panel attrition does not compose the estimation sample around the reform. The second row re-estimates the preferred home-based-work DiD weighting each observation by the survey weight times the inverse predicted probability of retention (from a logit on age, education, child age, and quarter), up-weighting under-retained cells. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+\end{table}

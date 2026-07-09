@@ -40,9 +40,9 @@ S[, trxp_fem := treat_x_post * female]
 # Real earnings enter the outcome table in logs (workers with positive earnings).
 S[, log_earnings := fifelse(earnings_habitual_real > 0, log(earnings_habitual_real), NA_real_)]
 
-dict <- c(treat_x_post = "Treated $\\times$ Post", trxp_fem = "Treated $\\times$ Post $\\times$ Female",
-          treated = "Treated (child $\\leq$ 4)", tr_fem = "Treated $\\times$ Female",
-          home_office = "Home office", log_earnings = "Log earnings",
+dict <- c(treat_x_post = "Young child $\\times$ Post", trxp_fem = "Young child $\\times$ Post $\\times$ Female",
+          treated = "Young child ($\\leq$ 4)", tr_fem = "Young child $\\times$ Female",
+          home_office = "Home-based work", log_earnings = "Log earnings",
           hours_usual = "Usual hours", employed = "Employed", in_labor_force = "In labor force",
           on_maternity_leave = "Maternity leave", id_panel = "Individual", id_dom = "Household",
           year_quarter = "Year-quarter", female = "Female")
@@ -62,7 +62,7 @@ etable(did(S[female == 0]), did(S[female == 1]), ddd(),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Triple Difference: Home Office, Men vs.\\ Women",
        label = "tab:triple_diff",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Columns~(1) and~(2) estimate ", EQ_REF, " (outcome home office) separately for men and women (treated $=$ child $\\leq$ 4 vs.\\ Control~A). Column~(3) is the pooled triple difference; the coefficient on Treated $\\times$ Post $\\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Columns~(1) and~(2) estimate ", EQ_REF, " (outcome home-based work) separately for men and women (young child $=$ aged 4 or younger vs.\\ Control~A). Column~(3) is the pooled triple difference; the coefficient on Young child $\\times$ Post $\\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab08_file, fontsize = "\\small", tabcolsep = 5)
 # Show explicit "No" where a fixed effect is absent (etable leaves it blank):
 # the men/women DiD (cols 1-2) use year-quarter FE; the DDD (col 3) uses
@@ -82,7 +82,7 @@ etable(ddd_mods,
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
        title = "Triple Difference Across Outcomes",
        label = "tab:triple_diff_outcomes",
-       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a triple-difference regression extending ", EQ_REF, " with a female interaction, with individual and female-by-year-quarter fixed effects throughout; it reports the men effect (Treated $\\times$ Post) and the female differential (Treated $\\times$ Post $\\times$ Female). ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
+       notes = paste(paste0("\\footnotesize\\textit{Notes:} Each column is a triple-difference regression extending ", EQ_REF, " with a female interaction, with individual and female-by-year-quarter fixed effects throughout; it reports the men effect (Young child $\\times$ Post) and the female differential (Young child $\\times$ Post $\\times$ Female). ", UNITS_NOTE), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab08b_file, fontsize = "\\footnotesize", tabcolsep = 3)
 
 # ---- Console ---------------------------------------------------------------

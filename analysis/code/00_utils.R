@@ -63,4 +63,4 @@ CLUSTER_NOTE <- "Standard errors are clustered at the household level in parenth
 
 # Units sentence for the multi-outcome tables. Real earnings enter in logs (as in
 # the robustness table), so their coefficient is an approximate proportional effect.
-UNITS_NOTE <- "Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; log earnings is the natural logarithm of real monthly labor earnings, so its coefficient is an approximate proportional effect, and usual hours are usual weekly hours---both defined only for workers."
+UNITS_NOTE <- "Home-based work, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; log earnings is the natural logarithm of real monthly labor earnings, so its coefficient is an approximate proportional effect, and usual hours are usual weekly hours---both defined only for workers."

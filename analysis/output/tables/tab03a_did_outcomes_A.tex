@@ -5,29 +5,29 @@
 \footnotesize\setlength{\tabcolsep}{3pt}
    \begin{tabular}{lcccccc}
       \toprule
-      Dependent Variables:      & Home office & Log earnings & Usual hours & Employed      & In labor force & Maternity leave\\  
-      Model:                    & (1)         & (2)          & (3)         & (4)           & (5)            & (6)\\  
+      Dependent Variables:       & Home-based work & Log earnings & Usual hours & Employed      & In labor force & Maternity leave\\  
+      Model:                     & (1)             & (2)          & (3)         & (4)           & (5)            & (6)\\  
       \midrule
       \emph{Variables}\\
-      Treated (child $\leq$ 4)  & 0.003       & -0.003       & -0.244      & -0.009$^{**}$ & -0.007         & 0.013$^{***}$\\   
-                                & (0.002)     & (0.007)      & (0.153)     & (0.004)       & (0.004)        & (0.002)\\   
+      Young child ($\leq$ 4)     & 0.003           & -0.003       & -0.244      & -0.009$^{**}$ & -0.007         & 0.013$^{***}$\\   
+                                 & (0.002)         & (0.007)      & (0.153)     & (0.004)       & (0.004)        & (0.002)\\   
 \addlinespace[2pt]
-      Treated $\times$ Post     & -0.0008     & -0.001       & 0.069       & 0.010$^{**}$  & 0.011$^{**}$   & -0.009$^{***}$\\   
-                                & (0.003)     & (0.009)      & (0.202)     & (0.005)       & (0.005)        & (0.002)\\   
+      Young child $\times$ Post  & -0.0008         & -0.001       & 0.069       & 0.010$^{**}$  & 0.011$^{**}$   & -0.009$^{***}$\\   
+                                 & (0.003)         & (0.009)      & (0.202)     & (0.005)       & (0.005)        & (0.002)\\   
 \addlinespace[2pt]
       \midrule
       \emph{Fixed-effects}\\
-      Individual                & Yes         & Yes          & Yes         & Yes           & Yes            & Yes\\  
-      Year-quarter              & Yes         & Yes          & Yes         & Yes           & Yes            & Yes\\  
+      Individual                 & Yes             & Yes          & Yes         & Yes           & Yes            & Yes\\  
+      Year-quarter               & Yes             & Yes          & Yes         & Yes           & Yes            & Yes\\  
       \midrule
       \emph{Fit statistics}\\
-      Observations              & 989,898     & 481,352      & 504,745     & 989,898       & 989,898        & 989,898\\  
-      R$^2$                     & 0.654       & 0.921        & 0.780       & 0.793         & 0.771          & 0.542\\  
+      Observations               & 989,898         & 481,352      & 504,745     & 989,898       & 989,898        & 989,898\\  
+      R$^2$                      & 0.654           & 0.921        & 0.780       & 0.793         & 0.771          & 0.542\\  
 \bottomrule
    \end{tabular}
    
    \par \raggedright 
-   \footnotesize\textit{Notes:} Each column is a separate difference-in-differences regression estimating Eq.~\eqref{eq:did}. Sample: women 18--49, household head or spouse, treated (child $\leq$ 4) vs.\ Control~A (youngest child 5--7). Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; log earnings is the natural logarithm of real monthly labor earnings, so its coefficient is an approximate proportional effect, and usual hours are usual weekly hours---both defined only for workers. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+   \footnotesize\textit{Notes:} Each column is a separate difference-in-differences regression estimating Eq.~\eqref{eq:did}. The home-based-work, employment, participation, and maternity-leave columns are defined over all sample women (non-employed coded zero); the log-earnings and hours columns are defined only for workers. Sample: women 18--49, household head or spouse, young child (aged 4 or younger) vs.\ Control~A (youngest child 5--7). The employment, participation, and maternity-leave coefficients fail the parallel-trends pre-test (Section~\ref{sec:results}) and are descriptive, not causal. Home-based work, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; log earnings is the natural logarithm of real monthly labor earnings, so its coefficient is an approximate proportional effect, and usual hours are usual weekly hours---both defined only for workers. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}
 
 

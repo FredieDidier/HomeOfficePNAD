@@ -26,16 +26,26 @@ load(file.path(OUTPUT_PATH, "main_data.RData"))
 setDT(dt)
 dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
-dt[, clt_base    := as.integer(clt_private[1] == 1), by = id_panel]
-dt[, formal_base := as.integer(formal[1] == 1),      by = id_panel]
-dt[, vd4009_base := VD4009[1],                       by = id_panel]
-dt[, he_base     := as.integer(higher_educ[1] == 1), by = id_panel]
-dt[, age_base    := V2009[1],                        by = id_panel]
-dt[, age_band := fcase(age_base <= 29, "Age 18--29", age_base <= 39, "Age 30--39", default = "Age 40--49")]
-dt[, race_base := as.integer(V2010[1] %in% c(1L, 3L)), by = id_panel]  # white = branca(1)+amarela(3); non-white = preta/parda/indigena
-dt[, sm_base   := as.integer(single_mother[1] == 1), by = id_panel]    # baseline single (lone) mother: female head, no co-resident partner
 
-A <- dt[has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)]
+# PREDETERMINED baseline moderators (referee Comment 2): each moderator is taken
+# at the woman's LAST observation on or before 2022Q1 (the last pre-reform
+# quarter), NOT her first observed quarter, so that for women first interviewed
+# after the reform the moderator is genuinely pre-determined. Women with no
+# pre-reform observation are dropped from the heterogeneity sample.
+pre <- dt[year_quarter <= 20221]
+b <- pre[, .SD[.N], by = id_panel,
+         .SDcols = c("clt_private", "formal", "VD4009", "higher_educ", "V2009",
+                     "V2010", "single_mother")]
+setnames(b, c("clt_private", "formal", "VD4009", "higher_educ", "V2009", "V2010", "single_mother"),
+         c("clt_base", "formal_base", "vd4009_base", "he_base", "age_base", "race_raw", "sm_raw"))
+b[, `:=`(clt_base = as.integer(clt_base == 1), formal_base = as.integer(formal_base == 1),
+         he_base = as.integer(he_base == 1), race_base = as.integer(race_raw %in% c(1L, 3L)),
+         sm_base = as.integer(sm_raw == 1), has_pre = 1L)]
+b[, age_band := fcase(age_base <= 29, "Age 18--29", age_base <= 39, "Age 30--39", default = "Age 40--49")]
+dt <- merge(dt, b[, .(id_panel, clt_base, formal_base, vd4009_base, he_base, age_base,
+                      age_band, race_base, sm_base, has_pre)], by = "id_panel", all.x = TRUE)
+
+A <- dt[(has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)) & has_pre == 1L]
 
 star <- function(p) ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.1, "*", "")))
 did_row <- function(sub, label) {
@@ -117,11 +127,11 @@ grp_decomp <- function(title, labs) {
     }))
 }
 tab <- c("\\begin{table}[H]\\centering",
-  "\\caption{Heterogeneity of the First-Stage Home-Office Effect}",
+  "\\caption{Heterogeneity of the Home-Based-Work Effect}",
   "\\label{tab:heterogeneity}\\small",
   "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{%",
   "\\begin{tabular}{lcccc}", "\\toprule",
-  " & Treated $\\times$ Post (se) & $p$-value & Holm $p$ & Obs. \\\\", "\\midrule",
+  " & Young child $\\times$ Post (se) & $p$-value & Holm $p$ & Obs. \\\\", "\\midrule",
   grp("By formality",
       c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT")), "\\midrule",
   grp("By sector", c("Private employee", "Public employee")), "\\midrule",
@@ -131,7 +141,7 @@ tab <- c("\\begin{table}[H]\\centering",
   grp_decomp("Single mothers, by contract type", c("Single mother, CLT", "Single mother, non-CLT")), "\\midrule",
   grp("By age band", c("Age 18--29", "Age 30--39", "Age 40--49")),
   "\\bottomrule\\end{tabular}}",
-  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate first-stage difference-in-differences regression estimating ", EQ_REF, " (outcome: home office, in percentage points) on the preferred sample (treated vs.\\ Control~A), for the subgroup indicated; standard errors in parentheses next to the estimate. Subgroups are defined at baseline (first observed quarter); the ``Single mothers, by contract type'' rows decompose the single-mother cell and are not part of the Holm family (dash in the Holm-$p$ column)."), WEIGHT_NOTE, CLUSTER_NOTE, mt_note, SIGNIF_NOTE),
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression estimating ", EQ_REF, " (outcome: home-based work, in percentage points) on the preferred sample (young child vs.\\ Control~A), for the subgroup indicated; standard errors in parentheses next to the estimate. Subgroups are defined at each woman's last observation on or before 2022Q1 (predetermined), and the sample is restricted to women observed at least once before the reform; the ``Single mothers, by contract type'' rows decompose the single-mother cell and are not part of the Holm family (dash in the Holm-$p$ column)."), WEIGHT_NOTE, CLUSTER_NOTE, mt_note, SIGNIF_NOTE),
   "\\end{table}")
 writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
 

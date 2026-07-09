@@ -1,0 +1,20 @@
+\begin{table}[H]\centering
+\caption{Inference and Estimator Robustness of the Home-Based-Work Effect}
+\label{tab:inference}\small
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{lcc}
+\toprule
+Specification & Young child $\times$ Post (se) & $p$-value \\
+\midrule
+Individual FE, household-clustered (baseline) & -0.08$^{}$ (0.30) & 0.785 \\
+Individual FE, state-clustered (27 clusters) & -0.08$^{}$ (0.31) & 0.791 \\
+Individual + state$\times$quarter FE, state-clustered & -0.08$^{}$ (0.31) & 0.798 \\
+Wild cluster bootstrap of preferred spec (Webb, $B=9{,}999$, 27 states) & \multicolumn{1}{c}{---} & 0.821 \\
+Repeated cross-section DiD, no person FE (reproduces cross-sectional selection) & 0.35$^{***}$ (0.11) & 0.005 \\
+Local diff-in-disc.\ around 60m, bandwidth $\pm$12m & -0.18$^{}$ (0.43) & 0.671 \\
+Local diff-in-disc.\ around 60m, bandwidth $\pm$18m & 0.18$^{}$ (0.45) & 0.697 \\
+Local diff-in-disc.\ around 60m, bandwidth $\pm$24m & 0.35$^{}$ (0.43) & 0.424 \\
+Temporal placebo (fake reform 2020Q2, pre-period only) & 0.29$^{}$ (0.30) & 0.340 \\
+\bottomrule\end{tabular}}
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Home-based work in percentage points. The first block varies the level of clustering for the preferred individual-fixed-effects estimator: household (baseline), state (27 clusters, so standard errors use the $t(26)$ distribution), and state with state-by-year-quarter fixed effects. For the wild cluster bootstrap of the preferred specification, the outcome and the regressors are residualized with respect to the individual and year-quarter fixed effects (the within-transformation), and the restricted null is tested at the state level using Webb weights and $9{,}999$ replications; the reported $p$-value is that of the preferred individual-fixed-effects estimate. The repeated-cross-section row is a separate specification---it drops the individual fixed effects and instead absorbs the youngest child's age, the mother's age, and state-by-year-quarter fixed effects---and is not the model underlying the reported bootstrap $p$-value. The local difference-in-discontinuities rows compare children just below and just above the fifth-birthday (60-month) boundary within the stated bandwidth, with a linear running variable on each side. The temporal placebo restricts the sample to 2018Q1--2021Q4 and assigns a fake reform in 2020Q2. All regressions are weighted by the survey weights. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+\end{table}

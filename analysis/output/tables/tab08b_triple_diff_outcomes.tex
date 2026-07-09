@@ -5,35 +5,35 @@
 \footnotesize\setlength{\tabcolsep}{3pt}
    \begin{tabular}{lcccccc}
       \toprule
-      Dependent Variables:                    & Home office   & Log earnings & Usual hours & Employed  & In labor force & Maternity leave\\  
-      Model:                                  & (1)           & (2)          & (3)         & (4)       & (5)            & (6)\\  
+      Dependent Variables:                        & Home-based work & Log earnings & Usual hours & Employed  & In labor force & Maternity leave\\  
+      Model:                                      & (1)             & (2)          & (3)         & (4)       & (5)            & (6)\\  
       \midrule
       \emph{Variables}\\
-      Treated (child $\leq$ 4)                & -0.004$^{**}$ & -0.003       & 0.040       & -0.0006   & 0.005$^{**}$   & 0.0002\\   
-                                              & (0.002)       & (0.005)      & (0.118)     & (0.003)   & (0.002)        & (0.0002)\\   
+      Young child ($\leq$ 4)                      & -0.004$^{**}$   & -0.003       & 0.040       & -0.0006   & 0.005$^{**}$   & 0.0002\\   
+                                                  & (0.002)         & (0.005)      & (0.118)     & (0.003)   & (0.002)        & (0.0002)\\   
 \addlinespace[2pt]
-      Treated $\times$ Female                 & 0.007$^{***}$ & 0.0003       & -0.287      & -0.009    & -0.012$^{**}$  & 0.013$^{***}$\\   
-                                              & (0.003)       & (0.009)      & (0.181)     & (0.006)   & (0.005)        & (0.002)\\   
+      Young child $\times$ Female                 & 0.007$^{***}$   & 0.0003       & -0.287      & -0.009    & -0.012$^{**}$  & 0.013$^{***}$\\   
+                                                  & (0.003)         & (0.009)      & (0.181)     & (0.006)   & (0.005)        & (0.002)\\   
 \addlinespace[2pt]
-      Treated $\times$ Post                   & 0.002         & 0.010        & 0.129       & 0.005     & -0.0006        & -0.0002\\   
-                                              & (0.002)       & (0.007)      & (0.148)     & (0.004)   & (0.003)        & (0.0002)\\   
+      Young child $\times$ Post                   & 0.002           & 0.010        & 0.129       & 0.005     & -0.0006        & -0.0002\\   
+                                                  & (0.002)         & (0.007)      & (0.148)     & (0.004)   & (0.003)        & (0.0002)\\   
 \addlinespace[2pt]
-      Treated $\times$ Post $\times$ Female   & -0.003        & -0.011       & -0.054      & 0.005     & 0.011$^{**}$   & -0.008$^{***}$\\   
-                                              & (0.004)       & (0.011)      & (0.237)     & (0.006)   & (0.006)        & (0.002)\\   
+      Young child $\times$ Post $\times$ Female   & -0.003          & -0.011       & -0.054      & 0.005     & 0.011$^{**}$   & -0.008$^{***}$\\   
+                                                  & (0.004)         & (0.011)      & (0.237)     & (0.006)   & (0.006)        & (0.002)\\   
 \addlinespace[2pt]
       \midrule
       \emph{Fixed-effects}\\
-      Individual                              & Yes           & Yes          & Yes         & Yes       & Yes            & Yes\\  
-      Female-Year-quarter                     & Yes           & Yes          & Yes         & Yes       & Yes            & Yes\\  
+      Individual                                  & Yes             & Yes          & Yes         & Yes       & Yes            & Yes\\  
+      Female-Year-quarter                         & Yes             & Yes          & Yes         & Yes       & Yes            & Yes\\  
       \midrule
       \emph{Fit statistics}\\
-      Observations                            & 1,765,944     & 1,169,170    & 1,194,564   & 1,765,944 & 1,765,944      & 1,765,944\\  
-      R$^2$                                   & 0.658         & 0.915        & 0.753       & 0.796     & 0.788          & 0.542\\  
+      Observations                                & 1,765,944       & 1,169,170    & 1,194,564   & 1,765,944 & 1,765,944      & 1,765,944\\  
+      R$^2$                                       & 0.658           & 0.915        & 0.753       & 0.796     & 0.788          & 0.542\\  
 \bottomrule
    \end{tabular}
    
    \par \raggedright 
-   \footnotesize\textit{Notes:} Each column is a triple-difference regression extending Eq.~\eqref{eq:did} with a female interaction, with individual and female-by-year-quarter fixed effects throughout; it reports the men effect (Treated $\times$ Post) and the female differential (Treated $\times$ Post $\times$ Female). Home office, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; log earnings is the natural logarithm of real monthly labor earnings, so its coefficient is an approximate proportional effect, and usual hours are usual weekly hours---both defined only for workers. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+   \footnotesize\textit{Notes:} Each column is a triple-difference regression extending Eq.~\eqref{eq:did} with a female interaction, with individual and female-by-year-quarter fixed effects throughout; it reports the men effect (Young child $\times$ Post) and the female differential (Young child $\times$ Post $\times$ Female). Home-based work, employed, in labor force, and maternity leave are 0/1 indicators, so a coefficient of $0.01$ corresponds to one percentage point; log earnings is the natural logarithm of real monthly labor earnings, so its coefficient is an approximate proportional effect, and usual hours are usual weekly hours---both defined only for workers. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
 \end{table}
 
 
