@@ -60,7 +60,7 @@ etable(did(S[female == 0]), did(S[female == 1]), ddd(),
        tex = TRUE, file = tab08_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, headers = c("Men", "Women", "DDD"),
        fitstat = ~ n + r2, digits = 3, digits.stats = 3,
-       title = "Triple Difference: Home Office, Men vs.\\ Women",
+       title = "Triple Difference: Home-Based Work, Men vs.\\ Women",
        label = "tab:triple_diff",
        notes = paste(paste0("\\footnotesize\\textit{Notes:} Columns~(1) and~(2) estimate ", EQ_REF, " (outcome home-based work) separately for men and women (young child $=$ aged 4 or younger vs.\\ Control~A). Column~(3) is the pooled triple difference; the coefficient on Young child $\\times$ Post $\\times$ Female is the extra effect for women relative to men, with female-by-year-quarter fixed effects absorbing any sex-specific time shock."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE))
 postprocess_tex(tab08_file, fontsize = "\\small", tabcolsep = 5)

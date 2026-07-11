@@ -3,9 +3,10 @@
 # effect (Table 6 + coefficient plot fig07). Preferred sample: treated vs
 # Control A (child 5-7), women 18-49 head/spouse.
 #
-# The formality and sector splits double as placebos: the law binds only on CLT
-# (formal, private) employees, so a ~zero effect for informal and for public
-# workers would corroborate the channel — here everything is ~zero.
+# The formality split doubles as a placebo: the law binds only on CLT
+# (celetista) employees — private AND public-company/mixed-economy celetistas —
+# so a ~zero effect for the informal, who the law cannot reach, would corroborate
+# the channel; here everything is ~zero.
 #
 # Moderators taken at BASELINE (first observed quarter), held fixed, since
 # employment/occupation/sector are endogenous to the policy. Education uses the
@@ -27,6 +28,13 @@ setDT(dt)
 dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
 
+# CLT (celetista) employees the law reaches = signed-card employees, private OR
+# public (public companies / mixed-economy firms hire under the CLT). Derived
+# here from VD4009 so the script runs on the existing build without a rebuild;
+# see build/01_pnadc.R for the canonical definition. clt_private (private-only)
+# is already in the dataset and kept as the narrower robustness split.
+dt[, clt_covered := as.integer(!is.na(VD4009) & VD4009 %in% c(1L, 5L))]
+
 # PREDETERMINED baseline moderators (referee Comment 2): each moderator is taken
 # at the woman's LAST observation on or before 2022Q1 (the last pre-reform
 # quarter), NOT her first observed quarter, so that for women first interviewed
@@ -34,15 +42,16 @@ setorder(dt, id_panel, year_quarter)
 # pre-reform observation are dropped from the heterogeneity sample.
 pre <- dt[year_quarter <= 20221]
 b <- pre[, .SD[.N], by = id_panel,
-         .SDcols = c("clt_private", "formal", "VD4009", "higher_educ", "V2009",
-                     "V2010", "single_mother")]
-setnames(b, c("clt_private", "formal", "VD4009", "higher_educ", "V2009", "V2010", "single_mother"),
-         c("clt_base", "formal_base", "vd4009_base", "he_base", "age_base", "race_raw", "sm_raw"))
-b[, `:=`(clt_base = as.integer(clt_base == 1), formal_base = as.integer(formal_base == 1),
+         .SDcols = c("clt_covered", "clt_private", "formal", "VD4009", "higher_educ",
+                     "V2009", "V2010", "single_mother")]
+setnames(b, c("clt_covered", "clt_private", "formal", "VD4009", "higher_educ", "V2009", "V2010", "single_mother"),
+         c("clt_cov_base", "clt_base", "formal_base", "vd4009_base", "he_base", "age_base", "race_raw", "sm_raw"))
+b[, `:=`(clt_cov_base = as.integer(clt_cov_base == 1), clt_base = as.integer(clt_base == 1),
+         formal_base = as.integer(formal_base == 1),
          he_base = as.integer(he_base == 1), race_base = as.integer(race_raw %in% c(1L, 3L)),
          sm_base = as.integer(sm_raw == 1), has_pre = 1L)]
 b[, age_band := fcase(age_base <= 29, "Age 18--29", age_base <= 39, "Age 30--39", default = "Age 40--49")]
-dt <- merge(dt, b[, .(id_panel, clt_base, formal_base, vd4009_base, he_base, age_base,
+dt <- merge(dt, b[, .(id_panel, clt_cov_base, clt_base, formal_base, vd4009_base, he_base, age_base,
                       age_band, race_base, sm_base, has_pre)], by = "id_panel", all.x = TRUE)
 
 A <- dt[(has_child_u4 == 1 | (has_child_5_7 == 1 & has_child_u4 == 0)) & has_pre == 1L]
@@ -61,8 +70,8 @@ rows <- rbindlist(list(
   did_row(A,                              "All women"),
   did_row(A[formal_base == 1],            "Formal"),
   did_row(A[formal_base == 0],            "Informal"),
-  did_row(A[clt_base == 1],               "Private, signed card (CLT)"),
-  did_row(A[clt_base == 0],               "Non-CLT"),
+  did_row(A[clt_cov_base == 1],           "CLT (private or public)"),
+  did_row(A[clt_cov_base == 0],           "Non-CLT"),
   did_row(A[vd4009_base %in% c(1, 2)],    "Private employee"),
   did_row(A[vd4009_base %in% c(5, 6, 7)], "Public employee"),
   did_row(A[he_base == 1],                "With higher education"),
@@ -74,8 +83,8 @@ rows <- rbindlist(list(
   # Decomposition of the single-mother cell by contract type (channel check: the
   # statute binds only CLT). NOT added to het_subs, so NOT in the Holm family;
   # placed next to the single-mother rows so they sit together in the coefplot.
-  did_row(A[sm_base == 1 & clt_base == 1], "Single mother, CLT"),
-  did_row(A[sm_base == 1 & clt_base == 0], "Single mother, non-CLT"),
+  did_row(A[sm_base == 1 & clt_cov_base == 1], "Single mother, CLT"),
+  did_row(A[sm_base == 1 & clt_cov_base == 0], "Single mother, non-CLT"),
   did_row(A[age_band == "Age 18--29"],    "Age 18--29"),
   did_row(A[age_band == "Age 30--39"],    "Age 30--39"),
   did_row(A[age_band == "Age 40--49"],    "Age 40--49")
@@ -85,7 +94,7 @@ rows[, ci_lo := est - 1.96 * se][, ci_hi := est + 1.96 * se]
 # Multiple-testing correction across the displayed subgroups (Holm). Only
 # one of the 13 subgroups is individually significant; correcting for the number
 # of tests leaves nothing significant.
-het_subs <- c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT",
+het_subs <- c("Formal", "Informal", "CLT (private or public)", "Non-CLT",
               "Private employee", "Public employee", "With higher education",
               "Without higher education", "White", "Non-white",
               "Single mother", "Partnered mother",
@@ -133,7 +142,7 @@ tab <- c("\\begin{table}[H]\\centering",
   "\\begin{tabular}{lcccc}", "\\toprule",
   " & Young child $\\times$ Post (se) & $p$-value & Holm $p$ & Obs. \\\\", "\\midrule",
   grp("By formality",
-      c("Formal", "Informal", "Private, signed card (CLT)", "Non-CLT")), "\\midrule",
+      c("Formal", "Informal", "CLT (private or public)", "Non-CLT")), "\\midrule",
   grp("By sector", c("Private employee", "Public employee")), "\\midrule",
   grp("By education", c("With higher education", "Without higher education")), "\\midrule",
   grp("By race", c("White", "Non-white")), "\\midrule",
@@ -155,7 +164,7 @@ fig <- ggplot(rows_fig, aes(x = est, y = label)) +
   geom_vline(xintercept = 0, linetype = "dashed", colour = "grey45") +
   geom_errorbarh(aes(xmin = ci_lo, xmax = ci_hi), height = 0.25, colour = "#2C3E50") +
   geom_point(colour = "#2C3E50", size = 2) +
-  labs(x = "First-stage home-office effect (pp)", y = NULL) +
+  labs(x = "Home-based-work effect (pp)", y = NULL) +
   theme_bw(base_size = 13) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
         axis.text = element_text(size = 11))
@@ -168,7 +177,7 @@ print(rows[, .(label, est = round(est, 2), se = round(se, 2), star, n = formatC(
 # Single-mother x CLT decomposition (now shown at the bottom of Table 6). The
 # raw-significant negative single-mother coefficient is concentrated among
 # single mothers OUTSIDE the CLT (the group the statute cannot reach) and is null
-# among the registered private-sector (CLT) single mothers it does bind, so it
+# among the celetista (CLT, private or public) single mothers it does bind, so it
 # cannot be a response to the law.
 cat("\n=== Single-mother x CLT decomposition (first stage, pp) ===\n")
 print(rows[grepl("^Single mother", label),

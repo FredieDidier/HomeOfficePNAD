@@ -102,7 +102,7 @@ vars_desc <- c(
 )
 
 labels_desc <- c(
-  "Home office (\\%)", "In labor force (\\%)", "Employed (\\%)",
+  "Home-based work (\\%)", "In labor force (\\%)", "Employed (\\%)",
   "Real monthly earnings (R\\$)", "Usual weekly hours",
   "On maternity leave (\\%)", "Formal employment (\\%)", "Telework-eligible occupation (\\%)",
   "Age (years)"
@@ -503,7 +503,7 @@ if (requireNamespace("geobr", quietly = TRUE) && requireNamespace("sf", quietly 
 
   fig5 <- ggplot(states_sf) +
     geom_sf(aes(fill = home_office_rate * 100), colour = "white", linewidth = 0.3) +
-    scale_fill_gradient(name = "Home office (%)", low = "#D5F5E3", high = "#0B5345",
+    scale_fill_gradient(name = "Home-based work (%)", low = "#D5F5E3", high = "#0B5345",
                         na.value = "grey85") +
     theme_void(base_size = 14) +
     theme(legend.position = "right")

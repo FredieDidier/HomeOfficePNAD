@@ -619,13 +619,24 @@ build_main_data <- function() {
   dt[, employed   := fifelse(!is.na(ocupado) & ocupado == 1L, 1L, 0L)]
   dt[, unemployed := fifelse(!is.na(ocupado) & ocupado == 0L, 1L, 0L)]
 
-  # --- CLT private-sector employee (sharp "law binds" indicator) ---
-  # Art. 75-F binds on CLT employees. datazoom's `formal` is broader (also public,
-  # military/statutory, and INSS-contributing self-employed), where the law does
-  # NOT bind. VD4009 == 1 = "empregado no setor privado com carteira" is the
-  # sharpest group the provision applies to. Used as the precise placebo/
-  # heterogeneity split in 05_heterogeneity.R; `formal`/`informal` (datazoom) are
-  # kept as the general informality measure. = 0 for everyone else (incl. non-employed).
+  # --- CLT (celetista) employees: the group Art. 75-F legally reaches ---
+  # Art. 75-F sits in the CLT (Titulo II-A) and binds on `empregados` under the
+  # CLT regime. In PNADC these are the signed-card (`com carteira`) employees:
+  #   VD4009 == 1 : private sector, signed card  (celetista)
+  #   VD4009 == 5 : public sector, signed card   (celetista) -- public companies
+  #                 and mixed-economy firms (Banco do Brasil, Caixa, Petrobras,
+  #                 Correios) hire under the CLT, so these workers ARE covered.
+  # Excluded: VD4009 == 7 (militares / servidores estatutarios, governed by the
+  # statutory RJU, not the CLT), VD4009 == 3 (domestic signed-card, LC 150/2015),
+  # and all informal/self-employed/employer categories. datazoom's `formal` is
+  # broader still (adds statutory public, military, and INSS-contributing
+  # self-employed), where the law does NOT bind.
+  #   clt_covered : the correct "legally covered" group = VD4009 in {1,5}.
+  #   clt_private : the narrower private-only group (VD4009 == 1), kept as a
+  #                 robustness split. Public celetistas are ~4.8% of the covered
+  #                 pool among treated women, so the two are close but not equal.
+  # Both = 0 for everyone else (incl. the non-employed).
+  dt[, clt_covered := fifelse(!is.na(VD4009) & VD4009 %in% c(1L, 5L), 1L, 0L)]
   dt[, clt_private := fifelse(!is.na(VD4009) & VD4009 == 1L, 1L, 0L)]
 
   # --- Sex indicator (for the triple-difference / men placebo) ---
@@ -705,8 +716,8 @@ build_main_data <- function() {
     "ocupado", "forca_trab", "formal", "informal",
     # Employment status outcomes (project-derived, defined over full sample)
     "in_labor_force", "employed", "unemployed",
-    # CLT private-sector employee (sharp "law binds" heterogeneity indicator)
-    "clt_private",
+    # CLT (celetista) employees the law reaches: covered (private+public) & private-only
+    "clt_covered", "clt_private",
     # Earnings
     "VD4019", "Habitual", "earnings_habitual_real",
     # Hours

@@ -47,6 +47,12 @@ setDT(dt)
 dt <- dt[female == 1 & is_head_or_spouse == 1 & panel_matched == 1]
 setorder(dt, id_panel, year_quarter)
 
+# CLT (celetista) employees the law legally reaches = signed-card employees,
+# private OR public (public companies / mixed-economy firms hire under the CLT).
+# Derived from VD4009 so the script runs on the existing build; see
+# build/01_pnadc.R for the canonical definition.
+dt[, clt_covered := as.integer(!is.na(VD4009) & VD4009 %in% c(1L, 5L))]
+
 star <- function(p) ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.1, "*", "")))
 fmt  <- function(x, d = 2) sub("^-(0\\.?0*)$", "\\1", formatC(x, format = "f", digits = d))  # strip signed zero
 fmt0 <- function(x) formatC(as.integer(x), format = "d", big.mark = ",")
@@ -58,9 +64,9 @@ fmt0 <- function(x) formatC(as.integer(x), format = "d", big.mark = ",")
 # =============================================================================
 pre <- dt[year_quarter <= 20221]
 base <- pre[, .SD[.N], by = id_panel,
-            .SDcols = c("clt_private", "potential_telework", "employed",
+            .SDcols = c("clt_covered", "potential_telework", "employed",
                         "VD4009", "V2009")]
-setnames(base, c("clt_private", "potential_telework", "employed", "VD4009", "V2009"),
+setnames(base, c("clt_covered", "potential_telework", "employed", "VD4009", "V2009"),
          c("clt_pre", "tele_pre", "emp_pre", "vd4009_pre", "age_pre"))
 base[, salaried_pre := as.integer(vd4009_pre %in% 1:6)]  # employees (private/domestic/public), signed or not
 base[, selfemp_pre  := as.integer(vd4009_pre == 9)]      # conta propria (self-employed)
@@ -94,7 +100,7 @@ subs <- list(
   list("All women (population-average exposure)", A),
   list("Employed at baseline",                    A[emp_pre == 1]),
   list("Salaried employees at baseline",          A[salaried_pre == 1]),
-  list("Private, signed-card (CLT) at baseline",  A[clt_pre == 1]),
+  list("CLT (private or public) at baseline",     A[clt_pre == 1]),
   list("Self-employed at baseline",               A[selfemp_pre == 1]),
   list("Telework-eligible occupation at baseline", A[tele_pre == 1]),
   list("CLT $\\times$ telework-eligible at baseline", A[clt_pre == 1 & tele_pre == 1])
@@ -121,6 +127,46 @@ tab9 <- c(
   paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} The outcome is an indicator for performing the main job at the worker's own residence (home-based work as measured in the PNADC); non-employed women are coded zero, so in the first row the estimand is the population-average effect on the share of \\emph{all} women working from home. Each row re-estimates ", EQ_REF, " on the subsample of women who were in the stated group at their \\emph{last observation on or before 2022Q1} (predetermined, so not itself an outcome of the reform); women with no pre-reform observation are excluded. Coefficients are in percentage points; ``Pre-mean'' is the survey-weighted pre-reform home-based-work rate among treated women in each subsample. The first row is the population-average (exposure) estimand; the CLT and CLT $\\times$ telework-eligible rows are the effect among the workers Article~75-F can legally reach."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
 writeLines(tab9, file.path(TABLE_DIR, "tab09_estimands.tex"))
+
+# =============================================================================
+# Table 16 — statutory-reach funnel (new reviewer Comment 2)
+# =============================================================================
+# A descriptive accounting of how quickly the population Article 75-F can reach
+# narrows, among women with a child aged 0-4. Predetermined snapshot: each woman
+# at her last observation on or before 2022Q1. The steps NEST: employees (VD4009
+# in 1:6) contain the celetistas (VD4009 in {1,5}), who contain the teleworkable
+# celetistas, who contain those not already working from home. Shares are of ALL
+# young-child women (survey-weighted). Descriptive, not causal: a teleworkable
+# occupation does not imply an employer has a remote position to allocate.
+fu <- dt[has_child_u4 == 1 & year_quarter <= 20221][
+  , .SD[.N], by = id_panel,
+  .SDcols = c("VD4009", "potential_telework", "employed", "home_office", "V1028")]
+den <- fu[, sum(V1028)]
+reach <- data.table(
+  label = c("All women with a child aged 0--4",
+            "Employed",
+            "Salaried employees",
+            "CLT (celetista, private or public)",
+            "CLT in a telework-eligible occupation",
+            "CLT, telework-eligible, and not already working from home"),
+  pct = c(100,
+          100 * fu[employed == 1, sum(V1028)] / den,
+          100 * fu[VD4009 %in% 1:6, sum(V1028)] / den,
+          100 * fu[VD4009 %in% c(1, 5), sum(V1028)] / den,
+          100 * fu[VD4009 %in% c(1, 5) & potential_telework == 1, sum(V1028)] / den,
+          100 * fu[VD4009 %in% c(1, 5) & potential_telework == 1 & home_office == 0, sum(V1028)] / den))
+tab16 <- c(
+  "\\begin{table}[H]\\centering",
+  "\\caption{Potential Statutory Reach among Women with a Young Child}",
+  "\\label{tab:reach}\\small",
+  "\\begin{tabular}{lc}", "\\toprule",
+  "Step & Weighted share (\\%) \\\\", "\\midrule",
+  sprintf("%s & %s \\\\", reach$label, fmt(reach$pct, 1)),
+  "\\bottomrule\\end{tabular}",
+  paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Survey-weighted shares of all women aged 18--49 who are household heads or spouses and have a child aged 0--4, each taken at her last observation on or before 2022Q1 (predetermined). The steps are nested: salaried employees (VD4009 $\\in\\{1,\\dots,6\\}$) contain the celetistas covered by Article~75-F (signed-card employees in the private or public sector, VD4009 $\\in\\{1,5\\}$; public-sector celetistas are the employees of public companies and mixed-economy firms), who contain those in a telework-eligible occupation, who contain those not already working from home. This reach accounting is descriptive rather than causal: occupational teleworkability does not imply that an employer has an available remote position, but it shows how quickly the potentially affected population narrows. ", WEIGHT_NOTE),
+  "\\end{table}")
+writeLines(tab16, file.path(TABLE_DIR, "tab16_statutory_reach.tex"))
+cat("\n=== Statutory-reach funnel (weighted %) ===\n"); print(reach)
 
 # =============================================================================
 # Table 10 — precision and equivalence tests (Comment 7)

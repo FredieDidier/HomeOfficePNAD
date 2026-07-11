@@ -255,7 +255,7 @@ figw <- ggplot(win, aes(x = label, y = est)) +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey45") +
   geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi), width = 0.2, colour = "#2C3E50") +
   geom_point(colour = "#2C3E50", size = 2) +
-  labs(x = "Control window (youngest child age)", y = "First-stage home-office effect (pp)") +
+  labs(x = "Control window (youngest child age)", y = "Home-based-work effect (pp)") +
   theme_bw(base_size = 13) +
   theme(panel.grid.minor = element_blank())
 ggsave(file.path(GRAPH_DIR, "fig08_control_window_sweep.pdf"), figw, width = 7.5, height = 4.5)

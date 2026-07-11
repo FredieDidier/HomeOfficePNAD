@@ -80,7 +80,8 @@ get_pos <- function(p) posr[pos == p, ho]
 ho_emp  <- get_pos("Employee (signed-card or public)")
 ho_self <- get_pos("Self-employed")
 ho_er   <- get_pos("Employer")
-ho_clt  <- 100 * e[clt_private == 1, weighted.mean(home_office, V1028)]
+e[, clt_covered := as.integer(!is.na(VD4009) & VD4009 %in% c(1L, 5L))]
+ho_clt  <- 100 * e[clt_covered == 1, weighted.mean(home_office, V1028)]
 
 # ---- Table 14 ---------------------------------------------------------------
 row <- function(lbl, val) sprintf("$\\quad$ %s & %s \\\\", lbl, val)
@@ -98,7 +99,7 @@ tab14 <- c(
   "\\midrule",
   "\\multicolumn{2}{l}{\\textit{B. Home-based-work proxy by position in employment, 2022}} \\\\",
   row("Employees (signed-card or public)", fmt(ho_emp)),
-  row("Private, signed-card (CLT)", fmt(ho_clt)),
+  row("CLT (celetista, private or public)", fmt(ho_clt)),
   row("Self-employed", fmt(ho_self)),
   row("Employers", fmt(ho_er)),
   "\\midrule",
@@ -107,7 +108,7 @@ tab14 <- c(
   sprintf("$\\quad$ Pearson correlation, unweighted & %s \\\\", fmt(r_u, 2)),
   sprintf("$\\quad$ Spearman rank correlation & %s \\\\", fmt(r_s, 2)),
   "\\bottomrule\\end{tabular}",
-  paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Cross-sectional validation of the home-based-work proxy (main job performed at the worker's own residence, V4022 $\\in\\{4,5\\}$) against IBGE's experimental 2022 telework supplement (Table 9471), which reports, by state, the share of employed persons aged 14 or older who did remote work, telework, or telework at home in 2022. Panel~A compares aggregate magnitudes: the proxy (6--7\\% of the employed) is close to the supplement's telework-at-home rate. Panel~B shows the proxy by position in employment: home-based work is concentrated among the self-employed (home businesses) and is low among the employees, and among the private-sector CLT employees, that the statute binds---which is why the paper reports the effect on those predetermined subgroups separately (Table~\\ref{tab:estimands}). Panel~C reports the cross-state association between the proxy (share of the employed in main\\_data, aged 18--49) and the supplement's telework-at-home rate over the 27 states; the employment-weighted correlation is higher than the unweighted one because the small northern states, which the supplement flags as high-variance experimental estimates, are noisy. The supplement is an aggregate state-level table and cannot be linked at the individual level, so this is a cross-sectional check, not a person-level match."),
+  paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Cross-sectional validation of the home-based-work proxy (main job performed at the worker's own residence, V4022 $\\in\\{4,5\\}$) against IBGE's experimental 2022 telework supplement (Table 9471), which reports, by state, the share of employed persons aged 14 or older who did remote work, telework, or telework at home in 2022. Panel~A compares aggregate magnitudes: the proxy (6--7\\% of the employed) is close to the supplement's telework-at-home rate. Panel~B shows the proxy by position in employment: home-based work is concentrated among the self-employed (home businesses) and is low among the employees, and among the CLT (celetista) employees, that the statute binds---which is why the paper reports the effect on those predetermined subgroups separately (Table~\\ref{tab:estimands}). Panel~C reports the cross-state association between the proxy (share of the employed in main\\_data, aged 18--49) and the supplement's telework-at-home rate over the 27 states; the employment-weighted correlation is higher than the unweighted one because the small northern states, which the supplement flags as high-variance experimental estimates, are noisy. The supplement is an aggregate state-level table and cannot be linked at the individual level, so this is a cross-sectional check, not a person-level match."),
   "\\end{table}")
 writeLines(tab14, file.path(TABLE_DIR, "tab14_proxy_validation.tex"))
 

@@ -53,9 +53,11 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "age_youngest_child_any",
                      "female", "higher_educ",
                      "age_youngest_child_months_any", "single_mother",
-                     "V2008", "V20081", "V20082"
+                     "V2008", "V20081", "V20082",
+                     # CLT (celetista) employees the law reaches (private + public)
+                     "clt_covered"
                    ),
-                   
+
                    source = c(
                      "datazoom.social", "Project-derived", "Project-derived", "Project-derived",
                      "PNADC raw", "PNADC raw", "Project-derived", "PNADC raw",
@@ -83,7 +85,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "Project-derived",
                      "Project-derived", "Project-derived",
                      "Project-derived", "Project-derived",
-                     "PNADC raw", "PNADC raw", "PNADC raw"
+                     "PNADC raw", "PNADC raw", "PNADC raw",
+                     "Project-derived"
                    ),
 
                    type = c(
@@ -113,7 +116,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "numeric",
                      "integer", "integer",
                      "integer", "integer",
-                     "integer", "integer", "integer"
+                     "integer", "integer", "integer",
+                     "integer"
                    ),
 
                    description_pt = c(
@@ -184,7 +188,7 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "=1 se year_quarter ≥ 20221 (robustez: pós-MP a partir do 1º tri 2022)",
                      "Interação DiD principal (= treated × post_mp)",
                      "Interação DiD de robustez (= treated × post_mp_alt)",
-                     "=1 se VD4009==1 (empregado no setor privado com carteira = empregado CLT). Grupo em que o Art. 75-F de fato vincula. Usado como corte de placebo/heterogeneidade (não como restrição amostral). =0 para os demais, inclusive não ocupadas.",
+                     "=1 se VD4009==1 (empregado no setor privado com carteira = empregado CLT privado). NOTA: substituído por clt_covered (VD4009 ∈ {1,5}, que inclui os celetistas do setor público) como grupo 'coberto' principal; mantido como corte de robustez (setor privado apenas). Corte de placebo/heterogeneidade, não restrição amostral. =0 para os demais, inclusive não ocupadas.",
                      "Idade do filho mais novo de QUALQUER idade no domicílio (todos os tipos de filho; NA se não há filhos). Subsume as definições de grupo: tratado = (≤4); janela de controle [5,K]; Controle B = (≥8 ou NA). Usada na robustez de janela de controle.",
                      "Indicador de sexo feminino (=1 se V2007==2). A base contém ambos os sexos; as análises principais filtram female==1. Homens entram apenas no triple-difference (DDD) e no placebo.",
                      "Ensino superior completo (=1 se VD3004==7). Split de educação mais interpretável que faixa_educ, usado na heterogeneidade.",
@@ -192,7 +196,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "=1 se mulher chefe do domicílio (V2005==1) sem cônjuge/companheiro(a) co-residente (nenhum membro com V2005 ∈ {2,3}; PNADC trimestral não traz estado civil). No sample de análise (que condiciona à presença de criança pequena) identifica a mãe solteira/sem parceiro co-residente. Usada apenas como moderadora de heterogeneidade (baseline), nunca como restrição.",
                      "Dia de nascimento da própria pessoa entrevistada (a pessoa da linha). Variável bruta da PNADC. NÃO é a data de nascimento da criança: age_youngest_child_months_any usa o V20081/V20082 da criança mais nova do domicílio, obtidos do roster durante o build. O dia de nascimento não alimenta nenhuma variável derivada (a data exata da entrevista não é divulgada, tornando precisão sub-mensal espúria).",
                      "Mês de nascimento da própria pessoa entrevistada (variável bruta da PNADC). É o V20081 da criança mais nova do domicílio (não este, que é o da pessoa da linha) que é usado no build para construir age_youngest_child_months_any.",
-                     "Ano de nascimento da própria pessoa entrevistada (variável bruta da PNADC). É o V20082 da criança mais nova do domicílio que é usado no build para construir age_youngest_child_months_any."
+                     "Ano de nascimento da própria pessoa entrevistada (variável bruta da PNADC). É o V20082 da criança mais nova do domicílio que é usado no build para construir age_youngest_child_months_any.",
+                     "=1 se VD4009 ∈ {1,5} (empregado com carteira assinada no setor privado OU público). Grupo efetivamente coberto pelo Art. 75-F: empregados celetistas privados E celetistas de empresas públicas/sociedades de economia mista (Banco do Brasil, Caixa, Petrobras, Correios), que são contratados sob o regime da CLT. Exclui servidores estatutários (VD4009==7), domésticos (VD4009==3), informais e conta-própria. Substitui clt_private como grupo 'coberto' principal (clt_private = VD4009==1 fica como robustez). =0 para os demais, inclusive não ocupadas."
                    ),
 
                    description_en = c(
@@ -263,7 +268,7 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "=1 if year_quarter ≥ 20221 (robustness: post-MP from Q1 2022 onwards)",
                      "Main DiD interaction term (= treated × post_mp)",
                      "Robustness DiD interaction term (= treated × post_mp_alt)",
-                     "=1 if VD4009==1 (private-sector employee with a signed card = CLT employee). The group Art. 75-F actually binds on. Used as a placebo/heterogeneity split (not a sample restriction). =0 otherwise, including the non-employed.",
+                     "=1 if VD4009==1 (private-sector employee with a signed card = private CLT employee). NOTE: superseded by clt_covered (VD4009 ∈ {1,5}, which adds public-sector celetistas) as the headline covered group; kept as the private-only robustness split. Placebo/heterogeneity moderator, not a sample restriction. =0 otherwise, including the non-employed.",
                      "Age of the youngest child of ANY age in the household (all child types; NA if no children). Subsumes the group definitions: treated = (<=4); control window [5,K]; Control B = (>=8 or NA). Used for the control-window robustness.",
                      "Female indicator (=1 if V2007==2). The base holds both sexes; main analyses filter female==1. Men enter only the triple-difference (DDD) and the placebo.",
                      "Completed higher education (=1 if VD3004==7). More interpretable education split than faixa_educ, used in the heterogeneity analysis.",
@@ -271,7 +276,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "=1 if a female household head (V2005==1) with no co-resident spouse or partner (no household member with V2005 in {2,3}; the quarterly PNADC carries no marital-status variable). In the analysis sample, which conditions on the presence of a young child, this identifies the single (lone) mother — a mother with no co-resident partner. Used only as a baseline heterogeneity moderator, never as a sample restriction.",
                      "Day of birth of the interviewed person (the row's person). Raw PNADC variable. This is NOT the child's date of birth: age_youngest_child_months_any uses the youngest child's V20081/V20082, pulled from the household roster during the build. The day of birth feeds no derived variable (the exact interview date is not released, making sub-monthly precision spurious).",
                      "Month of birth of the interviewed person (raw PNADC variable). It is the youngest child's V20081 in the household (not this one, which is the row person's) that is used in the build to construct age_youngest_child_months_any.",
-                     "Year of birth of the interviewed person (raw PNADC variable). It is the youngest child's V20082 in the household that is used in the build to construct age_youngest_child_months_any."
+                     "Year of birth of the interviewed person (raw PNADC variable). It is the youngest child's V20082 in the household that is used in the build to construct age_youngest_child_months_any.",
+                     "=1 if VD4009 ∈ {1,5} (signed-card employee in the private OR public sector). The group actually covered by Art. 75-F: private-sector celetistas AND the celetistas of public companies / mixed-economy firms (Banco do Brasil, Caixa, Petrobras, the postal service), who are hired under the CLT regime. Excludes statutory servants (VD4009==7), domestic workers (VD4009==3), the informal, and the self-employed. Supersedes clt_private as the headline 'legally covered' group (clt_private = VD4009==1 is kept as a robustness split). =0 otherwise, including the non-employed."
                    ),
 
                    values_notes = c(
@@ -342,7 +348,7 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "0 or 1 (integer). Alternative cutoff: Q1 2022 (year_quarter ≥ 20221). Use in robustness tables.",
                      "0 or 1 (integer). Main DiD regressor.",
                      "0 or 1 (integer). Use in robustness specifications alongside post_mp_alt.",
-                     "0 or 1 (integer). Sharp CLT (private carteira) indicator, VD4009==1. Heterogeneity/placebo moderator; ~19.5% of sample women, ~34% of employed.",
+                     "0 or 1 (integer). Private-only CLT (carteira) indicator, VD4009==1. Narrower robustness split; see clt_covered for the full covered group (private + public celetistas). ~19.5% of sample women, ~34% of employed.",
                      "Integer years (0-17+) or NA. Youngest child of any age. Treated == (value <= 4); control window [5,K] == (value in 5:K).",
                      "0 or 1 (integer). V2007: 1=male, 2=female.",
                      "0 or 1 (integer). VD3004==7 (Superior completo). ~19.7% of women.",
@@ -350,7 +356,8 @@ dict <- data.frame(stringsAsFactors = FALSE,
                      "0 or 1 (integer). =1 for a female lone household head (no co-resident partner). Baseline heterogeneity moderator (single vs. partnered mother); ~1/4 of treated women in the sample.",
                      "1–31 (integer) or NA. Interviewed person's own day of birth.",
                      "1–12 (integer) or NA. Interviewed person's own month of birth.",
-                     "Four-digit year or NA. Interviewed person's own year of birth (roughly 1968–2008 in this sample of persons aged 18–49 across 2018–2026)."
+                     "Four-digit year or NA. Interviewed person's own year of birth (roughly 1968–2008 in this sample of persons aged 18–49 across 2018–2026).",
+                     "0 or 1 (integer). Covered-CLT indicator, VD4009 ∈ {1,5} (private + public celetistas). Headline 'legally covered' group for Art. 75-F; public celetistas ≈4.8% of the covered pool among treated women. clt_private (VD4009==1) is the narrower private-only robustness split."
                    )
 )
 
