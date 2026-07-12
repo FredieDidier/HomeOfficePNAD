@@ -12,3 +12,7 @@ latex/*.out
 latex/*.pdf
 latex/*.synctex.gz
 .DS_Store
+
+# Internal working docs — NOT part of the replication package
+CLAUDE.md
+memory/
