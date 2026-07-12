@@ -244,7 +244,7 @@ if (requireNamespace("fwildclusterboot", quietly = TRUE)) {
                                param = "treat_x_post", B = 9999, type = "webb")$p_val
   }, error = function(e) { message("boottest failed: ", conditionMessage(e)); NA_real_ })
 }
-add_inf("Wild cluster bootstrap of preferred spec (Webb, $B=9{,}999$, 27 states)",
+add_inf("Wild cluster bootstrap of preferred spec",
         b$est*100, b$se*100, wb_p, extra = "wildp")
 
 # (e) Repeated-cross-section DiD (no individual FE): child-age, maternal-age and
@@ -411,7 +411,7 @@ tab13 <- c(
   sprintf("\\multicolumn{3}{@{}l}{\\textit{DiD re-estimated on stable-status women only:} %s$^{%s}$ (%s) pp} \\\\",
           fmt(ct_stable[1]*100), star(ct_stable[4]), fmt(ct_stable[2]*100)),
   "\\bottomrule\\end{tabular}",
-  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Among women observed both before and after the reform (2022Q2), the table classifies each by how her eligibility (a young child in the household) moves over the panel. Most retain a stable eligibility status across the reform, whose pre/post contrast is uncontaminated by a birth or a child ageing out; the table reports person counts, not the econometric weight each path carries in the pooled estimator. The final row re-estimates ", EQ_REF, " on the stable-status women only, as a check that the pooled null is not driven solely by the switchers. ", WEIGHT_NOTE), CLUSTER_NOTE, SIGNIF_NOTE),
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Among women observed both before and after the reform (2022Q2), the table classifies each by how her eligibility (a young child in the household) moves over the panel. Most retain a stable eligibility status across the reform, whose pre/post contrast is uncontaminated by a birth or a child ageing out; the table reports person counts, not the econometric weight each path carries in the pooled estimator. The final row re-estimates ", EQ_REF, " on the stable-status women only, as a check that the pooled null is not driven solely by the switchers. The person counts and shares are unweighted; the final-row regression is weighted by the survey weights."), CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
 writeLines(tab13, file.path(TABLE_DIR, "tabE4_identification.tex"))
 
