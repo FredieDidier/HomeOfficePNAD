@@ -55,7 +55,7 @@ ddd  <- function(y = "home_office")
         S, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
 
 # ---- Table 8: first stage, men / women / DDD -------------------------------
-tab08_file <- file.path(TABLE_DIR, "tab08_triple_diff.tex")
+tab08_file <- file.path(TABLE_DIR, "tabE6_triple_diff.tex")
 etable(did(S[female == 0]), did(S[female == 1]), ddd(),
        tex = TRUE, file = tab08_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, headers = c("Men", "Women", "DDD"),
@@ -76,7 +76,7 @@ writeLines(.tx, tab08_file)
 outcomes <- c("home_office", "log_earnings", "hours_usual",
               "employed", "in_labor_force", "on_maternity_leave")
 ddd_mods <- setNames(lapply(outcomes, ddd), outcomes)
-tab08b_file <- file.path(TABLE_DIR, "tab08b_triple_diff_outcomes.tex")
+tab08b_file <- file.path(TABLE_DIR, "tabE7_triple_diff_outcomes.tex")
 etable(ddd_mods,
        tex = TRUE, file = tab08b_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,

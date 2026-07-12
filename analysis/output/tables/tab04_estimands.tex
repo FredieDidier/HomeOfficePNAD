@@ -1,0 +1,18 @@
+\begin{table}[H]\centering
+\caption{Home-Based Work by Predetermined Subsample: Population-Average versus Legally-Covered Estimands}
+\label{tab:estimands}\small
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Subsample (predetermined) & Young child $\times$ Post (se) & 95\% CI & Pre-mean & Obs. & Persons \\
+\midrule
+All women (population-average exposure) & -0.08$^{}$ (0.30) & [-0.67, 0.51] & 4.6 & 989,898 & 310,960 \\
+Employed at baseline & -0.61$^{}$ (0.72) & [-2.02, 0.79] & 7.7 & 277,301 & 86,342 \\
+Salaried employees at baseline & -1.01$^{}$ (0.75) & [-2.48, 0.47] & 1.9 & 156,533 & 49,972 \\
+CLT (private or public) at baseline & -1.32$^{}$ (1.12) & [-3.52, 0.88] & 1.6 & 85,892 & 27,082 \\
+Self-employed at baseline & 0.45$^{}$ (2.32) & [-4.09, 4.99] & 27.4 & 64,782 & 19,987 \\
+Telework-eligible occupation at baseline & -0.59$^{}$ (1.73) & [-3.97, 2.79] & 7.3 & 71,769 & 21,598 \\
+CLT $\times$ telework-eligible at baseline & -0.89$^{}$ (3.05) & [-6.86, 5.08] & 2.9 & 26,874 & 8,219 \\
+\bottomrule\end{tabular}}
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} The outcome is an indicator for performing the main job at the worker's own residence (home-based work as measured in the PNADC); non-employed women are coded zero, so in the first row the estimand is the population-average effect on the share of \emph{all} women working from home. Each row re-estimates Eq.~\eqref{eq:did} on the subsample of women who were in the stated group at their \emph{last observation on or before 2022Q1} (predetermined); women with no pre-reform observation are excluded. Coefficients are in percentage points; ``Pre-mean'' is the survey-weighted pre-reform home-based-work rate among treated women in each subsample. The first row is the population-average (exposure) estimand; the CLT and CLT $\times$ telework-eligible rows are the effect among the workers Article~75-F can legally reach. All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+\end{table}

@@ -236,7 +236,7 @@ tab <- c(
   "\\end{longtable}",
   "}"
 )
-writeLines(tab, file.path(TABLE_DIR, "tab07_robustness.tex"))
+writeLines(tab, file.path(TABLE_DIR, "tabE1_robustness.tex"))
 
 # =============================================================================
 # Figure A5 (fig08) — control-window sweep, first stage

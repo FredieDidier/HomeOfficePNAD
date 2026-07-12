@@ -150,9 +150,9 @@ tab <- c("\\begin{table}[H]\\centering",
   grp_decomp("Single mothers, by contract type", c("Single mother, CLT", "Single mother, non-CLT")), "\\midrule",
   grp("By age band", c("Age 18--29", "Age 30--39", "Age 40--49")),
   "\\bottomrule\\end{tabular}}",
-  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression estimating ", EQ_REF, " (outcome: home-based work, in percentage points) on the preferred sample (young child vs.\\ Control~A), for the subgroup indicated; standard errors in parentheses next to the estimate. Subgroups are defined at each woman's last observation on or before 2022Q1 (predetermined), and the sample is restricted to women observed at least once before the reform; the ``Single mothers, by contract type'' rows decompose the single-mother cell and are not part of the Holm family (dash in the Holm-$p$ column)."), WEIGHT_NOTE, CLUSTER_NOTE, mt_note, SIGNIF_NOTE),
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each estimate is a separate difference-in-differences regression estimating ", EQ_REF, " (outcome: home-based work, in percentage points) on the preferred sample (young child vs.\\ Control~A), for the subgroup indicated; standard errors in parentheses next to the estimate. Subgroups are defined at each woman's last observation on or before 2022Q1 (predetermined), and the sample is restricted to women observed at least once before the reform."), mt_note, WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab, file.path(TABLE_DIR, "tab06_heterogeneity.tex"))
+writeLines(tab, file.path(TABLE_DIR, "tab08_heterogeneity.tex"))
 
 # ---- Figure 3 (fig07) — coefficient plot -----------------------------------
 # ggplot renders labels verbatim, so convert the LaTeX en-dash "--" in the age

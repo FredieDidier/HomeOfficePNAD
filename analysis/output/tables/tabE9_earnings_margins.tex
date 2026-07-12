@@ -1,0 +1,15 @@
+\begin{table}[H]\centering
+\caption{Earnings and Hours: Worker-Conditional and Unconditional Estimates}
+\label{tab:earnings_margins}\small
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Outcome & Young child $\times$ Post (se) & 95\% CI & Pre-trend $\chi^2(16)$ & Parallel trends? & Obs. \\
+\midrule
+Log earnings (workers only) & -0.001 (0.009) & [-0.019, 0.017] & 8.7\ ($p=0.926$) & Yes & 481,352 \\
+Usual weekly hours (workers only) & 0.069 (0.202) & [-0.326, 0.464] & 9.4\ ($p=0.895$) & Yes & 504,745 \\
+Inverse hyperbolic sine of earnings (all women, non-employed $=0$) & 0.060 (0.038) & [-0.015, 0.135] & 33.3\ ($p=0.007$) & No & 989,898 \\
+Weekly hours (all women, non-employed $=0$) & 0.338 (0.202) & [-0.057, 0.733] & 36.3\ ($p=0.003$) & No & 989,898 \\
+\bottomrule\end{tabular}}
+\par\vspace{3pt}\footnotesize\raggedright \textit{Notes:} Each row is a separate difference-in-differences regression estimating Eq.~\eqref{eq:did} on the preferred sample (young child vs.\ Control~A). The first two rows are the intensive-margin outcomes observed only for workers (log real earnings and usual weekly hours). The last two re-define the outcomes over \emph{all} sample women, coding the non-employed as zero (inverse hyperbolic sine for earnings, to admit the zeros), so they combine the intensive and the extensive margins. ``Pre-trend $\chi^2(16)$'' is the joint Wald test that the pre-reform event-study leads are zero (the parallel-trends diagnostic): the worker-conditional earnings and hours pass it and are precise nulls, whereas the unconditional versions reject it, because they inherit the differential pre-trend of the employment extensive margin (Table~\ref{tab:did_outcomes_A}). All regressions are weighted by the survey weights. Standard errors are clustered at the household level in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+\end{table}

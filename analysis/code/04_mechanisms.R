@@ -51,7 +51,7 @@ fe <- function(sample, y = "home_office")
         sample, weights = ~V1028, cluster = ~id_dom, notes = FALSE)
 
 # ---- Table 4: moderation by baseline telework eligibility -------------------
-tab04_file <- file.path(TABLE_DIR, "tab04_mechanism_moderation.tex")
+tab04_file <- file.path(TABLE_DIR, "tab06_mechanism_moderation.tex")
 etable(fe(A_pt), fe(A_pt[pt_base == 1]), fe(A_pt[pt_base == 0]),
        tex = TRUE, file = tab04_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, headers = c("All", "Telework-eligible", "Not eligible"),
@@ -62,7 +62,7 @@ etable(fe(A_pt), fe(A_pt[pt_base == 1]), fe(A_pt[pt_base == 0]),
 postprocess_tex(tab04_file, fontsize = "\\small", tabcolsep = 5)
 
 # ---- Table 5: occupational sorting (potential_telework as outcome) ----------
-tab05_file <- file.path(TABLE_DIR, "tab05_mechanism_allocation.tex")
+tab05_file <- file.path(TABLE_DIR, "tab07_mechanism_allocation.tex")
 etable(fe(A, "potential_telework"), fe(B, "potential_telework"),
        tex = TRUE, file = tab05_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, headers = c("Control A (5--7)", "Control B (no child 0--7)"),
@@ -99,7 +99,7 @@ tb <- c("\\begin{table}[H]\\centering",
   trans_tab(0, "Control A (child 5--7)"), "\\bottomrule\\end{tabular}",
   "\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each cell is the share of women in a given pre-to-post telework-eligibility transition, among matched women observed both before and after the second quarter of 2022. Off-diagonal cells are occupation switches. The treated and control distributions are similar, consistent with the null in Table~\\ref{tab:mech_allocation}.",
   "\\end{table}")
-writeLines(tb, file.path(TABLE_DIR, "tab05b_occupation_transition.tex"))
+writeLines(tb, file.path(TABLE_DIR, "tabE5_occupation_transition.tex"))
 
 # ---- Console ----------------------------------------------------------------
 cat("\n=== Mechanism I: home-based work by baseline eligibility (pp) ===\n")

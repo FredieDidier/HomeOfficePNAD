@@ -4,17 +4,17 @@
 # on the preferred sample (young-child vs Control A), varying what the referee
 # asked for. Produces the new exhibits cited in the revised paper:
 #
-#   Table 9  (tab09_estimands)     — home-based work by PREDETERMINED subsample:
+#   Table 4  (tab04_estimands)     — home-based work by PREDETERMINED subsample:
 #                                    all / employed / salaried employees / CLT /
 #                                    self-employed / teleworkable / CLT x
 #                                    teleworkable. Separates the population-
 #                                    average estimand from the effect among the
 #                                    legally covered (Comments 1 and 3).
-#   Table 10 (tab10_equivalence)   — precision and TOST equivalence tests, with
+#   Table 5  (tab05_equivalence)   — precision and TOST equivalence tests, with
 #                                    95% CI, pre-reform mean, upper bound as % of
 #                                    mean, and the equivalence verdict against a
 #                                    pre-specified SESOI (Comment 7).
-#   Table 11 (tab11_inference)     — inference and estimator robustness: state
+#   Table E.2 (tabE2_inference)    — inference and estimator robustness: state
 #                                    clustering, wild cluster bootstrap over the
 #                                    27 states, a repeated-cross-section DiD with
 #                                    child-age / maternal-age / state x quarter
@@ -22,10 +22,10 @@
 #                                    discontinuities around the 60-month cutoff,
 #                                    and a pre-reform temporal placebo
 #                                    (Comments 5 and 6).
-#   Table 12 (tab12_attrition)     — differential-attrition test and an inverse-
+#   Table E.3 (tabE3_attrition)    — differential-attrition test and an inverse-
 #                                    probability-of-retention-weighted estimate
 #                                    (Comment 9).
-#   Table 13 (tab13_identification)— decomposition of the identifying variation
+#   Table E.4 (tabE4_identification)— decomposition of the identifying variation
 #                                    by how eligibility changes within a woman
 #                                    (Comment 5).
 #
@@ -91,7 +91,7 @@ did_fit <- function(sample, y = "home_office", clu = ~id_dom,
 }
 
 # =============================================================================
-# Table 9 — home-based work by predetermined subsample (Comments 1, 3)
+# Table 4 — home-based work by predetermined subsample (Comments 1, 3)
 # =============================================================================
 # Each row is the same DiD on women who, at their last pre-reform observation,
 # were in the stated group. "All women" is the population-average (exposure)
@@ -124,12 +124,12 @@ tab9 <- c(
   "Subsample (predetermined) & Young child $\\times$ Post (se) & 95\\% CI & Pre-mean & Obs. & Persons \\\\", "\\midrule",
   unlist(lapply(seq_len(nrow(estim)), function(i) est_row(estim[i]))),
   "\\bottomrule\\end{tabular}}",
-  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} The outcome is an indicator for performing the main job at the worker's own residence (home-based work as measured in the PNADC); non-employed women are coded zero, so in the first row the estimand is the population-average effect on the share of \\emph{all} women working from home. Each row re-estimates ", EQ_REF, " on the subsample of women who were in the stated group at their \\emph{last observation on or before 2022Q1} (predetermined, so not itself an outcome of the reform); women with no pre-reform observation are excluded. Coefficients are in percentage points; ``Pre-mean'' is the survey-weighted pre-reform home-based-work rate among treated women in each subsample. The first row is the population-average (exposure) estimand; the CLT and CLT $\\times$ telework-eligible rows are the effect among the workers Article~75-F can legally reach."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE),
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} The outcome is an indicator for performing the main job at the worker's own residence (home-based work as measured in the PNADC); non-employed women are coded zero, so in the first row the estimand is the population-average effect on the share of \\emph{all} women working from home. Each row re-estimates ", EQ_REF, " on the subsample of women who were in the stated group at their \\emph{last observation on or before 2022Q1} (predetermined); women with no pre-reform observation are excluded. Coefficients are in percentage points; ``Pre-mean'' is the survey-weighted pre-reform home-based-work rate among treated women in each subsample. The first row is the population-average (exposure) estimand; the CLT and CLT $\\times$ telework-eligible rows are the effect among the workers Article~75-F can legally reach."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab9, file.path(TABLE_DIR, "tab09_estimands.tex"))
+writeLines(tab9, file.path(TABLE_DIR, "tab04_estimands.tex"))
 
 # =============================================================================
-# Table 16 — statutory-reach funnel (new reviewer Comment 2)
+# Table 3 — statutory-reach funnel (new reviewer Comment 2)
 # =============================================================================
 # A descriptive accounting of how quickly the population Article 75-F can reach
 # narrows, among women with a child aged 0-4. Predetermined snapshot: each woman
@@ -163,13 +163,13 @@ tab16 <- c(
   "Step & Weighted share (\\%) \\\\", "\\midrule",
   sprintf("%s & %s \\\\", reach$label, fmt(reach$pct, 1)),
   "\\bottomrule\\end{tabular}",
-  paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Survey-weighted shares of all women aged 18--49 who are household heads or spouses and have a child aged 0--4, each taken at her last observation on or before 2022Q1 (predetermined). The steps are nested: salaried employees (VD4009 $\\in\\{1,\\dots,6\\}$) contain the celetistas covered by Article~75-F (signed-card employees in the private or public sector, VD4009 $\\in\\{1,5\\}$; public-sector celetistas are the employees of public companies and mixed-economy firms), who contain those in a telework-eligible occupation, who contain those not already working from home. This reach accounting is descriptive rather than causal: occupational teleworkability does not imply that an employer has an available remote position, but it shows how quickly the potentially affected population narrows. ", WEIGHT_NOTE),
+  paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Survey-weighted shares of all women aged 18--49 who are household heads or spouses and have a child aged 0--4, each taken at her last observation on or before 2022Q1 (predetermined). The steps are nested: salaried employees contain the CLT covered by Article~75-F, who contain those in a telework-eligible occupation, who contain those not already working from home."),
   "\\end{table}")
-writeLines(tab16, file.path(TABLE_DIR, "tab16_statutory_reach.tex"))
+writeLines(tab16, file.path(TABLE_DIR, "tab03_statutory_reach.tex"))
 cat("\n=== Statutory-reach funnel (weighted %) ===\n"); print(reach)
 
 # =============================================================================
-# Table 10 — precision and equivalence tests (Comment 7)
+# Table 5 — precision and equivalence tests (Comment 7)
 # =============================================================================
 # Pre-specified smallest effect size of interest (SESOI): 0.5 pp in the full
 # population, 1.0 pp in the narrower legally-covered subgroups (the referee's
@@ -202,10 +202,10 @@ tab10 <- c(
   "\\bottomrule\\end{tabular}}",
   paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Estimates (percentage points) and 95\\% confidence intervals reproduce Table~\\ref{tab:estimands}. The smallest effect size of interest (SESOI) is pre-specified at $0.5$ pp for the full population and $1.0$ pp for the narrower legally-covered subgroups. ``TOST $p$'' is the $p$-value of the two-one-sided-tests equivalence test against that SESOI: a value below $0.05$ (verdict ``Equivalent'') means the effect is statistically distinguishable from anything as large as the SESOI, i.e. a precise null. ``Inconclusive'' means the data neither reject zero nor establish equivalence, so a substantively relevant effect cannot be ruled out. ", SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab10, file.path(TABLE_DIR, "tab10_equivalence.tex"))
+writeLines(tab10, file.path(TABLE_DIR, "tab05_equivalence.tex"))
 
 # =============================================================================
-# Table 11 — inference and estimator robustness (Comments 5, 6)
+# Table E.2 — inference and estimator robustness (Comments 5, 6)
 # =============================================================================
 inf_rows <- list()
 add_inf <- function(label, est_pp, se_pp, p, extra = "") {
@@ -312,12 +312,12 @@ tab11 <- c(
   "Specification & Young child $\\times$ Post (se) & $p$-value \\\\", "\\midrule",
   unlist(lapply(seq_len(nrow(inf)), function(i) inf_row(inf[i]))),
   "\\bottomrule\\end{tabular}}",
-  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Home-based work in percentage points. The first block varies the level of clustering for the preferred individual-fixed-effects estimator: household (baseline), state (27 clusters, so standard errors use the $t(26)$ distribution), and state with state-by-year-quarter fixed effects. For the wild cluster bootstrap of the preferred specification, the outcome and the regressors are residualized with respect to the individual and year-quarter fixed effects (the within-transformation), and the restricted null is tested at the state level using Webb weights and $9{,}999$ replications; the reported $p$-value is that of the preferred individual-fixed-effects estimate. The repeated-cross-section row is a separate specification---it drops the individual fixed effects and instead absorbs the youngest child's age, the mother's age, and state-by-year-quarter fixed effects---and is not the model underlying the reported bootstrap $p$-value. The local difference-in-discontinuities rows compare children just below and just above the fifth-birthday (60-month) boundary within the stated bandwidth, with a linear running variable on each side. The temporal placebo restricts the sample to 2018Q1--2021Q4 and assigns a fake reform in 2020Q2. ", WEIGHT_NOTE), SIGNIF_NOTE),
+  paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Home-based work in percentage points. The first block varies the level of clustering for the preferred individual-fixed-effects estimator: household (baseline), state, and state with state-by-year-quarter fixed effects. For the wild cluster bootstrap of the preferred specification, the outcome and the regressors are residualized with respect to the individual and year-quarter fixed effects (the within-transformation), and the restricted null is tested at the state level using Webb weights and $9{,}999$ replications; the reported $p$-value is that of the preferred individual-fixed-effects estimate. The repeated-cross-section row is a separate specification---it drops the individual fixed effects and instead absorbs the youngest child's age, the mother's age, and state-by-year-quarter fixed effects---and is not the model underlying the reported bootstrap $p$-value. The local difference-in-discontinuities rows compare children just below and just above the fifth-birthday (60-month) boundary within the stated bandwidth, with a linear running variable on each side. The temporal placebo restricts the sample to 2018Q1--2021Q4 and assigns a fake reform in 2020Q2. ", WEIGHT_NOTE), SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab11, file.path(TABLE_DIR, "tab11_inference.tex"))
+writeLines(tab11, file.path(TABLE_DIR, "tabE2_inference.tex"))
 
 # =============================================================================
-# Table 12 — differential attrition and inverse-probability weighting (Comment 9)
+# Table E.3 — differential attrition and inverse-probability weighting (Comment 9)
 # =============================================================================
 # Retention: does the probability of reappearing in the immediately following
 # quarter differ for young-child women after the reform? R_{i,t+1} regressed on
@@ -364,10 +364,10 @@ tab12 <- c(
   "\\bottomrule\\end{tabular}",
   paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} The first row regresses an indicator for reappearing in the immediately following quarter on Young child $\\times$ Post with year-quarter fixed effects, among women in interview rounds 1--4 (round 5 cannot reappear); a coefficient near zero means the reform did not change the retention of young-child women differentially, so panel attrition does not compose the estimation sample around the reform. The second row re-estimates the preferred home-based-work DiD weighting each observation by the survey weight times the inverse predicted probability of retention (from a logit on age, education, child age, and quarter), up-weighting under-retained cells. ", WEIGHT_NOTE), CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab12, file.path(TABLE_DIR, "tab12_attrition.tex"))
+writeLines(tab12, file.path(TABLE_DIR, "tabE3_attrition.tex"))
 
 # =============================================================================
-# Table 13 — decomposition of the identifying variation (Comment 5)
+# Table E.4 — decomposition of the identifying variation (Comment 5)
 # =============================================================================
 # With individual FE and a common post date, beta is identified by within-woman
 # variation in Young child x Post. Classify each woman observed both before and
@@ -413,25 +413,25 @@ tab13 <- c(
   "\\bottomrule\\end{tabular}",
   paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Among women observed both before and after the reform (2022Q2), the table classifies each by how her eligibility (a young child in the household) moves over the panel. Most retain a stable eligibility status across the reform, whose pre/post contrast is uncontaminated by a birth or a child ageing out; the table reports person counts, not the econometric weight each path carries in the pooled estimator. The final row re-estimates ", EQ_REF, " on the stable-status women only, as a check that the pooled null is not driven solely by the switchers. ", WEIGHT_NOTE), CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab13, file.path(TABLE_DIR, "tab13_identification.tex"))
+writeLines(tab13, file.path(TABLE_DIR, "tabE4_identification.tex"))
 
 # =============================================================================
 # Console summary
 # =============================================================================
-cat("\n=== Table 9: home-based work by predetermined subsample (pp) ===\n")
+cat("\n=== Table 4: home-based work by predetermined subsample (pp) ===\n")
 print(estim[, .(label = substr(gsub("\\$|\\\\times|\\\\", "", label), 1, 40),
                 est = round(est_pp, 2), ci_lo = round(ci_lo, 2), ci_hi = round(ci_hi, 2),
                 premean = round(premean_pp, 1), npers = fmt0(npers))])
-cat("\n=== Table 10: equivalence (TOST) ===\n")
+cat("\n=== Table 5: equivalence (TOST) ===\n")
 print(equiv[, .(label = substr(gsub("\\$|\\\\times|\\\\", "", label), 1, 40),
                 est = round(est_pp, 2), sesoi, tost_p = round(tost_p, 3), equiv_verdict)])
-cat("\n=== Table 11: inference/estimator robustness (pp) ===\n")
+cat("\n=== Table E.2: inference/estimator robustness (pp) ===\n")
 print(inf[, .(label = substr(gsub("\\$|\\\\quad|\\\\times|\\\\pm|\\\\", "", label), 1, 52),
               est = round(est, 2), se = round(se, 2), p = round(p, 3))])
 cat("\nWild cluster bootstrap p-value (Webb, 27 states):", round(wb_p, 4), "\n")
-cat("\n=== Table 12: attrition / IPW (pp) ===\n")
+cat("\n=== Table E.3: attrition / IPW (pp) ===\n")
 print(att[, .(label = substr(label, 1, 52), est = round(est, 2), se = round(se, 2), p = round(p, 3))])
-cat("\n=== Table 13: identification decomposition ===\n")
+cat("\n=== Table E.4: identification decomposition ===\n")
 print(decomp)
 cat(sprintf("Stable-status re-estimate: %.2f (%.2f) pp, p=%.2f\n",
             ct_stable[1]*100, ct_stable[2]*100, ct_stable[4]))
