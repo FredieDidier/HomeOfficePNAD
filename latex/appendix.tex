@@ -21,7 +21,7 @@ This section defines the derived variables used in the analysis that are not alr
 \item \textbf{In the labor force}: employed or actively searching for work; defined for every sample woman.
 \item \textbf{Employed}: in the labor force and occupied. Women outside the labor force are coded zero rather than missing, so the outcome is the share employed among all women, not the share among labor-force participants.
 \item \textbf{Formal / informal}: the formal indicator covers workers with a signed work card (private-sector, domestic, or public), the military and statutory civil servants, and self-employed workers who contribute to social security; all others are informal. It is broader than the CLT.
-\item \textbf{CLT (\emph{celetista})}: signed-card employees in the private sector or in public companies and mixed-economy firms; this is the group Article 75-F directly binds. Statutory civil servants (governed by the separate public-service statute), the self-employed, and employers are excluded. A narrower private-sector-only version of this indicator is used as a robustness split.
+\item \textbf{CLT (\emph{celetista})}: signed-card employees in the private sector or in public companies and mixed-economy firms; this is the group Article 75-F directly binds. Statutory civil servants (governed by the separate public-service statute), the self-employed, and employers are excluded.
 \item \textbf{Private / public employee}: an employee of a private-sector firm / of the public sector (including statutory civil servants), by the survey's position-in-employment classification.
 \item \textbf{Telework-eligible occupation}: the worker's occupation is on the teleworkable list of \citet{goes2020} and \citet{costa2024}; see Appendix~\ref{app:telework}.
 \item \textbf{Higher education}: has completed a tertiary degree.
@@ -78,15 +78,27 @@ Table~\ref{tab:proxy_validation} reports the comparison and Figure~\ref{fig:vali
 \clearpage
 \section{Additional tables and figures}\label{app:additional}
 
-This appendix collects the supplementary tables and figures, ordered as they are cited in the text. Table~\ref{tab:robustness} collects the robustness checks on the home-based-work effect discussed in Section~\ref{sec:robustness}. Tables~\ref{tab:inference}, \ref{tab:attrition}, and~\ref{tab:identification} report, respectively, the inference and alternative-estimator checks (state clustering, the wild cluster bootstrap, the repeated-cross-section and local difference-in-discontinuities estimators, and the temporal placebo), the differential-attrition and inverse-probability-weighted estimates, and the decomposition of the identifying variation, all discussed in Section~\ref{sec:inference}. Tables~\ref{tab:did_outcomes_A} and~\ref{tab:earnings_margins} report the secondary labor-market outcomes under the primary comparison group and the worker-conditional and unconditional earnings and hours margins discussed in Section~\ref{sec:results}. Figure~\ref{fig:event_maternity} shows the event study for maternity leave, which exhibits the pronounced pre-reform trend discussed in the text and motivates treating that outcome as non-causal. Table~\ref{tab:occ_transition} reports the occupation-transition matrix underlying the mechanism discussion, and Figure~\ref{fig:hetero} summarizes the subgroup estimates of Table~\ref{tab:heterogeneity} as a coefficient plot. Figure~\ref{fig:window} reports the control-window robustness. Table~\ref{tab:triple_diff} reports the triple difference on home-based work and Table~\ref{tab:triple_diff_outcomes} extends it to all outcomes, and Figure~\ref{fig:trends_eligible} plots home-based-work trends for women in telework-eligible occupations at baseline. Table~\ref{tab:did_outcomes_B} repeats the difference-in-differences estimates using the broad comparison group (women with no child aged 0--7), which delivers more precision at the cost of a less tightly matched counterfactual; the conclusions are unchanged. Finally, Figure~\ref{fig:lfp} plots labor-force participation and employment trends by group.
+This appendix collects the supplementary tables and figures, ordered as they are cited in the text. Table~\ref{tab:robustness} collects the robustness checks on the home-based-work effect discussed in Section~\ref{sec:robustness}, and Table~\ref{tab:inference} reports the inference and alternative-estimator checks (state clustering, the wild cluster bootstrap, the repeated-cross-section and local difference-in-discontinuities estimators, and the temporal placebo) discussed in Section~\ref{sec:inference}. Tables~\ref{tab:did_outcomes_A} and~\ref{tab:earnings_margins} report the secondary labor-market outcomes under the primary comparison group and the worker-conditional and unconditional earnings and hours margins discussed in Section~\ref{sec:results}, and Table~\ref{tab:occ_transition} reports the occupation-transition matrix underlying the mechanism discussion. Tables~\ref{tab:attrition} and~\ref{tab:identification} report the differential-attrition and inverse-probability-weighted estimates and the decomposition of the identifying variation, both discussed in Section~\ref{sec:inference}. Table~\ref{tab:triple_diff} reports the triple difference on home-based work and Table~\ref{tab:triple_diff_outcomes} extends it to all outcomes. Table~\ref{tab:did_outcomes_B} repeats the difference-in-differences estimates using the broad comparison group (women with no child aged 0--7), which delivers more precision at the cost of a less tightly matched counterfactual; the conclusions are unchanged. Figure~\ref{fig:event_maternity} shows the event study for maternity leave, which exhibits the pronounced pre-reform trend discussed in the text and motivates treating that outcome as non-causal; Figure~\ref{fig:hetero} summarizes the subgroup estimates of Table~\ref{tab:heterogeneity} as a coefficient plot; Figure~\ref{fig:window} reports the control-window robustness; Figure~\ref{fig:trends_eligible} plots home-based-work trends for women in telework-eligible occupations at baseline; and Figure~\ref{fig:lfp} plots labor-force participation and employment trends by group.
 
 \input{../analysis/output/tables/tabE1_robustness.tex}
 
 \input{../analysis/output/tables/tabE2_inference.tex}
 
-\input{../analysis/output/tables/tabE3_attrition.tex}
+\input{../analysis/output/tables/tabE3_did_outcomes_A.tex}
 
-\input{../analysis/output/tables/tabE4_identification.tex}
+\input{../analysis/output/tables/tabE4_earnings_margins.tex}
+
+\input{../analysis/output/tables/tabE5_occupation_transition.tex}
+
+\input{../analysis/output/tables/tabE6_attrition.tex}
+
+\input{../analysis/output/tables/tabE7_identification.tex}
+
+\input{../analysis/output/tables/tabE8_triple_diff.tex}
+
+\input{../analysis/output/tables/tabE9_triple_diff_outcomes.tex}
+
+\input{../analysis/output/tables/tabE10_did_outcomes_B.tex}
 
 \begin{figure}[H]
 \centering
@@ -94,8 +106,6 @@ This appendix collects the supplementary tables and figures, ordered as they are
 \caption{Event study: maternity leave around the reform. Constructed exactly as Figure~\ref{fig:event_home}. The pronounced pre-reform trend in the treated-versus-control gap indicates that the parallel-trends assumption fails for this outcome, which is therefore not interpreted causally: a joint Wald test rejects that the pre-reform coefficients are jointly zero for both comparison groups ($\chi^2(16)=282$, $p<0.001$ for Control~A; $\chi^2(16)=889$, $p<0.001$ for Control~B), in contrast to the home-based-work event study in Figure~\ref{fig:event_home}.}
 \label{fig:event_maternity}
 \end{figure}
-
-\input{../analysis/output/tables/tabE5_occupation_transition.tex}
 
 \begin{figure}[H]
 \centering
@@ -111,22 +121,12 @@ This appendix collects the supplementary tables and figures, ordered as they are
 \label{fig:window}
 \end{figure}
 
-\input{../analysis/output/tables/tabE6_triple_diff.tex}
-
-\input{../analysis/output/tables/tabE7_triple_diff_outcomes.tex}
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{fig04_home_office_telework_eligible.pdf}
 \caption{Home-based work rate by group and quarter, women in telework-eligible occupations at baseline. Constructed as Figure~\ref{fig:trends} but restricted to women whose occupation is telework-eligible, the only group for whom the priority is not vacuous. The rate is higher than in the full sample but still rises in parallel across groups, with no break for treated women at the reform.}
 \label{fig:trends_eligible}
 \end{figure}
-
-\input{../analysis/output/tables/tabE8_did_outcomes_A.tex}
-
-\input{../analysis/output/tables/tabE9_earnings_margins.tex}
-
-\input{../analysis/output/tables/tabE10_did_outcomes_B.tex}
 
 \begin{figure}[H]
 \centering

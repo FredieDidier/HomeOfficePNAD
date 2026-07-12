@@ -112,7 +112,7 @@ run_all <- function(sample) {
 mods_A <- run_all(samp_A)
 mods_B <- run_all(samp_B)
 
-tab03a_file <- file.path(TABLE_DIR, "tabE8_did_outcomes_A.tex")
+tab03a_file <- file.path(TABLE_DIR, "tabE3_did_outcomes_A.tex")
 etable(mods_A,
        tex = TRUE, file = tab03a_file, replace = TRUE, signif.code = c("***" = 0.01, "**" = 0.05, "*" = 0.10),
        dict = dict, fitstat = ~ n + r2, digits = 3, digits.stats = 3,
@@ -184,7 +184,7 @@ tab3b <- c("\\begin{table}[H]\\centering",
   "\\bottomrule\\end{tabular}}",
   paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Each row is a separate difference-in-differences regression estimating ", EQ_REF, " on the preferred sample (young child vs.\\ Control~A). The first two rows are the intensive-margin outcomes observed only for workers (log real earnings and usual weekly hours). The last two re-define the outcomes over \\emph{all} sample women, coding the non-employed as zero (inverse hyperbolic sine for earnings, to admit the zeros), so they combine the intensive and the extensive margins. ``Pre-trend $\\chi^2(16)$'' is the joint Wald test that the pre-reform event-study leads are zero (the parallel-trends diagnostic): the worker-conditional earnings and hours pass it and are precise nulls, whereas the unconditional versions reject it, because they inherit the differential pre-trend of the employment extensive margin (Table~\\ref{tab:did_outcomes_A})."), WEIGHT_NOTE, CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab3b, file.path(TABLE_DIR, "tabE9_earnings_margins.tex"))
+writeLines(tab3b, file.path(TABLE_DIR, "tabE4_earnings_margins.tex"))
 cat("\n=== Table 3b: earnings/hours conditional vs unconditional ===\n")
 print(eh[, .(label = substr(gsub("\\$|\\\\", "", label), 1, 34), est = round(est, 3),
              ptp = round(ptp, 3), pass, n = formatC(n, big.mark = ",", format = "d"))])

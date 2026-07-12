@@ -22,10 +22,10 @@
 #                                    discontinuities around the 60-month cutoff,
 #                                    and a pre-reform temporal placebo
 #                                    (Comments 5 and 6).
-#   Table E.3 (tabE3_attrition)    — differential-attrition test and an inverse-
+#   Table E.6 (tabE6_attrition)    — differential-attrition test and an inverse-
 #                                    probability-of-retention-weighted estimate
 #                                    (Comment 9).
-#   Table E.4 (tabE4_identification)— decomposition of the identifying variation
+#   Table E.7 (tabE7_identification)— decomposition of the identifying variation
 #                                    by how eligibility changes within a woman
 #                                    (Comment 5).
 #
@@ -317,7 +317,7 @@ tab11 <- c(
 writeLines(tab11, file.path(TABLE_DIR, "tabE2_inference.tex"))
 
 # =============================================================================
-# Table E.3 — differential attrition and inverse-probability weighting (Comment 9)
+# Table E.6 — differential attrition and inverse-probability weighting (Comment 9)
 # =============================================================================
 # Retention: does the probability of reappearing in the immediately following
 # quarter differ for young-child women after the reform? R_{i,t+1} regressed on
@@ -364,10 +364,10 @@ tab12 <- c(
   "\\bottomrule\\end{tabular}",
   paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} The first row regresses an indicator for reappearing in the immediately following quarter on Young child $\\times$ Post with year-quarter fixed effects, among women in interview rounds 1--4 (round 5 cannot reappear); a coefficient near zero means the reform did not change the retention of young-child women differentially, so panel attrition does not compose the estimation sample around the reform. The second row re-estimates the preferred home-based-work DiD weighting each observation by the survey weight times the inverse predicted probability of retention (from a logit on age, education, child age, and quarter), up-weighting under-retained cells. ", WEIGHT_NOTE), CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab12, file.path(TABLE_DIR, "tabE3_attrition.tex"))
+writeLines(tab12, file.path(TABLE_DIR, "tabE6_attrition.tex"))
 
 # =============================================================================
-# Table E.4 — decomposition of the identifying variation (Comment 5)
+# Table E.7 — decomposition of the identifying variation (Comment 5)
 # =============================================================================
 # With individual FE and a common post date, beta is identified by within-woman
 # variation in Young child x Post. Classify each woman observed both before and
@@ -413,7 +413,7 @@ tab13 <- c(
   "\\bottomrule\\end{tabular}",
   paste(paste0("\\par\\vspace{3pt}\\footnotesize\\raggedright \\textit{Notes:} Among women observed both before and after the reform (2022Q2), the table classifies each by how her eligibility (a young child in the household) moves over the panel. Most retain a stable eligibility status across the reform, whose pre/post contrast is uncontaminated by a birth or a child ageing out; the table reports person counts, not the econometric weight each path carries in the pooled estimator. The final row re-estimates ", EQ_REF, " on the stable-status women only, as a check that the pooled null is not driven solely by the switchers. The person counts and shares are unweighted; the final-row regression is weighted by the survey weights."), CLUSTER_NOTE, SIGNIF_NOTE),
   "\\end{table}")
-writeLines(tab13, file.path(TABLE_DIR, "tabE4_identification.tex"))
+writeLines(tab13, file.path(TABLE_DIR, "tabE7_identification.tex"))
 
 # =============================================================================
 # Console summary
@@ -429,9 +429,9 @@ cat("\n=== Table E.2: inference/estimator robustness (pp) ===\n")
 print(inf[, .(label = substr(gsub("\\$|\\\\quad|\\\\times|\\\\pm|\\\\", "", label), 1, 52),
               est = round(est, 2), se = round(se, 2), p = round(p, 3))])
 cat("\nWild cluster bootstrap p-value (Webb, 27 states):", round(wb_p, 4), "\n")
-cat("\n=== Table E.3: attrition / IPW (pp) ===\n")
+cat("\n=== Table E.6: attrition / IPW (pp) ===\n")
 print(att[, .(label = substr(label, 1, 52), est = round(est, 2), se = round(se, 2), p = round(p, 3))])
-cat("\n=== Table E.4: identification decomposition ===\n")
+cat("\n=== Table E.7: identification decomposition ===\n")
 print(decomp)
 cat(sprintf("Stable-status re-estimate: %.2f (%.2f) pp, p=%.2f\n",
             ct_stable[1]*100, ct_stable[2]*100, ct_stable[4]))

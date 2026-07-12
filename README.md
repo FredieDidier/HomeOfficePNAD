@@ -120,13 +120,13 @@ Table and figure numbers below are the numbers as they appear in the paper (main
 | Table D.1 — Proxy validation vs 2022 telework supplement | `09_supplement_validation.R` | `tables/tabD1_proxy_validation.tex` |
 | Table E.1 — Robustness (longtable) | `06_robustness.R` | `tables/tabE1_robustness.tex` |
 | Table E.2 — Inference and estimator robustness | `08_referee_revision.R` | `tables/tabE2_inference.tex` |
-| Table E.3 — Attrition and IPW | `08_referee_revision.R` | `tables/tabE3_attrition.tex` |
-| Table E.4 — Eligibility paths (before/after reform) | `08_referee_revision.R` | `tables/tabE4_identification.tex` |
+| Table E.3 — Outcomes, Control A | `03_did.R` | `tables/tabE3_did_outcomes_A.tex` |
+| Table E.4 — Earnings and hours, worker-conditional vs unconditional | `03_did.R` | `tables/tabE4_earnings_margins.tex` |
 | Table E.5 — Occupation transition matrix | `04_mechanisms.R` | `tables/tabE5_occupation_transition.tex` |
-| Table E.6 — Triple difference, first stage | `07_triple_diff.R` | `tables/tabE6_triple_diff.tex` |
-| Table E.7 — Triple difference, all outcomes | `07_triple_diff.R` | `tables/tabE7_triple_diff_outcomes.tex` |
-| Table E.8 — Outcomes, Control A | `03_did.R` | `tables/tabE8_did_outcomes_A.tex` |
-| Table E.9 — Earnings and hours, worker-conditional vs unconditional | `03_did.R` | `tables/tabE9_earnings_margins.tex` |
+| Table E.6 — Attrition and IPW | `08_referee_revision.R` | `tables/tabE6_attrition.tex` |
+| Table E.7 — Eligibility paths (before/after reform) | `08_referee_revision.R` | `tables/tabE7_identification.tex` |
+| Table E.8 — Triple difference (home-based work) | `07_triple_diff.R` | `tables/tabE8_triple_diff.tex` |
+| Table E.9 — Triple difference, all outcomes | `07_triple_diff.R` | `tables/tabE9_triple_diff_outcomes.tex` |
 | Table E.10 — Outcomes, Control B | `03_did.R` | `tables/tabE10_did_outcomes_B.tex` |
 | Fig. D.1 — Proxy validation scatter | `09_supplement_validation.R` | `graphs/fig10_proxy_validation` |
 | Fig. E.1 — Event study, maternity leave | `02_event_study.R` | `graphs/fig09_event_study_maternity` |
