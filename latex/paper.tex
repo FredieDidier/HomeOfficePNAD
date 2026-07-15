@@ -1,6 +1,6 @@
 % =============================================================================
 % paper.tex — "The Labor-Market Effects on Mothers of a Telework Priority for Parents of Young Children: Evidence from Brazil"
-% Journal of Population Economics submission draft.
+% Empirical Economics submission draft.
 % Compile with pdfLaTeX + BibTeX (paper -> bibtex paper -> paper -> paper).
 % =============================================================================
 \documentclass[12pt]{article}
@@ -22,7 +22,12 @@
 \definecolor{citegreen}{RGB}{0,120,60}
 \usepackage[colorlinks=true,citecolor=citegreen,urlcolor=citegreen,linkcolor=citegreen]{hyperref}
 \usepackage[round]{natbib}
-\bibliographystyle{apalike}
+% Springer "Basic" reference style (spbasic.bst, bundled in this folder) — the
+% Empirical Economics house list format: "Kleven H, Landais C (2019) Title.
+% Journal 11:181-209". It sets the reference-LIST punctuation; the IN-TEXT
+% no-comma form "(Thompson 1990)" still comes from natbib, so keep aysep empty.
+\bibliographystyle{spbasic}
+\setcitestyle{aysep={}}
 
 \graphicspath{{../analysis/output/graphs/}{../analysis/output/maps/}}
 \captionsetup{font=small,labelfont=bf}
@@ -254,12 +259,11 @@ Brazil's 2022 reform gave mothers of young children a legal priority in the allo
 
 \clearpage
 \appendix
-% Number appendix tables and figures by their appendix section: a table in
-% Appendix B reads "B.1", one in Appendix D reads "D.1", and so on, so a
-% cross-reference makes clear which appendix it lives in. \numberwithin
-% (amsmath) redefines the counter format and resets it at each \section.
-\numberwithin{table}{section}
-\numberwithin{figure}{section}
+% Springer/Empirical Economics rule: figures and tables in a print appendix
+% continue the consecutive Arabic numbering of the main text (Fig. 3, Table 9,
+% ...), NOT a per-section "A.1"/"E.1" scheme. The appendix SECTIONS are still
+% lettered A, B, ... via \appendix; only the float counters run on. So we do
+% NOT \numberwithin the table/figure counters here; every \ref updates itself.
 \input{appendix.tex}
 
 \end{document}
